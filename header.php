@@ -17,14 +17,12 @@
 	<header class="site-header">
 		<div class="nwm-shell">
 			<div class="site-header__top">
-				<div class="social-links" aria-label="<?php esc_attr_e('Social links', 'nerdywithme'); ?>">
-					<a href="#" aria-label="<?php esc_attr_e('Facebook', 'nerdywithme'); ?>">f</a>
-					<a href="#" aria-label="<?php esc_attr_e('X', 'nerdywithme'); ?>">x</a>
-					<a href="#" aria-label="<?php esc_attr_e('Instagram', 'nerdywithme'); ?>">ig</a>
-				</div>
+				<?php nerdywithme_render_social_links(); ?>
 				<?php nerdywithme_branding(); ?>
 				<div class="site-header__cta">
-					<a class="button" href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('Read NerdyWithMe', 'nerdywithme'); ?></a>
+					<a class="button" href="<?php echo esc_url(nerdywithme_get_option('header_cta_url', home_url('/'))); ?>">
+						<?php echo esc_html(nerdywithme_get_option('header_cta_label', __('Read NerdyWithMe', 'nerdywithme'))); ?>
+					</a>
 				</div>
 			</div>
 			<div class="site-header__nav">
@@ -39,13 +37,13 @@
 							'theme_location' => 'primary',
 							'container'      => false,
 							'menu_class'     => 'menu',
-							'fallback_cb'    => false,
+							'fallback_cb'    => 'nerdywithme_primary_menu_fallback',
 						)
 					);
 					?>
 				</nav>
 				<div class="header-tools">
-					<button class="header-tools__button search-toggle" type="button" aria-expanded="false" aria-controls="search-panel">⌕</button>
+					<button class="header-tools__button search-toggle" type="button" aria-expanded="false" aria-controls="search-panel">?</button>
 				</div>
 			</div>
 			<div id="search-panel" class="search-panel">

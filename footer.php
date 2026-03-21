@@ -11,7 +11,8 @@
 		<div class="nwm-shell">
 			<div class="footer-brand">
 				<?php nerdywithme_branding(false); ?>
-				<p class="section-intro"><?php echo esc_html(get_bloginfo('description') ? get_bloginfo('description') : __('Pop culture, blogging, games, stories, and everything delightfully nerdy.', 'nerdywithme')); ?></p>
+				<p class="section-intro"><?php echo esc_html(nerdywithme_get_option('footer_blurb', __('Pop culture, blogging, games, stories, and everything delightfully nerdy.', 'nerdywithme'))); ?></p>
+				<?php nerdywithme_brand_previews(); ?>
 			</div>
 			<div class="footer-links">
 				<div>
@@ -48,11 +49,7 @@
 				</div>
 				<div>
 					<h3><?php esc_html_e('Follow Me', 'nerdywithme'); ?></h3>
-					<div class="social-links">
-						<a href="#" aria-label="<?php esc_attr_e('Facebook', 'nerdywithme'); ?>">f</a>
-						<a href="#" aria-label="<?php esc_attr_e('X', 'nerdywithme'); ?>">x</a>
-						<a href="#" aria-label="<?php esc_attr_e('Instagram', 'nerdywithme'); ?>">ig</a>
-					</div>
+					<?php nerdywithme_render_social_links(); ?>
 				</div>
 			</div>
 			<div class="site-info">

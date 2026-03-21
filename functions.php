@@ -63,6 +63,89 @@ function nerdywithme_enqueue_assets() {
 }
 add_action('wp_enqueue_scripts', 'nerdywithme_enqueue_assets');
 
+function nerdywithme_customize_register($wp_customize) {
+	$wp_customize->add_section(
+		'nerdywithme_theme_options',
+		array(
+			'title'    => __('NerdyWithMe Theme Options', 'nerdywithme'),
+			'priority' => 30,
+		)
+	);
+
+	$wp_customize->add_setting(
+		'nerdywithme_brand_style',
+		array(
+			'default'           => 'refined',
+			'sanitize_callback' => 'nerdywithme_sanitize_brand_style',
+		)
+	);
+
+	$wp_customize->add_control(
+		'nerdywithme_brand_style',
+		array(
+			'label'   => __('Brand Style', 'nerdywithme'),
+			'section' => 'nerdywithme_theme_options',
+			'type'    => 'select',
+			'choices' => array(
+				'refined' => __('Option 1: Refined Wordmark', 'nerdywithme'),
+				'lockup'  => __('Option 2: Pop Lockup', 'nerdywithme'),
+			),
+		)
+	);
+
+	$options = array(
+		'header_cta_label' => array(
+			'label'   => __('Header CTA Label', 'nerdywithme'),
+			'default' => __('Read NerdyWithMe', 'nerdywithme'),
+		),
+		'header_cta_url'   => array(
+			'label'   => __('Header CTA URL', 'nerdywithme'),
+			'default' => home_url('/'),
+		),
+		'facebook_url'     => array(
+			'label'   => __('Facebook URL', 'nerdywithme'),
+			'default' => '#',
+		),
+		'x_url'            => array(
+			'label'   => __('X URL', 'nerdywithme'),
+			'default' => '#',
+		),
+		'instagram_url'    => array(
+			'label'   => __('Instagram URL', 'nerdywithme'),
+			'default' => '#',
+		),
+		'footer_blurb'     => array(
+			'label'   => __('Footer Blurb', 'nerdywithme'),
+			'default' => __('Pop culture, blogging, games, stories, and everything delightfully nerdy.', 'nerdywithme'),
+		),
+	);
+
+	foreach ($options as $id => $option) {
+		$wp_customize->add_setting(
+			'nerdywithme_' . $id,
+			array(
+				'default'           => $option['default'],
+				'sanitize_callback' => ('footer_blurb' === $id || 'header_cta_label' === $id) ? 'sanitize_text_field' : 'esc_url_raw',
+			)
+		);
+
+		$wp_customize->add_control(
+			'nerdywithme_' . $id,
+			array(
+				'label'   => $option['label'],
+				'section' => 'nerdywithme_theme_options',
+				'type'    => ('footer_blurb' === $id || 'header_cta_label' === $id) ? 'text' : 'url',
+			)
+		);
+	}
+}
+add_action('customize_register', 'nerdywithme_customize_register');
+
+function nerdywithme_sanitize_brand_style($value) {
+	$allowed = array('refined', 'lockup');
+	return in_array($value, $allowed, true) ? $value : 'refined';
+}
+
 function nerdywithme_widgets_init() {
 	register_sidebar(
 		array(
@@ -109,11 +192,72 @@ function nerdywithme_site_title_markup() {
 	return '<span>' . esc_html($head) . '</span><span class="accent">' . esc_html($tail) . '</span>';
 }
 
-function nerdywithme_branding($show_tagline = true) {
+function nerdywithme_site_title_lockup_markup() {
+	$name = get_bloginfo('name');
+
+	if (! $name) {
+		$name = 'NerdyWithMe';
+	}
+
+	$name = preg_replace('/\s+/', '', $name);
+	$head = substr($name, 0, 5);
+	$tail = substr($name, 5);
+
+	return '<span class="site-title__bubble">' . esc_html($head) . '</span><span class="site-title__tail">' . esc_html($tail) . '</span>';
+}
+
+function nerdywithme_get_option($key, $default = '') {
+	return get_theme_mod('nerdywithme_' . $key, $default);
+}
+
+function nerdywithme_social_links() {
+	return array(
+		array(
+			'label' => __('Facebook', 'nerdywithme'),
+			'text'  => 'f',
+			'url'   => nerdywithme_get_option('facebook_url', '#'),
+		),
+		array(
+			'label' => __('X', 'nerdywithme'),
+			'text'  => 'x',
+			'url'   => nerdywithme_get_option('x_url', '#'),
+		),
+		array(
+			'label' => __('Instagram', 'nerdywithme'),
+			'text'  => 'ig',
+			'url'   => nerdywithme_get_option('instagram_url', '#'),
+		),
+	);
+}
+
+function nerdywithme_render_social_links() {
+	$links = nerdywithme_social_links();
+	?>
+	<div class="social-links" aria-label="<?php esc_attr_e('Social links', 'nerdywithme'); ?>">
+		<?php foreach ($links as $link) : ?>
+			<a href="<?php echo esc_url($link['url']); ?>" aria-label="<?php echo esc_attr($link['label']); ?>"><?php echo esc_html($link['text']); ?></a>
+		<?php endforeach; ?>
+	</div>
+	<?php
+}
+
+function nerdywithme_primary_menu_fallback() {
+	echo '<ul class="menu">';
+	echo '<li><a href="' . esc_url(home_url('/')) . '">' . esc_html__('Home', 'nerdywithme') . '</a></li>';
+	$categories = nerdywithme_get_primary_categories();
+	foreach ($categories as $category) {
+		echo '<li><a href="' . esc_url(get_category_link($category)) . '">' . esc_html($category->name) . '</a></li>';
+	}
+	echo '</ul>';
+}
+
+function nerdywithme_branding($show_tagline = true, $variant = '') {
 	$custom_logo_id = get_theme_mod('custom_logo');
 	$tagline        = get_bloginfo('description');
+	$variant        = $variant ? $variant : nerdywithme_get_option('brand_style', 'refined');
+	$title_markup   = 'lockup' === $variant ? nerdywithme_site_title_lockup_markup() : nerdywithme_site_title_markup();
 	?>
-	<a class="site-brand" href="<?php echo esc_url(home_url('/')); ?>" rel="home">
+	<a class="site-brand site-brand--<?php echo esc_attr($variant); ?>" href="<?php echo esc_url(home_url('/')); ?>" rel="home">
 		<span class="site-brand__mark">
 			<?php if ($custom_logo_id) : ?>
 				<?php echo wp_get_attachment_image($custom_logo_id, 'thumbnail'); ?>
@@ -122,12 +266,59 @@ function nerdywithme_branding($show_tagline = true) {
 			<?php endif; ?>
 		</span>
 		<span class="site-brand__text">
-			<span class="site-title"><?php echo wp_kses_post(nerdywithme_site_title_markup()); ?></span>
+			<span class="site-title"><?php echo wp_kses_post($title_markup); ?></span>
 			<?php if ($show_tagline && $tagline) : ?>
 				<span class="site-tagline"><?php echo esc_html($tagline); ?></span>
 			<?php endif; ?>
 		</span>
 	</a>
+	<?php
+}
+
+function nerdywithme_brand_style_label($variant) {
+	return 'lockup' === $variant ? __('Option 2: Pop Lockup', 'nerdywithme') : __('Option 1: Refined Wordmark', 'nerdywithme');
+}
+
+function nerdywithme_brand_previews() {
+	?>
+	<div class="brand-preview-grid">
+		<div class="brand-preview-card">
+			<p class="brand-preview-card__eyebrow"><?php echo esc_html(nerdywithme_brand_style_label('refined')); ?></p>
+			<?php nerdywithme_branding(false, 'refined'); ?>
+		</div>
+		<div class="brand-preview-card">
+			<p class="brand-preview-card__eyebrow"><?php echo esc_html(nerdywithme_brand_style_label('lockup')); ?></p>
+			<?php nerdywithme_branding(false, 'lockup'); ?>
+		</div>
+	</div>
+	<?php
+}
+
+function nerdywithme_get_category_preview_post($category_id) {
+	$posts = get_posts(
+		array(
+			'posts_per_page'      => 1,
+			'cat'                 => $category_id,
+			'ignore_sticky_posts' => true,
+		)
+	);
+
+	return $posts[0]->ID ?? 0;
+}
+
+function nerdywithme_category_card($category) {
+	$image_id    = nerdywithme_get_category_preview_post($category->term_id);
+	$description = trim(wp_strip_all_tags(category_description($category)));
+	?>
+	<article class="category-pill">
+		<a class="category-pill__thumb" href="<?php echo esc_url(get_category_link($category)); ?>">
+			<img src="<?php echo esc_url(nerdywithme_get_post_image($image_id, 'medium_large')); ?>" alt="<?php echo esc_attr($category->name); ?>">
+		</a>
+		<div class="category-pill__name"><?php echo esc_html($category->name); ?></div>
+		<p class="section-intro">
+			<?php echo esc_html($description ? wp_trim_words($description, 12, '...') : __('Fresh posts and discoveries from this corner of the blog.', 'nerdywithme')); ?>
+		</p>
+	</article>
 	<?php
 }
 

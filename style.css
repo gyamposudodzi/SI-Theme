@@ -20,6 +20,7 @@ Text Domain: nerdywithme
   --nwm-border: #ece7f5;
   --nwm-primary: #132a78;
   --nwm-secondary: #ff5f36;
+  --nwm-sugar-pink: #ff4f7d;
   --nwm-accent: #ff98bc;
   --nwm-lime: #ddf8b8;
   --nwm-sky: #dff3ff;
@@ -94,36 +95,37 @@ button, input, textarea, select { font: inherit; }
   text-shadow: 2px 2px 0 rgba(255, 95, 54, 0.12);
 }
 .site-brand--lockup {
-  gap: 16px;
-}
-.site-brand--lockup .site-brand__mark {
-  width: 68px;
-  height: 68px;
-  border-radius: 20px;
-  background: linear-gradient(135deg, #ffffff, #eef6ff 48%, #fff2ea);
+  gap: 8px;
 }
 .site-brand--lockup .site-title {
   display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  letter-spacing: 0;
+  align-items: flex-end;
+  flex-wrap: nowrap;
+  gap: 0;
+  letter-spacing: -0.06em;
   text-transform: none;
   text-shadow: 4px 4px 0 rgba(255, 95, 54, 0.18);
 }
-.site-title__bubble {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 0.98em;
-  padding: 0.06em 0.26em 0.12em;
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--nwm-secondary), #ff8b67);
-  color: #fff;
-  box-shadow: 0 10px 20px rgba(255, 95, 54, 0.22);
+.site-brand__text--lockup { align-items: flex-start; gap: 4px; }
+.site-title--lockup {
+  font-size: clamp(2.05rem, 4.2vw, 3.8rem);
+  line-height: 0.82;
+}
+.site-brand--lockup .site-brand__mark {
+  width: clamp(48px, 4vw, 66px);
+  height: clamp(48px, 4vw, 66px);
+  margin: 0 -10px 0 -8px;
+  transform: translateY(2px);
+  background: transparent;
+  box-shadow: none;
+}
+.site-title__lead {
+  color: var(--nwm-primary);
+  margin-right: -6px;
 }
 .site-title__tail {
-  color: var(--nwm-primary);
+  color: var(--nwm-sugar-pink);
+  margin-left: -10px;
 }
 .site-tagline { margin: 0; color: var(--nwm-muted); font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; }
 .site-header__cta { justify-self: end; }
@@ -415,6 +417,6 @@ textarea { min-height: 160px; padding: 16px 18px; }
   .site-title { font-size: 1.8rem; }
   .site-tagline { display: none; }
   .site-brand__mark, .site-brand__fallback { width: 46px; height: 46px; border-radius: 14px; }
-  .site-brand--lockup .site-brand__mark { width: 52px; height: 52px; border-radius: 16px; }
+  .site-brand--lockup .site-brand__mark { width: 50px; height: 50px; margin: 0 -8px 0 -7px; }
   .search-form { grid-template-columns: 1fr; }
 }

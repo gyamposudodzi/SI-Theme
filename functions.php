@@ -75,7 +75,7 @@ function nerdywithme_customize_register($wp_customize) {
 	$wp_customize->add_setting(
 		'nerdywithme_brand_style',
 		array(
-			'default'           => 'refined',
+			'default'           => 'lockup',
 			'sanitize_callback' => 'nerdywithme_sanitize_brand_style',
 		)
 	);
@@ -88,7 +88,7 @@ function nerdywithme_customize_register($wp_customize) {
 			'type'    => 'select',
 			'choices' => array(
 				'refined' => __('Option 1: Refined Wordmark', 'nerdywithme'),
-				'lockup'  => __('Option 2: Pop Lockup', 'nerdywithme'),
+				'lockup'  => __('Option D: Head-In-Middle Lockup', 'nerdywithme'),
 			),
 		)
 	);
@@ -193,17 +193,7 @@ function nerdywithme_site_title_markup() {
 }
 
 function nerdywithme_site_title_lockup_markup() {
-	$name = get_bloginfo('name');
-
-	if (! $name) {
-		$name = 'NerdyWithMe';
-	}
-
-	$name = preg_replace('/\s+/', '', $name);
-	$head = substr($name, 0, 5);
-	$tail = substr($name, 5);
-
-	return '<span class="site-title__bubble">' . esc_html($head) . '</span><span class="site-title__tail">' . esc_html($tail) . '</span>';
+	return '<span class="site-title__lead">nerdy</span><span class="site-title__tail">withme.</span>';
 }
 
 function nerdywithme_get_option($key, $default = '') {
@@ -255,28 +245,46 @@ function nerdywithme_branding($show_tagline = true, $variant = '') {
 	$custom_logo_id = get_theme_mod('custom_logo');
 	$tagline        = get_bloginfo('description');
 	$variant        = $variant ? $variant : nerdywithme_get_option('brand_style', 'refined');
-	$title_markup   = 'lockup' === $variant ? nerdywithme_site_title_lockup_markup() : nerdywithme_site_title_markup();
 	?>
 	<a class="site-brand site-brand--<?php echo esc_attr($variant); ?>" href="<?php echo esc_url(home_url('/')); ?>" rel="home">
-		<span class="site-brand__mark">
-			<?php if ($custom_logo_id) : ?>
-				<?php echo wp_get_attachment_image($custom_logo_id, 'thumbnail'); ?>
-			<?php else : ?>
-				<span class="site-brand__fallback">N</span>
-			<?php endif; ?>
-		</span>
-		<span class="site-brand__text">
-			<span class="site-title"><?php echo wp_kses_post($title_markup); ?></span>
-			<?php if ($show_tagline && $tagline) : ?>
-				<span class="site-tagline"><?php echo esc_html($tagline); ?></span>
-			<?php endif; ?>
-		</span>
+		<?php if ('lockup' === $variant) : ?>
+			<span class="site-brand__text site-brand__text--lockup">
+				<span class="site-title site-title--lockup">
+					<span class="site-title__lead">nerdy</span>
+					<span class="site-brand__mark">
+						<?php if ($custom_logo_id) : ?>
+							<?php echo wp_get_attachment_image($custom_logo_id, 'thumbnail'); ?>
+						<?php else : ?>
+							<span class="site-brand__fallback">N</span>
+						<?php endif; ?>
+					</span>
+					<span class="site-title__tail">withme.</span>
+				</span>
+				<?php if ($show_tagline && $tagline) : ?>
+					<span class="site-tagline"><?php echo esc_html($tagline); ?></span>
+				<?php endif; ?>
+			</span>
+		<?php else : ?>
+			<span class="site-brand__mark">
+				<?php if ($custom_logo_id) : ?>
+					<?php echo wp_get_attachment_image($custom_logo_id, 'thumbnail'); ?>
+				<?php else : ?>
+					<span class="site-brand__fallback">N</span>
+				<?php endif; ?>
+			</span>
+			<span class="site-brand__text">
+				<span class="site-title"><?php echo wp_kses_post(nerdywithme_site_title_markup()); ?></span>
+				<?php if ($show_tagline && $tagline) : ?>
+					<span class="site-tagline"><?php echo esc_html($tagline); ?></span>
+				<?php endif; ?>
+			</span>
+		<?php endif; ?>
 	</a>
 	<?php
 }
 
 function nerdywithme_brand_style_label($variant) {
-	return 'lockup' === $variant ? __('Option 2: Pop Lockup', 'nerdywithme') : __('Option 1: Refined Wordmark', 'nerdywithme');
+	return 'lockup' === $variant ? __('Option D: Head-In-Middle Lockup', 'nerdywithme') : __('Option 1: Refined Wordmark', 'nerdywithme');
 }
 
 function nerdywithme_brand_previews() {

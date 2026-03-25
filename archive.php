@@ -22,7 +22,7 @@ get_header();
 					<?php nerdywithme_card(get_the_ID()); ?>
 				<?php endwhile; ?>
 			<?php else : ?>
-				<p><?php esc_html_e('Nothing here yet, but this space is ready for your next great post.', 'nerdywithme'); ?></p>
+				<p><?php esc_html_e('Nothing here yet, but this section is ready for your next trading breakdown.', 'nerdywithme'); ?></p>
 			<?php endif; ?>
 		</div>
 		<?php get_sidebar(); ?>

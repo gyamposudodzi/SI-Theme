@@ -50,14 +50,16 @@ add_action('after_setup_theme', 'nerdywithme_setup');
 
 function nerdywithme_enqueue_assets() {
 	$fonts_url = 'https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap';
+	$style_version  = file_exists(get_stylesheet_directory() . '/style.css') ? (string) filemtime(get_stylesheet_directory() . '/style.css') : NERDYWITHME_VERSION;
+	$script_version = file_exists(get_template_directory() . '/script.js') ? (string) filemtime(get_template_directory() . '/script.js') : NERDYWITHME_VERSION;
 
 	wp_enqueue_style('nerdywithme-fonts', esc_url($fonts_url), array(), null);
-	wp_enqueue_style('nerdywithme-style', get_stylesheet_uri(), array('nerdywithme-fonts'), NERDYWITHME_VERSION);
+	wp_enqueue_style('nerdywithme-style', get_stylesheet_uri(), array('nerdywithme-fonts'), $style_version);
 	wp_enqueue_script(
 		'nerdywithme-script',
 		get_template_directory_uri() . '/script.js',
 		array(),
-		NERDYWITHME_VERSION,
+		$script_version,
 		true
 	);
 }
@@ -116,7 +118,7 @@ function nerdywithme_customize_register($wp_customize) {
 		),
 		'footer_blurb'     => array(
 			'label'   => __('Footer Blurb', 'nerdywithme'),
-			'default' => __('Pop culture, blogging, games, stories, and everything delightfully nerdy.', 'nerdywithme'),
+			'default' => __('Where trading meets technology: practical market education, automation, AI, and tools for modern traders.', 'nerdywithme'),
 		),
 	);
 
@@ -200,6 +202,31 @@ function nerdywithme_get_option($key, $default = '') {
 	return get_theme_mod('nerdywithme_' . $key, $default);
 }
 
+function nerdywithme_get_brand_logo_id() {
+	$custom_logo_id = (int) get_theme_mod('custom_logo');
+
+	if ($custom_logo_id) {
+		return $custom_logo_id;
+	}
+
+	$matches = get_posts(
+		array(
+			'post_type'      => 'attachment',
+			'post_status'    => 'inherit',
+			'posts_per_page' => 1,
+			'post_mime_type' => 'image',
+			's'              => 'Coloured Logo',
+			'fields'         => 'ids',
+		)
+	);
+
+	if (! empty($matches)) {
+		return (int) $matches[0];
+	}
+
+	return 0;
+}
+
 function nerdywithme_social_links() {
 	return array(
 		array(
@@ -234,6 +261,9 @@ function nerdywithme_render_social_links() {
 function nerdywithme_primary_menu_fallback() {
 	echo '<ul class="menu">';
 	echo '<li><a href="' . esc_url(home_url('/')) . '">' . esc_html__('Home', 'nerdywithme') . '</a></li>';
+	echo '<li><a href="' . esc_url(home_url('/about')) . '">' . esc_html__('About', 'nerdywithme') . '</a></li>';
+	echo '<li><a href="' . esc_url(home_url('/tools')) . '">' . esc_html__('Tools', 'nerdywithme') . '</a></li>';
+	echo '<li><a href="' . esc_url(home_url('/projects')) . '">' . esc_html__('Projects', 'nerdywithme') . '</a></li>';
 	$categories = nerdywithme_get_primary_categories();
 	foreach ($categories as $category) {
 		echo '<li><a href="' . esc_url(get_category_link($category)) . '">' . esc_html($category->name) . '</a></li>';
@@ -242,7 +272,7 @@ function nerdywithme_primary_menu_fallback() {
 }
 
 function nerdywithme_branding($show_tagline = true, $variant = '') {
-	$custom_logo_id = get_theme_mod('custom_logo');
+	$custom_logo_id = nerdywithme_get_brand_logo_id();
 	$tagline        = get_bloginfo('description');
 	$variant        = $variant ? $variant : nerdywithme_get_option('brand_style', 'refined');
 	?>
@@ -287,21 +317,6 @@ function nerdywithme_brand_style_label($variant) {
 	return 'lockup' === $variant ? __('Option D: Head-In-Middle Lockup', 'nerdywithme') : __('Option 1: Refined Wordmark', 'nerdywithme');
 }
 
-function nerdywithme_brand_previews() {
-	?>
-	<div class="brand-preview-grid">
-		<div class="brand-preview-card">
-			<p class="brand-preview-card__eyebrow"><?php echo esc_html(nerdywithme_brand_style_label('refined')); ?></p>
-			<?php nerdywithme_branding(false, 'refined'); ?>
-		</div>
-		<div class="brand-preview-card">
-			<p class="brand-preview-card__eyebrow"><?php echo esc_html(nerdywithme_brand_style_label('lockup')); ?></p>
-			<?php nerdywithme_branding(false, 'lockup'); ?>
-		</div>
-	</div>
-	<?php
-}
-
 function nerdywithme_get_category_preview_post($category_id) {
 	$posts = get_posts(
 		array(
@@ -330,20 +345,34 @@ function nerdywithme_category_card($category) {
 	<?php
 }
 
-function nerdywithme_post_meta($post_id = null) {
+function nerdywithme_get_display_category($post_id = null) {
 	$post_id = $post_id ? $post_id : get_the_ID();
 	$cats    = get_the_category($post_id);
+	$hidden  = array('editors-pick', 'featured');
+
+	if (empty($cats)) {
+		return null;
+	}
+
+	foreach ($cats as $cat) {
+		if (! in_array($cat->slug, $hidden, true)) {
+			return $cat;
+		}
+	}
+
+	return null;
+}
+
+function nerdywithme_post_meta($post_id = null) {
+	$post_id = $post_id ? $post_id : get_the_ID();
+	$cat     = nerdywithme_get_display_category($post_id);
 	?>
 	<div class="post-meta">
-		<?php if (! empty($cats)) : ?>
+		<?php if ($cat) : ?>
 			<span class="post-categories">
-				<?php foreach (array_slice($cats, 0, 2) as $cat) : ?>
-					<a href="<?php echo esc_url(get_category_link($cat->term_id)); ?>"><?php echo esc_html($cat->name); ?></a>
-				<?php endforeach; ?>
+				<a href="<?php echo esc_url(get_category_link($cat->term_id)); ?>"><?php echo esc_html($cat->name); ?></a>
 			</span>
 		<?php endif; ?>
-		<span><?php echo esc_html(get_the_author_meta('display_name', (int) get_post_field('post_author', $post_id))); ?></span>
-		<span>&middot;</span>
 		<span><?php echo esc_html(get_the_date('', $post_id)); ?></span>
 	</div>
 	<?php
@@ -402,8 +431,30 @@ function nerdywithme_mini_post($post_id) {
 	<?php
 }
 
+function nerdywithme_row_post($post_id) {
+	if (! $post_id) {
+		return;
+	}
+	?>
+	<article class="row-post">
+		<a class="row-post__thumb" href="<?php echo esc_url(get_permalink($post_id)); ?>">
+			<img src="<?php echo esc_url(nerdywithme_get_post_image($post_id, 'medium_large')); ?>" alt="<?php echo esc_attr(get_the_title($post_id)); ?>">
+		</a>
+		<div class="row-post__content">
+			<?php nerdywithme_post_meta($post_id); ?>
+			<h3 class="row-post__title"><a href="<?php echo esc_url(get_permalink($post_id)); ?>"><?php echo esc_html(get_the_title($post_id)); ?></a></h3>
+			<p class="row-post__excerpt"><?php echo esc_html(wp_trim_words(get_the_excerpt($post_id), 18)); ?></p>
+		</div>
+	</article>
+	<?php
+}
+
 function nerdywithme_ranked_posts($query_args, $limit = 3) {
-	$query = new WP_Query(wp_parse_args($query_args, array('posts_per_page' => $limit)));
+	$args                   = wp_parse_args($query_args, array());
+	$args['post_type']      = 'post';
+	$args['posts_per_page'] = 3;
+	$args['ignore_sticky_posts'] = true;
+	$query                  = new WP_Query($args);
 
 	if (! $query->have_posts()) {
 		return;
@@ -415,13 +466,20 @@ function nerdywithme_ranked_posts($query_args, $limit = 3) {
 		while ($query->have_posts()) :
 			$query->the_post();
 			?>
-			<a class="rank-list__item" href="<?php the_permalink(); ?>">
-				<span class="rank-list__count"><?php echo esc_html((string) $rank); ?></span>
-				<span>
-					<?php nerdywithme_post_meta(get_the_ID()); ?>
-					<strong><?php the_title(); ?></strong>
-				</span>
-			</a>
+			<article class="rank-list__item">
+				<a class="rank-list__media" href="<?php the_permalink(); ?>">
+					<span class="rank-list__thumb">
+						<span class="rank-list__count"><?php echo esc_html((string) $rank); ?></span>
+						<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'thumbnail')); ?>" alt="<?php the_title_attribute(); ?>">
+					</span>
+				</a>
+				<div class="rank-list__body">
+					<div class="rank-list__content">
+						<?php nerdywithme_post_meta(get_the_ID()); ?>
+						<h3 class="rank-list__title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
+					</div>
+				</div>
+			</article>
 			<?php
 			$rank++;
 		endwhile;
@@ -440,16 +498,64 @@ function nerdywithme_compact_posts($query_args, $limit = 3) {
 	?>
 	<div class="compact-list">
 		<?php while ($query->have_posts()) : $query->the_post(); ?>
-			<a class="compact-list__item" href="<?php the_permalink(); ?>">
+			<a class="compact-list__item compact-list__item--featured" href="<?php the_permalink(); ?>">
 				<span class="compact-list__thumb">
 					<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'thumbnail')); ?>" alt="<?php the_title_attribute(); ?>">
 				</span>
-				<span>
+				<span class="compact-list__content">
 					<?php nerdywithme_post_meta(get_the_ID()); ?>
-					<strong><?php the_title(); ?></strong>
+					<strong class="compact-list__title"><?php the_title(); ?></strong>
 				</span>
 			</a>
 		<?php endwhile; ?>
+	</div>
+	<?php
+	wp_reset_postdata();
+}
+
+function nerdywithme_featured_slider_posts($query_args, $limit = 3) {
+	$args                   = wp_parse_args($query_args, array());
+	$args['post_type']      = 'post';
+	$args['posts_per_page'] = $limit;
+	$args['ignore_sticky_posts'] = true;
+	$query                  = new WP_Query($args);
+
+	if (! $query->have_posts()) {
+		return;
+	}
+	?>
+	<div class="featured-slider" data-featured-slider>
+		<div class="featured-slider__track">
+			<?php
+			$index = 0;
+			while ($query->have_posts()) :
+				$query->the_post();
+				?>
+				<article class="featured-slide<?php echo 0 === $index ? ' is-active' : ''; ?>" data-featured-slide>
+					<a class="compact-list__item compact-list__item--featured" href="<?php the_permalink(); ?>">
+						<span class="compact-list__thumb">
+							<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'medium_large')); ?>" alt="<?php the_title_attribute(); ?>">
+						</span>
+						<span class="compact-list__content">
+							<?php nerdywithme_post_meta(get_the_ID()); ?>
+							<strong class="compact-list__title"><?php the_title(); ?></strong>
+						</span>
+					</a>
+				</article>
+				<?php
+				$index++;
+			endwhile;
+			?>
+		</div>
+		<div class="widget-card__nav featured-slider__nav" aria-label="<?php esc_attr_e('Featured posts navigation', 'nerdywithme'); ?>">
+			<button class="featured-slider__arrow" type="button" data-featured-prev aria-label="<?php esc_attr_e('Previous featured post', 'nerdywithme'); ?>">&lsaquo;</button>
+			<div class="featured-slider__dots">
+				<?php for ($i = 0; $i < $index; $i++) : ?>
+					<button class="featured-slider__dot<?php echo 0 === $i ? ' is-active' : ''; ?>" type="button" data-featured-dot="<?php echo esc_attr((string) $i); ?>" aria-label="<?php echo esc_attr(sprintf(__('Go to featured post %d', 'nerdywithme'), $i + 1)); ?>"></button>
+				<?php endfor; ?>
+			</div>
+			<button class="featured-slider__arrow" type="button" data-featured-next aria-label="<?php esc_attr_e('Next featured post', 'nerdywithme'); ?>">&rsaquo;</button>
+		</div>
 	</div>
 	<?php
 	wp_reset_postdata();
@@ -466,7 +572,36 @@ function nerdywithme_get_featured_posts($count = 6, $exclude = array()) {
 	);
 }
 
-function nerdywithme_get_primary_categories($count = 4) {
+function nerdywithme_get_posts_by_category_name($category_name, $count = 3, $exclude = array()) {
+	$category = get_category_by_slug(sanitize_title($category_name));
+
+	if (! $category) {
+		$category = get_term_by('name', $category_name, 'category');
+	}
+
+	if (! $category || is_wp_error($category)) {
+		return new WP_Query(
+			array(
+				'post_type'           => 'post',
+				'posts_per_page'      => $count,
+				'post__not_in'        => $exclude,
+				'ignore_sticky_posts' => true,
+			)
+		);
+	}
+
+	return new WP_Query(
+		array(
+			'post_type'           => 'post',
+			'posts_per_page'      => $count,
+			'post__not_in'        => $exclude,
+			'ignore_sticky_posts' => true,
+			'cat'                 => (int) $category->term_id,
+		)
+	);
+}
+
+function nerdywithme_get_primary_categories($count = 6) {
 	return get_categories(
 		array(
 			'hide_empty' => false,

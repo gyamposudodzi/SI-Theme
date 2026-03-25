@@ -11,16 +11,15 @@
 		<div class="nwm-shell">
 			<div class="footer-brand">
 				<?php nerdywithme_branding(false); ?>
-				<p class="section-intro"><?php echo esc_html(nerdywithme_get_option('footer_blurb', __('Pop culture, blogging, games, stories, and everything delightfully nerdy.', 'nerdywithme'))); ?></p>
-				<?php nerdywithme_brand_previews(); ?>
+				<p class="section-intro"><?php echo esc_html(nerdywithme_get_option('footer_blurb', __('Where trading meets technology: practical market education, automation, AI, and tools for modern traders.', 'nerdywithme'))); ?></p>
 			</div>
 			<div class="footer-links">
 				<div>
-					<h3><?php esc_html_e('Homepages', 'nerdywithme'); ?></h3>
+					<h3><?php esc_html_e('Core Pages', 'nerdywithme'); ?></h3>
 					<ul>
-						<li><a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('Front Page', 'nerdywithme'); ?></a></li>
-						<li><a href="<?php echo esc_url(get_permalink(get_option('page_for_posts')) ?: home_url('/')); ?>"><?php esc_html_e('Latest Posts', 'nerdywithme'); ?></a></li>
-						<li><a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('Featured Stories', 'nerdywithme'); ?></a></li>
+						<li><a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('Home', 'nerdywithme'); ?></a></li>
+						<li><a href="<?php echo esc_url(home_url('/about')); ?>"><?php esc_html_e('About', 'nerdywithme'); ?></a></li>
+						<li><a href="<?php echo esc_url(home_url('/blog')); ?>"><?php esc_html_e('Blog', 'nerdywithme'); ?></a></li>
 					</ul>
 				</div>
 				<div>
@@ -32,19 +31,19 @@
 					</ul>
 				</div>
 				<div>
-					<h3><?php esc_html_e('Features', 'nerdywithme'); ?></h3>
+					<h3><?php esc_html_e('Build Stack', 'nerdywithme'); ?></h3>
 					<ul>
-						<li><a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('Editor Picks', 'nerdywithme'); ?></a></li>
-						<li><a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('Popular Reads', 'nerdywithme'); ?></a></li>
-						<li><a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('Read Next', 'nerdywithme'); ?></a></li>
+						<li><a href="<?php echo esc_url(home_url('/tools')); ?>"><?php esc_html_e('Tools', 'nerdywithme'); ?></a></li>
+						<li><a href="<?php echo esc_url(home_url('/projects')); ?>"><?php esc_html_e('Projects', 'nerdywithme'); ?></a></li>
+						<li><a href="<?php echo esc_url(home_url('/resources')); ?>"><?php esc_html_e('Resources', 'nerdywithme'); ?></a></li>
 					</ul>
 				</div>
 				<div>
-					<h3><?php esc_html_e('Pages', 'nerdywithme'); ?></h3>
+					<h3><?php esc_html_e('Start Here', 'nerdywithme'); ?></h3>
 					<ul>
-						<li><a href="<?php echo esc_url(home_url('/404-preview')); ?>"><?php esc_html_e('404 Page', 'nerdywithme'); ?></a></li>
-						<li><a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('Archive Layout', 'nerdywithme'); ?></a></li>
-						<li><a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('Single Story', 'nerdywithme'); ?></a></li>
+						<li><a href="<?php echo esc_url(home_url('/category/trading-foundations')); ?>"><?php esc_html_e('Trading Foundations', 'nerdywithme'); ?></a></li>
+						<li><a href="<?php echo esc_url(home_url('/category/tech-for-traders')); ?>"><?php esc_html_e('Tech for Traders', 'nerdywithme'); ?></a></li>
+						<li><a href="<?php echo esc_url(home_url('/category/ai-quant-trading')); ?>"><?php esc_html_e('AI & Quant Trading', 'nerdywithme'); ?></a></li>
 					</ul>
 				</div>
 				<div>

@@ -19,9 +19,9 @@ $featured_id = $featured_post->posts[0]->ID ?? 0;
 ?>
 
 <section class="page-section archive-hero">
-	<p class="section-intro"><?php esc_html_e('Latest stories from NerdyWithMe', 'nerdywithme'); ?></p>
-	<h1 class="archive-headline"><?php bloginfo('name'); ?> <?php esc_html_e('Magazine', 'nerdywithme'); ?></h1>
-	<p class="archive-description"><?php esc_html_e('A bright mix of pop culture, internet trends, gaming finds, and cozy storytelling.', 'nerdywithme'); ?></p>
+	<p class="section-intro"><?php esc_html_e('Latest market education from NerdyWithMe', 'nerdywithme'); ?></p>
+	<h1 class="archive-headline"><?php bloginfo('name'); ?> <?php esc_html_e('Journal', 'nerdywithme'); ?></h1>
+	<p class="archive-description"><?php esc_html_e('Practical trading education, technical analysis, automation ideas, and AI-assisted systems for modern traders.', 'nerdywithme'); ?></p>
 </section>
 
 <?php if ($featured_id) : ?>
@@ -36,7 +36,7 @@ $featured_id = $featured_post->posts[0]->ID ?? 0;
 <?php endif; ?>
 
 <section class="page-section">
-	<?php nerdywithme_section_heading(__('Latest Posts', 'nerdywithme'), __('A scrolling list of everything new on the blog.', 'nerdywithme')); ?>
+	<?php nerdywithme_section_heading(__('Latest Posts', 'nerdywithme'), __('A rolling feed of trading breakdowns, platform comparisons, and builder-focused market lessons.', 'nerdywithme')); ?>
 	<div class="archive-grid">
 		<div class="post-grid">
 			<?php if (have_posts()) : ?>
@@ -59,15 +59,15 @@ $featured_id = $featured_post->posts[0]->ID ?? 0;
 <section class="page-section">
 	<div class="triple-columns">
 		<div>
-			<?php nerdywithme_section_heading(__('User Favourites', 'nerdywithme')); ?>
+			<?php nerdywithme_section_heading(__('Starter Reads', 'nerdywithme')); ?>
 			<?php nerdywithme_ranked_posts(array(), 3); ?>
 		</div>
 		<div>
-			<?php nerdywithme_section_heading(__('You Might Like', 'nerdywithme')); ?>
+			<?php nerdywithme_section_heading(__('Systems To Explore', 'nerdywithme')); ?>
 			<?php nerdywithme_compact_posts(array(), 3); ?>
 		</div>
 		<div>
-			<?php nerdywithme_section_heading(__('Short Reads', 'nerdywithme')); ?>
+			<?php nerdywithme_section_heading(__('Quick Lessons', 'nerdywithme')); ?>
 			<?php nerdywithme_compact_posts(array('orderby' => 'rand'), 3); ?>
 		</div>
 	</div>

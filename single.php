@@ -37,7 +37,7 @@ get_header();
 						<?php the_tags('<span class="post-categories">', '', '</span>'); ?>
 					</footer>
 					<section class="read-next">
-						<?php nerdywithme_section_heading(__('Read Next', 'nerdywithme')); ?>
+						<?php nerdywithme_section_heading(__('Read Next', 'nerdywithme'), __('Keep building from fundamentals into tools, automation, and smarter decision-making.', 'nerdywithme')); ?>
 						<div class="read-next__grid">
 							<?php
 							$related = nerdywithme_get_featured_posts(3, array(get_the_ID()));

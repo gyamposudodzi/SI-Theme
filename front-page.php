@@ -7,80 +7,107 @@
 
 get_header();
 
-$featured = nerdywithme_get_featured_posts(12);
+$featured = nerdywithme_get_featured_posts(18);
 $ids      = wp_list_pluck($featured->posts, 'ID');
+$hero_query = nerdywithme_get_posts_by_category_name('Featured', 1);
+$hero_ids   = wp_list_pluck($hero_query->posts, 'ID');
+$editor_query = nerdywithme_get_posts_by_category_name('Editors Pick', 3);
+$editor_ids   = wp_list_pluck($editor_query->posts, 'ID');
 
-$hero_id       = $ids[0] ?? 0;
-$hero_side_ids = array_slice($ids, 1, 4);
-$lead_id       = $ids[5] ?? $hero_id;
-$hot_ids       = array_slice($ids, 6, 3);
-$latest_ids    = array_slice($ids, 0, 8);
+$hero_id        = $hero_ids[0] ?? ($ids[0] ?? 0);
+$reserved_ids   = array_filter(array_merge(array($hero_id), $editor_ids));
+$remaining_ids  = array_values(array_diff($ids, $reserved_ids));
+$hero_side_ids  = array_slice($remaining_ids, 0, 4);
+$hot_pair_ids   = array_slice($remaining_ids, 4, 2);
+$hot_strip_ids  = array_slice($remaining_ids, 6, 4);
+$popular_ids    = array_slice($remaining_ids, 2, 7);
+$starter_query  = nerdywithme_get_featured_posts(3, array_merge(array($hero_id), $editor_ids));
+$builder_query  = nerdywithme_get_featured_posts(3, array_merge(array($hero_id, $hot_pair_ids[0] ?? 0), $editor_ids));
+$quick_query    = nerdywithme_get_featured_posts(3, array_merge(array($hero_id, $hot_pair_ids[0] ?? 0, $hot_pair_ids[1] ?? 0), $editor_ids));
+
+if (count($editor_ids) < 3) {
+	$fallback_editor_ids = array_slice(array_values(array_diff($ids, array($hero_id), $hero_side_ids, $hot_pair_ids, $hot_strip_ids)), 0, 3 - count($editor_ids));
+	$editor_ids          = array_values(array_unique(array_merge($editor_ids, $fallback_editor_ids)));
+	$editor_ids          = array_slice($editor_ids, 0, 3);
+}
 ?>
 
-<section class="page-section">
-	<div class="hero-grid">
+<section class="page-section homepage-compact-hero">
+	<div class="compact-hero-grid">
 		<?php if ($hero_id) : ?>
-			<article class="hero-story">
-				<div class="hero-story__grid">
-					<div class="hero-copy">
-						<?php nerdywithme_post_meta($hero_id); ?>
-						<h1 class="entry-title"><a href="<?php echo esc_url(get_permalink($hero_id)); ?>"><?php echo esc_html(get_the_title($hero_id)); ?></a></h1>
-						<p class="entry-summary"><?php echo esc_html(wp_trim_words(get_the_excerpt($hero_id), 28)); ?></p>
-						<a class="button" href="<?php echo esc_url(get_permalink($hero_id)); ?>"><?php esc_html_e('Read Story', 'nerdywithme'); ?></a>
-					</div>
-					<a class="hero-media" href="<?php echo esc_url(get_permalink($hero_id)); ?>">
-						<img src="<?php echo esc_url(nerdywithme_get_post_image($hero_id, 'large')); ?>" alt="<?php echo esc_attr(get_the_title($hero_id)); ?>">
-					</a>
+			<article class="compact-hero-card">
+				<a class="compact-hero-card__thumb" href="<?php echo esc_url(get_permalink($hero_id)); ?>">
+					<img src="<?php echo esc_url(nerdywithme_get_post_image($hero_id, 'large')); ?>" alt="<?php echo esc_attr(get_the_title($hero_id)); ?>">
+				</a>
+				<div class="compact-hero-card__content">
+					<?php nerdywithme_post_meta($hero_id); ?>
+					<h1 class="entry-title"><a href="<?php echo esc_url(get_permalink($hero_id)); ?>"><?php echo esc_html(get_the_title($hero_id)); ?></a></h1>
+					<p class="entry-summary"><?php echo esc_html(wp_trim_words(get_the_excerpt($hero_id), 18)); ?></p>
 				</div>
 			</article>
 		<?php endif; ?>
 
-		<div class="hero-sidebar">
+		<div class="compact-hero-side">
 			<?php foreach ($hero_side_ids as $side_id) : ?>
-				<?php nerdywithme_mini_post($side_id); ?>
+				<?php nerdywithme_card($side_id, 'compact'); ?>
 			<?php endforeach; ?>
 		</div>
 	</div>
 </section>
 
 <section class="page-section">
-	<?php nerdywithme_section_heading(__('Only Top Content', 'nerdywithme'), __('A playful map of the topics that shape your blog.', 'nerdywithme')); ?>
-	<div class="category-tiles">
-		<?php foreach (nerdywithme_get_primary_categories() as $category) : ?>
-			<?php nerdywithme_category_card($category); ?>
-		<?php endforeach; ?>
+	<?php nerdywithme_section_heading(__('Connect With My Favorite Apps', 'nerdywithme'), __('Chosen by the editor.', 'nerdywithme')); ?>
+	<div class="app-strip app-strip--social">
+		<a class="app-chip app-chip--green" href="#">
+			<span class="app-chip__icon">TV</span>
+			<span class="app-chip__body"><span>@nerdywithme</span><strong>Listen on TradingView</strong></span>
+		</a>
+		<a class="app-chip app-chip--pink" href="#">
+			<span class="app-chip__icon">X</span>
+			<span class="app-chip__body"><span>@nerdywithme</span><strong>Follow on X</strong></span>
+		</a>
+		<a class="app-chip app-chip--orange" href="#">
+			<span class="app-chip__icon">IG</span>
+			<span class="app-chip__body"><span>@nerdywithme</span><strong>Find me on Instagram</strong></span>
+		</a>
+		<a class="app-chip app-chip--blue" href="#">
+			<span class="app-chip__icon">GH</span>
+			<span class="app-chip__body"><span>@nerdywithme</span><strong>Builds on GitHub</strong></span>
+		</a>
 	</div>
 </section>
 
 <section class="page-section">
-	<?php nerdywithme_section_heading(__('What’s Hot Right Now', 'nerdywithme'), __('The stories getting the most love today.', 'nerdywithme'), get_permalink($lead_id), __('View all', 'nerdywithme')); ?>
-	<div class="split-grid">
-		<div class="lead-card">
-			<?php nerdywithme_card($lead_id); ?>
+	<?php nerdywithme_section_heading(__('What\'s Hot Right Now', 'nerdywithme'), __('Timely reads on markets, trader workflow, and the tech that sharpens decision-making.', 'nerdywithme'), home_url('/blog'), __('View all', 'nerdywithme')); ?>
+	<div class="hot-grid">
+		<div class="hot-grid__feature">
+			<?php foreach ($hot_pair_ids as $hot_id) : ?>
+				<?php nerdywithme_card($hot_id); ?>
+			<?php endforeach; ?>
 		</div>
-		<div class="sidebar-stack">
-			<?php foreach ($hot_ids as $hot_id) : ?>
-				<?php nerdywithme_mini_post($hot_id); ?>
+		<div class="hot-grid__strip">
+			<?php foreach ($hot_strip_ids as $hot_id) : ?>
+				<?php nerdywithme_card($hot_id, 'compact'); ?>
 			<?php endforeach; ?>
 		</div>
 	</div>
 </section>
 
 <section class="page-section">
-	<?php nerdywithme_section_heading(__('Editor Picks', 'nerdywithme'), __('Curated stories chosen for the NerdyWithMe vibe.', 'nerdywithme'), home_url('/'), __('View all', 'nerdywithme')); ?>
+	<?php nerdywithme_section_heading(__('Editor Picks', 'nerdywithme'), __('The clearest beginner guides, systematic trading lessons, and tech-first reads to start with.', 'nerdywithme'), home_url('/blog'), __('View all', 'nerdywithme')); ?>
 	<div class="subgrid">
-		<?php foreach (array_slice($ids, 2, 3) as $pick_id) : ?>
+		<?php foreach ($editor_ids as $pick_id) : ?>
 			<?php nerdywithme_card($pick_id, 'compact'); ?>
 		<?php endforeach; ?>
 	</div>
 </section>
 
 <section class="page-section">
-	<?php nerdywithme_section_heading(__('Latest Posts', 'nerdywithme'), __('Fresh updates, trends, and cozy internet finds.', 'nerdywithme')); ?>
+	<?php nerdywithme_section_heading(__('Popular Articles', 'nerdywithme'), __('Longer reads on execution, technical analysis, automation, and AI-assisted trading systems.', 'nerdywithme')); ?>
 	<div class="latest-grid">
-		<div class="post-grid">
-			<?php foreach ($latest_ids as $latest_id) : ?>
-				<?php nerdywithme_card($latest_id); ?>
+		<div class="row-posts">
+			<?php foreach ($popular_ids as $popular_id) : ?>
+				<?php nerdywithme_row_post($popular_id); ?>
 			<?php endforeach; ?>
 		</div>
 		<?php get_sidebar(); ?>
@@ -90,65 +117,68 @@ $latest_ids    = array_slice($ids, 0, 8);
 <section class="page-section">
 	<div class="triple-columns">
 		<div>
-			<?php nerdywithme_section_heading(__('User Favourites', 'nerdywithme')); ?>
+			<?php nerdywithme_section_heading(__('Starter Reads', 'nerdywithme')); ?>
 			<div class="list-posts">
 				<?php
-				$fave_query = nerdywithme_get_featured_posts(3, array($hero_id));
-				$index      = 1;
-				while ($fave_query->have_posts()) :
-					$fave_query->the_post();
+				while ($starter_query->have_posts()) :
+					$starter_query->the_post();
 					?>
-					<a class="list-post" href="<?php the_permalink(); ?>">
-						<span class="list-post__number"><?php echo esc_html((string) $index); ?></span>
-						<span>
-							<?php nerdywithme_post_meta(get_the_ID()); ?>
-							<span class="list-post__title"><?php the_title(); ?></span>
-						</span>
-					</a>
+					<article class="list-post list-post--circle">
+						<a class="list-post__media" href="<?php the_permalink(); ?>">
+							<span class="compact-list__thumb compact-list__thumb--circle">
+								<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'thumbnail')); ?>" alt="<?php the_title_attribute(); ?>">
+							</span>
+						</a>
+						<div class="list-post__body">
+							<div class="list-post__content">
+								<?php nerdywithme_post_meta(get_the_ID()); ?>
+								<a class="list-post__title" href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+							</div>
+						</div>
+					</article>
 					<?php
-					$index++;
 				endwhile;
 				wp_reset_postdata();
 				?>
 			</div>
 		</div>
 		<div>
-			<?php nerdywithme_section_heading(__('You Might Like', 'nerdywithme')); ?>
+			<?php nerdywithme_section_heading(__('Build Your Edge', 'nerdywithme')); ?>
 			<div class="list-posts">
-				<?php
-				$like_query = nerdywithme_get_featured_posts(3, array($hero_id, $lead_id));
-				while ($like_query->have_posts()) :
-					$like_query->the_post();
-					?>
-					<a class="list-post" href="<?php the_permalink(); ?>">
-						<span class="compact-list__thumb">
-							<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'thumbnail')); ?>" alt="<?php the_title_attribute(); ?>">
-						</span>
-						<span>
-							<?php nerdywithme_post_meta(get_the_ID()); ?>
-							<span class="list-post__title"><?php the_title(); ?></span>
-						</span>
-					</a>
+				<?php while ($builder_query->have_posts()) : $builder_query->the_post(); ?>
+					<article class="list-post list-post--circle">
+						<a class="list-post__media" href="<?php the_permalink(); ?>">
+							<span class="compact-list__thumb compact-list__thumb--circle">
+								<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'thumbnail')); ?>" alt="<?php the_title_attribute(); ?>">
+							</span>
+						</a>
+						<div class="list-post__body">
+							<div class="list-post__content">
+								<?php nerdywithme_post_meta(get_the_ID()); ?>
+								<a class="list-post__title" href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+							</div>
+						</div>
+					</article>
 				<?php endwhile; wp_reset_postdata(); ?>
 			</div>
 		</div>
 		<div>
-			<?php nerdywithme_section_heading(__('Short Reads', 'nerdywithme')); ?>
+			<?php nerdywithme_section_heading(__('Quick Lessons', 'nerdywithme')); ?>
 			<div class="list-posts">
-				<?php
-				$short_query = nerdywithme_get_featured_posts(3, array($hero_id, $lead_id));
-				while ($short_query->have_posts()) :
-					$short_query->the_post();
-					?>
-					<a class="list-post" href="<?php the_permalink(); ?>">
-						<span class="compact-list__thumb">
-							<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'thumbnail')); ?>" alt="<?php the_title_attribute(); ?>">
-						</span>
-						<span>
-							<?php nerdywithme_post_meta(get_the_ID()); ?>
-							<span class="list-post__title"><?php the_title(); ?></span>
-						</span>
-					</a>
+				<?php while ($quick_query->have_posts()) : $quick_query->the_post(); ?>
+					<article class="list-post list-post--circle">
+						<a class="list-post__media" href="<?php the_permalink(); ?>">
+							<span class="compact-list__thumb compact-list__thumb--circle">
+								<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'thumbnail')); ?>" alt="<?php the_title_attribute(); ?>">
+							</span>
+						</a>
+						<div class="list-post__body">
+							<div class="list-post__content">
+								<?php nerdywithme_post_meta(get_the_ID()); ?>
+								<a class="list-post__title" href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+							</div>
+						</div>
+					</article>
 				<?php endwhile; wp_reset_postdata(); ?>
 			</div>
 		</div>

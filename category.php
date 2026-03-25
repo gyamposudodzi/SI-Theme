@@ -15,7 +15,7 @@ get_header();
 </section>
 
 <section class="page-section">
-	<?php nerdywithme_section_heading(__('Explore More Categories', 'nerdywithme')); ?>
+	<?php nerdywithme_section_heading(__('Explore More Trading Topics', 'nerdywithme')); ?>
 	<div class="category-tiles">
 		<?php foreach (nerdywithme_get_primary_categories() as $category) : ?>
 			<?php nerdywithme_category_card($category); ?>

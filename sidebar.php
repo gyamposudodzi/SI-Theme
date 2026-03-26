@@ -10,6 +10,11 @@
 	<?php if (is_active_sidebar('sidebar-1') && ! is_front_page()) : ?>
 		<?php dynamic_sidebar('sidebar-1'); ?>
 	<?php else : ?>
+		<?php
+		$sidebar_social_cards = nerdywithme_get_social_cards('sidebar');
+		$profile_stack_urls   = nerdywithme_get_profile_stack_urls();
+		$profile_card         = nerdywithme_get_profile_card_settings();
+		?>
 		<section class="widget-card widget-card--plain">
 			<h2 class="widget-card__title"><?php esc_html_e('Top Picks', 'nerdywithme'); ?></h2>
 			<?php nerdywithme_ranked_posts(array('post__not_in' => array()), 3); ?>
@@ -23,41 +28,17 @@
 		<section class="widget-card widget-card--plain">
 			<h2 class="widget-card__title"><?php esc_html_e('Favorite Apps', 'nerdywithme'); ?></h2>
 			<div class="sidebar-stack">
-				<a class="app-link" href="#">
-					<span class="app-link__service">TV</span>
-					<span class="app-link__body"><strong>@nerdywithme</strong><span>Track setups in TradingView</span></span>
-					<span class="app-link__arrow">></span>
-				</a>
-				<a class="app-link" href="#">
-					<span class="app-link__service">X</span>
-					<span class="app-link__body"><strong>@nerdywithme</strong><span>Follow market notes on X</span></span>
-					<span class="app-link__arrow">></span>
-				</a>
-				<a class="app-link" href="#">
-					<span class="app-link__service">GH</span>
-					<span class="app-link__body"><strong>@nerdywithme</strong><span>See bots and build logs</span></span>
-					<span class="app-link__arrow">></span>
-				</a>
+				<?php foreach ($sidebar_social_cards as $card) : ?>
+					<a class="app-link app-link--<?php echo esc_attr($card['tone']); ?>" href="<?php echo esc_url($card['url']); ?>">
+						<?php echo nerdywithme_render_card_icon($card, 'app-link__service'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<span class="app-link__body"><strong><?php echo esc_html($card['handle']); ?></strong><span><?php echo esc_html($card['description']); ?></span></span>
+						<span class="app-link__arrow">></span>
+					</a>
+				<?php endforeach; ?>
 			</div>
 		</section>
 
 		<section class="widget-card widget-card--profile">
-			<?php
-			$profile_stack_query = nerdywithme_get_featured_posts(3);
-			$profile_stack_urls  = array();
-
-			if ($profile_stack_query->have_posts()) {
-				while ($profile_stack_query->have_posts()) {
-					$profile_stack_query->the_post();
-					$profile_stack_urls[] = nerdywithme_get_post_image(get_the_ID(), 'medium_large');
-				}
-				wp_reset_postdata();
-			}
-
-			while (count($profile_stack_urls) < 3) {
-				$profile_stack_urls[] = nerdywithme_fallback_image();
-			}
-			?>
 			<div class="profile-card">
 				<div class="profile-card__stack" aria-hidden="true">
 					<span class="profile-card__layer profile-card__layer--back">
@@ -83,10 +64,10 @@
 				</div>
 				<div class="profile-card__footer">
 					<div class="profile-card__identity">
-						<h2 class="widget-card__title"><?php esc_html_e('@nerdywithme', 'nerdywithme'); ?></h2>
-						<p><?php esc_html_e('127K followers', 'nerdywithme'); ?></p>
+						<h2 class="widget-card__title"><?php echo esc_html($profile_card['handle']); ?></h2>
+						<p><?php echo esc_html($profile_card['followers']); ?></p>
 					</div>
-					<a class="profile-card__button" href="#"><?php esc_html_e('Follow', 'nerdywithme'); ?> &rsaquo;</a>
+					<a class="profile-card__button" href="<?php echo esc_url($profile_card['button_url']); ?>"><?php echo esc_html($profile_card['button_label']); ?> &rsaquo;</a>
 				</div>
 			</div>
 		</section>

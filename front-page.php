@@ -9,6 +9,7 @@ get_header();
 
 $featured = nerdywithme_get_featured_posts(18);
 $ids      = wp_list_pluck($featured->posts, 'ID');
+$home_social_cards = nerdywithme_get_social_cards('home');
 $hero_query = nerdywithme_get_posts_by_category_name('Featured', 1);
 $hero_ids   = wp_list_pluck($hero_query->posts, 'ID');
 $editor_query = nerdywithme_get_posts_by_category_name('Editors Pick', 3);
@@ -58,22 +59,12 @@ if (count($editor_ids) < 3) {
 <section class="page-section">
 	<?php nerdywithme_section_heading(__('Connect With My Favorite Apps', 'nerdywithme'), __('Chosen by the editor.', 'nerdywithme')); ?>
 	<div class="app-strip app-strip--social">
-		<a class="app-chip app-chip--green" href="#">
-			<span class="app-chip__icon">TV</span>
-			<span class="app-chip__body"><span>@nerdywithme</span><strong>Listen on TradingView</strong></span>
-		</a>
-		<a class="app-chip app-chip--pink" href="#">
-			<span class="app-chip__icon">X</span>
-			<span class="app-chip__body"><span>@nerdywithme</span><strong>Follow on X</strong></span>
-		</a>
-		<a class="app-chip app-chip--orange" href="#">
-			<span class="app-chip__icon">IG</span>
-			<span class="app-chip__body"><span>@nerdywithme</span><strong>Find me on Instagram</strong></span>
-		</a>
-		<a class="app-chip app-chip--blue" href="#">
-			<span class="app-chip__icon">GH</span>
-			<span class="app-chip__body"><span>@nerdywithme</span><strong>Builds on GitHub</strong></span>
-		</a>
+		<?php foreach ($home_social_cards as $card) : ?>
+			<a class="app-chip app-chip--<?php echo esc_attr($card['tone']); ?>" href="<?php echo esc_url($card['url']); ?>">
+				<?php echo nerdywithme_render_card_icon($card, 'app-chip__icon'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<span class="app-chip__body"><span><?php echo esc_html($card['handle']); ?></span><strong><?php echo esc_html($card['description']); ?></strong></span>
+			</a>
+		<?php endforeach; ?>
 	</div>
 </section>
 

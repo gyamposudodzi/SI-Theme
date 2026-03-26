@@ -140,12 +140,323 @@ function nerdywithme_customize_register($wp_customize) {
 			)
 		);
 	}
+
+	$wp_customize->add_section(
+		'nerdywithme_home_social_cards',
+		array(
+			'title'    => __('Homepage Social Cards', 'nerdywithme'),
+			'priority' => 31,
+		)
+	);
+
+	$wp_customize->add_section(
+		'nerdywithme_sidebar_social_cards',
+		array(
+			'title'    => __('Sidebar Social Cards', 'nerdywithme'),
+			'priority' => 32,
+		)
+	);
+
+	$wp_customize->add_section(
+		'nerdywithme_sidebar_profile_card',
+		array(
+			'title'    => __('Sidebar Follow Card', 'nerdywithme'),
+			'priority' => 33,
+		)
+	);
+
+	$card_sections = array(
+		'home'    => array(
+			'section' => 'nerdywithme_home_social_cards',
+			'count'   => 4,
+			'defaults' => nerdywithme_default_home_social_cards(),
+		),
+		'sidebar' => array(
+			'section' => 'nerdywithme_sidebar_social_cards',
+			'count'   => 3,
+			'defaults' => nerdywithme_default_sidebar_social_cards(),
+		),
+	);
+
+	foreach ($card_sections as $prefix => $config) {
+		for ($i = 1; $i <= $config['count']; $i++) {
+			$defaults = $config['defaults'][ $i - 1 ];
+			$base     = 'nerdywithme_' . $prefix . '_social_' . $i . '_';
+
+			$wp_customize->add_setting(
+				$base . 'tone',
+				array(
+					'default'           => $defaults['tone'],
+					'sanitize_callback' => 'nerdywithme_sanitize_card_tone',
+				)
+			);
+			$wp_customize->add_control(
+				$base . 'tone',
+				array(
+					'label'   => sprintf(__('Card %d Color', 'nerdywithme'), $i),
+					'section' => $config['section'],
+					'type'    => 'select',
+					'choices' => nerdywithme_card_tone_choices(),
+				)
+			);
+
+			$text_fields = array(
+				'icon_text' => __('Fallback Icon Text', 'nerdywithme'),
+				'handle'    => __('Handle', 'nerdywithme'),
+				'description' => __('Description', 'nerdywithme'),
+			);
+
+			foreach ($text_fields as $field => $label) {
+				$wp_customize->add_setting(
+					$base . $field,
+					array(
+						'default'           => $defaults[ $field ],
+						'sanitize_callback' => 'sanitize_text_field',
+					)
+				);
+				$wp_customize->add_control(
+					$base . $field,
+					array(
+						'label'   => sprintf(__('Card %1$d %2$s', 'nerdywithme'), $i, $label),
+						'section' => $config['section'],
+						'type'    => 'text',
+					)
+				);
+			}
+
+			$wp_customize->add_setting(
+				$base . 'url',
+				array(
+					'default'           => $defaults['url'],
+					'sanitize_callback' => 'esc_url_raw',
+				)
+			);
+			$wp_customize->add_control(
+				$base . 'url',
+				array(
+					'label'   => sprintf(__('Card %d Link URL', 'nerdywithme'), $i),
+					'section' => $config['section'],
+					'type'    => 'url',
+				)
+			);
+
+			$wp_customize->add_setting(
+				$base . 'icon_image',
+				array(
+					'default'           => 0,
+					'sanitize_callback' => 'absint',
+				)
+			);
+			$wp_customize->add_control(
+				new WP_Customize_Image_Control(
+					$wp_customize,
+					$base . 'icon_image',
+					array(
+						'label'   => sprintf(__('Card %d Logo/Image', 'nerdywithme'), $i),
+						'section' => $config['section'],
+					)
+				)
+			);
+		}
+	}
+
+	$profile_defaults = array(
+		'handle'       => '@nerdywithme',
+		'followers'    => __('127K followers', 'nerdywithme'),
+		'button_label' => __('Follow', 'nerdywithme'),
+		'button_url'   => '#',
+	);
+
+	foreach ($profile_defaults as $field => $default) {
+		$wp_customize->add_setting(
+			'nerdywithme_profile_' . $field,
+			array(
+				'default'           => $default,
+				'sanitize_callback' => ('button_url' === $field) ? 'esc_url_raw' : 'sanitize_text_field',
+			)
+		);
+		$wp_customize->add_control(
+			'nerdywithme_profile_' . $field,
+			array(
+				'label'   => ucwords(str_replace('_', ' ', __('Profile ' . $field, 'nerdywithme'))),
+				'section' => 'nerdywithme_sidebar_profile_card',
+				'type'    => ('button_url' === $field) ? 'url' : 'text',
+			)
+		);
+	}
+
+	for ($i = 1; $i <= 3; $i++) {
+		$wp_customize->add_setting(
+			'nerdywithme_profile_stack_image_' . $i,
+			array(
+				'default'           => 0,
+				'sanitize_callback' => 'absint',
+			)
+		);
+		$wp_customize->add_control(
+			new WP_Customize_Image_Control(
+				$wp_customize,
+				'nerdywithme_profile_stack_image_' . $i,
+				array(
+					'label'   => sprintf(__('Follow Card Image %d', 'nerdywithme'), $i),
+					'section' => 'nerdywithme_sidebar_profile_card',
+				)
+			)
+		);
+	}
 }
 add_action('customize_register', 'nerdywithme_customize_register');
 
 function nerdywithme_sanitize_brand_style($value) {
 	$allowed = array('refined', 'lockup');
 	return in_array($value, $allowed, true) ? $value : 'refined';
+}
+
+function nerdywithme_card_tone_choices() {
+	return array(
+		'green'  => __('Green', 'nerdywithme'),
+		'pink'   => __('Pink', 'nerdywithme'),
+		'orange' => __('Orange', 'nerdywithme'),
+		'blue'   => __('Blue', 'nerdywithme'),
+	);
+}
+
+function nerdywithme_sanitize_card_tone($value) {
+	$allowed = array_keys(nerdywithme_card_tone_choices());
+	return in_array($value, $allowed, true) ? $value : 'green';
+}
+
+function nerdywithme_default_home_social_cards() {
+	return array(
+		array(
+			'tone'        => 'green',
+			'icon_text'   => 'TV',
+			'handle'      => '@nerdywithme',
+			'description' => __('Listen on TradingView', 'nerdywithme'),
+			'url'         => '#',
+		),
+		array(
+			'tone'        => 'pink',
+			'icon_text'   => 'X',
+			'handle'      => '@nerdywithme',
+			'description' => __('Follow on X', 'nerdywithme'),
+			'url'         => '#',
+		),
+		array(
+			'tone'        => 'orange',
+			'icon_text'   => 'IG',
+			'handle'      => '@nerdywithme',
+			'description' => __('Find me on Instagram', 'nerdywithme'),
+			'url'         => '#',
+		),
+		array(
+			'tone'        => 'blue',
+			'icon_text'   => 'GH',
+			'handle'      => '@nerdywithme',
+			'description' => __('Builds on GitHub', 'nerdywithme'),
+			'url'         => '#',
+		),
+	);
+}
+
+function nerdywithme_default_sidebar_social_cards() {
+	return array(
+		array(
+			'tone'        => 'green',
+			'icon_text'   => 'TV',
+			'handle'      => '@nerdywithme',
+			'description' => __('Track setups in TradingView', 'nerdywithme'),
+			'url'         => '#',
+		),
+		array(
+			'tone'        => 'pink',
+			'icon_text'   => 'X',
+			'handle'      => '@nerdywithme',
+			'description' => __('Follow market notes on X', 'nerdywithme'),
+			'url'         => '#',
+		),
+		array(
+			'tone'        => 'blue',
+			'icon_text'   => 'GH',
+			'handle'      => '@nerdywithme',
+			'description' => __('See bots and build logs', 'nerdywithme'),
+			'url'         => '#',
+		),
+	);
+}
+
+function nerdywithme_get_social_cards($context = 'home') {
+	$defaults = ('sidebar' === $context) ? nerdywithme_default_sidebar_social_cards() : nerdywithme_default_home_social_cards();
+	$count    = ('sidebar' === $context) ? 3 : 4;
+	$cards    = array();
+
+	for ($i = 1; $i <= $count; $i++) {
+		$base    = 'nerdywithme_' . $context . '_social_' . $i . '_';
+		$default = $defaults[ $i - 1 ];
+		$image_id = absint(get_theme_mod($base . 'icon_image', 0));
+
+		$cards[] = array(
+			'tone'        => nerdywithme_sanitize_card_tone(get_theme_mod($base . 'tone', $default['tone'])),
+			'icon_text'   => sanitize_text_field(get_theme_mod($base . 'icon_text', $default['icon_text'])),
+			'handle'      => sanitize_text_field(get_theme_mod($base . 'handle', $default['handle'])),
+			'description' => sanitize_text_field(get_theme_mod($base . 'description', $default['description'])),
+			'url'         => esc_url(get_theme_mod($base . 'url', $default['url'])),
+			'icon_image'  => $image_id ? wp_get_attachment_image_url($image_id, 'thumbnail') : '',
+		);
+	}
+
+	return $cards;
+}
+
+function nerdywithme_render_card_icon($card, $icon_class) {
+	if (! empty($card['icon_image'])) {
+		return '<span class="' . esc_attr($icon_class) . '"><img src="' . esc_url($card['icon_image']) . '" alt=""></span>';
+	}
+
+	return '<span class="' . esc_attr($icon_class) . '">' . esc_html($card['icon_text']) . '</span>';
+}
+
+function nerdywithme_get_profile_card_settings() {
+	return array(
+		'handle'       => sanitize_text_field(get_theme_mod('nerdywithme_profile_handle', '@nerdywithme')),
+		'followers'    => sanitize_text_field(get_theme_mod('nerdywithme_profile_followers', __('127K followers', 'nerdywithme'))),
+		'button_label' => sanitize_text_field(get_theme_mod('nerdywithme_profile_button_label', __('Follow', 'nerdywithme'))),
+		'button_url'   => esc_url(get_theme_mod('nerdywithme_profile_button_url', '#')),
+	);
+}
+
+function nerdywithme_get_profile_stack_urls() {
+	$urls = array();
+
+	for ($i = 1; $i <= 3; $i++) {
+		$image_id = absint(get_theme_mod('nerdywithme_profile_stack_image_' . $i, 0));
+		if ($image_id) {
+			$url = wp_get_attachment_image_url($image_id, 'medium_large');
+			if ($url) {
+				$urls[] = $url;
+			}
+		}
+	}
+
+	if (count($urls) < 3) {
+		$fallback_query = nerdywithme_get_featured_posts(3);
+		if ($fallback_query->have_posts()) {
+			while ($fallback_query->have_posts()) {
+				$fallback_query->the_post();
+				$urls[] = nerdywithme_get_post_image(get_the_ID(), 'medium_large');
+				if (count($urls) >= 3) {
+					break;
+				}
+			}
+			wp_reset_postdata();
+		}
+	}
+
+	while (count($urls) < 3) {
+		$urls[] = nerdywithme_fallback_image();
+	}
+
+	return array_slice($urls, 0, 3);
 }
 
 function nerdywithme_widgets_init() {

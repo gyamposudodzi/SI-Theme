@@ -44,7 +44,7 @@
 				<div class="header-tools">
 					<button class="header-tools__button search-toggle" type="button" aria-expanded="false" aria-controls="search-panel">
 						<span class="screen-reader-text"><?php esc_html_e('Open search', 'nerdywithme'); ?></span>
-						<span class="header-tools__icon">?</span>
+						<span class="header-tools__icon" aria-hidden="true">&#8981;</span>
 					</button>
 				</div>
 			</div>

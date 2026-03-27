@@ -459,21 +459,6 @@ function nerdywithme_get_profile_stack_urls() {
 	return array_slice($urls, 0, 3);
 }
 
-function nerdywithme_widgets_init() {
-	register_sidebar(
-		array(
-			'name'          => __('Sidebar', 'nerdywithme'),
-			'id'            => 'sidebar-1',
-			'description'   => __('Widgets on posts and archive pages.', 'nerdywithme'),
-			'before_widget' => '<section id="%1$s" class="widget %2$s">',
-			'after_widget'  => '</section>',
-			'before_title'  => '<h2 class="widget-title">',
-			'after_title'   => '</h2>',
-		)
-	);
-}
-add_action('widgets_init', 'nerdywithme_widgets_init');
-
 function nerdywithme_fallback_image() {
 	return 'data:image/svg+xml,' . rawurlencode('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900"><rect fill="#dff3ff" width="1200" height="900"/><circle fill="#ffe0d1" cx="290" cy="210" r="180"/><circle fill="#ddf8b8" cx="930" cy="180" r="150"/><circle fill="#ffd6e8" cx="920" cy="720" r="210"/><rect fill="#132a78" x="145" y="560" width="360" height="64" rx="32"/><rect fill="#ff5f36" x="145" y="660" width="590" height="64" rx="32"/><rect fill="#ffffff" x="145" y="350" width="720" height="140" rx="36"/><text x="175" y="444" fill="#132a78" font-family="Arial, sans-serif" font-size="74" font-weight="700">NerdyWithMe</text></svg>');
 }

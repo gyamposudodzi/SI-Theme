@@ -4,6 +4,19 @@ document.addEventListener("DOMContentLoaded", function () {
   const searchToggle = document.querySelector(".search-toggle");
   const megaPanel = document.querySelector(".mega-panel");
   const searchPanel = document.querySelector(".search-panel");
+  const searchDialog = searchPanel ? searchPanel.querySelector(".search-panel__dialog") : null;
+  const searchClose = searchPanel ? searchPanel.querySelector(".search-panel__close") : null;
+  const searchInput = searchPanel ? searchPanel.querySelector(".search-field") : null;
+
+  function closeSearch() {
+    if (searchToggle) {
+      searchToggle.setAttribute("aria-expanded", "false");
+    }
+    body.classList.remove("search-open");
+    if (searchPanel) {
+      searchPanel.setAttribute("aria-hidden", "true");
+    }
+  }
 
   if (navToggle) {
     navToggle.addEventListener("click", function () {
@@ -30,6 +43,11 @@ document.addEventListener("DOMContentLoaded", function () {
       body.classList.toggle("search-open", !expanded);
       if (searchPanel) {
         searchPanel.setAttribute("aria-hidden", String(expanded));
+      }
+      if (!expanded && searchInput) {
+        window.setTimeout(function () {
+          searchInput.focus();
+        }, 40);
       }
       if (!expanded && navToggle) {
         navToggle.setAttribute("aria-expanded", "false");
@@ -59,12 +77,23 @@ document.addEventListener("DOMContentLoaded", function () {
       body.classList.contains("search-open") &&
       searchToggle &&
       searchPanel &&
-      !searchPanel.contains(target) &&
+      searchDialog &&
+      !searchDialog.contains(target) &&
       !searchToggle.contains(target)
     ) {
-      searchToggle.setAttribute("aria-expanded", "false");
-      searchPanel.setAttribute("aria-hidden", "true");
-      body.classList.remove("search-open");
+      closeSearch();
+    }
+  });
+
+  if (searchClose) {
+    searchClose.addEventListener("click", function () {
+      closeSearch();
+    });
+  }
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && body.classList.contains("search-open")) {
+      closeSearch();
     }
   });
 

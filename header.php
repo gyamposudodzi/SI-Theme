@@ -18,6 +18,8 @@
 		<div class="nwm-shell">
 			<?php
 			$mega_posts = nerdywithme_get_featured_posts(2);
+			$search_posts = nerdywithme_get_featured_posts(3);
+			$search_categories = array_slice(nerdywithme_get_primary_categories(), 0, 6);
 			?>
 			<div class="site-header__top">
 				<?php nerdywithme_render_social_links(); ?>
@@ -92,8 +94,43 @@
 					</div>
 				</div>
 			</div>
-			<div id="search-panel" class="search-panel">
-				<?php get_search_form(); ?>
+			<div id="search-panel" class="search-panel" aria-hidden="true">
+				<div class="search-panel__backdrop"></div>
+				<div class="search-panel__dialog" role="dialog" aria-modal="true" aria-labelledby="search-panel-title">
+					<div class="search-panel__header">
+						<h2 id="search-panel-title"><?php esc_html_e('Search NerdyWithMe', 'nerdywithme'); ?></h2>
+						<button class="search-panel__close" type="button" aria-label="<?php esc_attr_e('Close search', 'nerdywithme'); ?>">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<?php get_search_form(); ?>
+					<div class="search-panel__filters" aria-label="<?php esc_attr_e('Suggested categories', 'nerdywithme'); ?>">
+						<?php foreach ($search_categories as $search_category) : ?>
+							<a class="search-panel__filter" href="<?php echo esc_url(get_category_link($search_category)); ?>"><?php echo esc_html($search_category->name); ?></a>
+						<?php endforeach; ?>
+					</div>
+					<div class="search-panel__suggested">
+						<div class="search-panel__intro">
+							<h3><?php esc_html_e('Recommended For You', 'nerdywithme'); ?></h3>
+							<p><?php esc_html_e('Useful reads to explore while you search the site.', 'nerdywithme'); ?></p>
+						</div>
+						<div class="search-panel__grid">
+							<?php while ($search_posts->have_posts()) : $search_posts->the_post(); ?>
+								<article class="search-panel__post">
+									<a class="search-panel__thumb" href="<?php the_permalink(); ?>">
+										<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'medium')); ?>" alt="<?php the_title_attribute(); ?>">
+									</a>
+									<div class="search-panel__content">
+										<div class="search-panel__meta"><?php nerdywithme_post_meta(get_the_ID()); ?></div>
+										<h4 class="search-panel__title">
+											<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+										</h4>
+									</div>
+								</article>
+							<?php endwhile; wp_reset_postdata(); ?>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	</header>

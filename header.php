@@ -51,46 +51,41 @@
 				</div>
 			</div>
 			<div class="mega-panel" aria-hidden="true">
-				<div class="mega-panel__grid">
-					<div class="mega-panel__group">
-						<h2><?php esc_html_e('Core Pages', 'nerdywithme'); ?></h2>
-						<ul class="mega-panel__links">
-							<li><a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('Home', 'nerdywithme'); ?></a></li>
-							<li><a href="<?php echo esc_url(home_url('/about')); ?>"><?php esc_html_e('About', 'nerdywithme'); ?></a></li>
-							<li><a href="<?php echo esc_url(home_url('/blog')); ?>"><?php esc_html_e('Blog', 'nerdywithme'); ?></a></li>
-							<li><a href="<?php echo esc_url(home_url('/tools')); ?>"><?php esc_html_e('Tools', 'nerdywithme'); ?></a></li>
-						</ul>
+				<div class="mega-panel__drawer">
+					<div class="mega-panel__brand">
+						<?php nerdywithme_branding(false, 'lockup'); ?>
 					</div>
 					<div class="mega-panel__group">
-						<h2><?php esc_html_e('Categories', 'nerdywithme'); ?></h2>
-						<ul class="mega-panel__links">
-							<?php foreach (nerdywithme_get_primary_categories() as $category) : ?>
-								<li><a href="<?php echo esc_url(get_category_link($category)); ?>"><?php echo esc_html($category->name); ?></a></li>
-							<?php endforeach; ?>
-						</ul>
-					</div>
-					<div class="mega-panel__group">
-						<h2><?php esc_html_e('Builder Tracks', 'nerdywithme'); ?></h2>
-						<ul class="mega-panel__links">
-							<li><a href="<?php echo esc_url(home_url('/projects')); ?>"><?php esc_html_e('Projects', 'nerdywithme'); ?></a></li>
-							<li><a href="<?php echo esc_url(home_url('/resources')); ?>"><?php esc_html_e('Resources', 'nerdywithme'); ?></a></li>
-							<li><a href="<?php echo esc_url(home_url('/category/automation-bots')); ?>"><?php esc_html_e('Automation & Bots', 'nerdywithme'); ?></a></li>
-							<li><a href="<?php echo esc_url(home_url('/category/ai-quant-trading')); ?>"><?php esc_html_e('AI & Quant Trading', 'nerdywithme'); ?></a></li>
-						</ul>
+						<h2><?php esc_html_e('Explore', 'nerdywithme'); ?></h2>
+						<?php
+						wp_nav_menu(
+							array(
+								'theme_location' => 'drawer_menu',
+								'container'      => false,
+								'menu_class'     => 'mega-panel__links',
+								'depth'          => 1,
+								'fallback_cb'    => 'nerdywithme_drawer_menu_fallback',
+							)
+						);
+						?>
 					</div>
 					<div class="mega-panel__posts">
-						<h2><?php esc_html_e('Latest Breakdowns', 'nerdywithme'); ?></h2>
+						<h2><?php esc_html_e('Latest Posts', 'nerdywithme'); ?></h2>
 						<div class="mega-panel__post-grid">
 							<?php while ($mega_posts->have_posts()) : $mega_posts->the_post(); ?>
-								<a class="mega-panel__post" href="<?php the_permalink(); ?>">
-									<span class="mega-panel__thumb">
+								<article class="mega-panel__post">
+									<a class="mega-panel__thumb" href="<?php the_permalink(); ?>">
 										<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'medium')); ?>" alt="<?php the_title_attribute(); ?>">
-									</span>
-									<span class="mega-panel__meta"><?php nerdywithme_post_meta(get_the_ID()); ?></span>
-									<strong><?php the_title(); ?></strong>
-								</a>
+									</a>
+									<div class="mega-panel__meta"><?php nerdywithme_post_meta(get_the_ID()); ?></div>
+									<h3 class="mega-panel__post-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
+								</article>
 							<?php endwhile; wp_reset_postdata(); ?>
 						</div>
+					</div>
+					<div class="mega-panel__social">
+						<h2><?php esc_html_e('Follow', 'nerdywithme'); ?></h2>
+						<?php nerdywithme_render_social_links(); ?>
 					</div>
 				</div>
 			</div>

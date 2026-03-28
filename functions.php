@@ -41,8 +41,14 @@ function nerdywithme_setup() {
 
 	register_nav_menus(
 		array(
-			'primary' => __('Primary Menu', 'nerdywithme'),
-			'footer'  => __('Footer Menu', 'nerdywithme'),
+			'primary'       => __('Primary Menu', 'nerdywithme'),
+			'drawer_menu'   => __('Drawer Menu', 'nerdywithme'),
+			'footer'        => __('Footer Menu', 'nerdywithme'),
+			'footer_col_1'  => __('Footer Column 1', 'nerdywithme'),
+			'footer_col_2'  => __('Footer Column 2', 'nerdywithme'),
+			'footer_col_3'  => __('Footer Column 3', 'nerdywithme'),
+			'footer_col_4'  => __('Footer Column 4', 'nerdywithme'),
+			'footer_legal'  => __('Footer Legal Menu', 'nerdywithme'),
 		)
 	);
 }
@@ -567,6 +573,16 @@ function nerdywithme_primary_menu_fallback() {
 	echo '</ul>';
 }
 
+function nerdywithme_drawer_menu_fallback() {
+	echo '<ul class="mega-panel__links">';
+	echo '<li><a href="' . esc_url(home_url('/')) . '">' . esc_html__('Home', 'nerdywithme') . '</a></li>';
+	echo '<li><a href="' . esc_url(home_url('/about')) . '">' . esc_html__('About', 'nerdywithme') . '</a></li>';
+	echo '<li><a href="' . esc_url(home_url('/blog')) . '">' . esc_html__('Blog', 'nerdywithme') . '</a></li>';
+	echo '<li><a href="' . esc_url(home_url('/tools')) . '">' . esc_html__('Tools', 'nerdywithme') . '</a></li>';
+	echo '<li><a href="' . esc_url(home_url('/projects')) . '">' . esc_html__('Projects', 'nerdywithme') . '</a></li>';
+	echo '</ul>';
+}
+
 function nerdywithme_branding($show_tagline = true, $variant = '') {
 	$custom_logo_id = nerdywithme_get_brand_logo_id();
 	$tagline        = get_bloginfo('description');
@@ -742,6 +758,19 @@ function nerdywithme_row_post($post_id) {
 			<p class="row-post__excerpt"><?php echo esc_html(wp_trim_words(get_the_excerpt($post_id), 18)); ?></p>
 		</div>
 	</article>
+	<?php
+}
+
+function nerdywithme_load_more_bar() {
+	$next_link = get_next_posts_link(__('Load More', 'nerdywithme'));
+
+	if (! $next_link) {
+		return;
+	}
+	?>
+	<div class="load-more-wrap">
+		<?php echo wp_kses_post($next_link); ?>
+	</div>
 	<?php
 }
 

@@ -259,12 +259,32 @@ button, input, textarea, select { font: inherit; }
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
 }
+.mega-panel__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
 .mega-panel__brand {
-  padding-bottom: 16px;
-  border-bottom: 1px solid #eceef4;
+  min-width: 0;
 }
 .mega-panel__brand .site-brand {
   justify-self: start;
+}
+.mega-panel__close {
+  display: none;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid #eceef4;
+  border-radius: 0;
+  background: #fff;
+  color: var(--nwm-primary);
+  font-size: 2rem;
+  line-height: 1;
+  box-shadow: none;
+  flex: 0 0 auto;
 }
 .mega-panel__group h2,
 .mega-panel__posts h2,
@@ -1497,10 +1517,18 @@ body.home .hot-grid__feature .card__title {
     overflow: auto;
   }
   .mega-panel__drawer {
-    width: min(360px, calc(100vw - 18px));
+    width: 100vw;
+    max-width: 100vw;
+    min-height: 100vh;
     gap: 24px;
-    padding: 24px 20px 30px;
-    box-shadow: 18px 0 42px rgba(10, 14, 35, 0.12);
+    padding: 20px 18px 28px;
+    box-shadow: none;
+    border-right: 0;
+  }
+  .mega-panel__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
   .mega-panel__group h2,
   .mega-panel__posts h2,

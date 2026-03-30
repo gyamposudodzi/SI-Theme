@@ -52,8 +52,13 @@
 			</div>
 			<div class="mega-panel" aria-hidden="true">
 				<div class="mega-panel__drawer">
-					<div class="mega-panel__brand">
-						<?php nerdywithme_branding(false, 'lockup'); ?>
+					<div class="mega-panel__topbar">
+						<div class="mega-panel__brand">
+							<?php nerdywithme_branding(false, 'lockup'); ?>
+						</div>
+						<button class="mega-panel__close" type="button" aria-label="<?php esc_attr_e('Close menu', 'nerdywithme'); ?>">
+							<span aria-hidden="true">&times;</span>
+						</button>
 					</div>
 					<div class="mega-panel__group">
 						<h2><?php esc_html_e('Explore', 'nerdywithme'); ?></h2>

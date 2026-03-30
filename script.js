@@ -3,10 +3,21 @@ document.addEventListener("DOMContentLoaded", function () {
   const navToggle = document.querySelector(".nav-toggle");
   const searchToggle = document.querySelector(".search-toggle");
   const megaPanel = document.querySelector(".mega-panel");
+  const megaClose = megaPanel ? megaPanel.querySelector(".mega-panel__close") : null;
   const searchPanel = document.querySelector(".search-panel");
   const searchDialog = searchPanel ? searchPanel.querySelector(".search-panel__dialog") : null;
   const searchClose = searchPanel ? searchPanel.querySelector(".search-panel__close") : null;
   const searchInput = searchPanel ? searchPanel.querySelector(".search-field") : null;
+
+  function closeNav() {
+    if (navToggle) {
+      navToggle.setAttribute("aria-expanded", "false");
+    }
+    body.classList.remove("nav-open");
+    if (megaPanel) {
+      megaPanel.setAttribute("aria-hidden", "true");
+    }
+  }
 
   function closeSearch() {
     if (searchToggle) {
@@ -33,6 +44,12 @@ document.addEventListener("DOMContentLoaded", function () {
           searchPanel.setAttribute("aria-hidden", "true");
         }
       }
+    });
+  }
+
+  if (megaClose) {
+    megaClose.addEventListener("click", function () {
+      closeNav();
     });
   }
 
@@ -68,9 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
       !megaPanel.contains(target) &&
       !navToggle.contains(target)
     ) {
-      navToggle.setAttribute("aria-expanded", "false");
-      megaPanel.setAttribute("aria-hidden", "true");
-      body.classList.remove("nav-open");
+      closeNav();
     }
 
     if (
@@ -92,6 +107,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && body.classList.contains("nav-open")) {
+      closeNav();
+    }
     if (event.key === "Escape" && body.classList.contains("search-open")) {
       closeSearch();
     }

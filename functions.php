@@ -171,6 +171,61 @@ function nerdywithme_customize_register($wp_customize) {
 		)
 	);
 
+	$wp_customize->add_section(
+		'nerdywithme_content_sources',
+		array(
+			'title'    => __('Curated Content Sources', 'nerdywithme'),
+			'priority' => 34,
+		)
+	);
+
+	$content_sources = array(
+		'hero_category'            => array(
+			'label'   => __('Homepage Hero Category Slug', 'nerdywithme'),
+			'default' => 'featured',
+		),
+		'editors_pick_category'    => array(
+			'label'   => __('Editors Pick Category Slug', 'nerdywithme'),
+			'default' => 'editors-pick',
+		),
+		'top_picks_category'       => array(
+			'label'   => __('Sidebar Top Picks Category Slug', 'nerdywithme'),
+			'default' => '',
+		),
+		'sidebar_featured_category' => array(
+			'label'   => __('Sidebar Featured Category Slug', 'nerdywithme'),
+			'default' => 'featured',
+		),
+		'search_recommended_category' => array(
+			'label'   => __('Search Modal Recommended Category Slug', 'nerdywithme'),
+			'default' => '',
+		),
+		'drawer_posts_category'    => array(
+			'label'   => __('Drawer Latest Posts Category Slug', 'nerdywithme'),
+			'default' => '',
+		),
+	);
+
+	foreach ($content_sources as $id => $source) {
+		$wp_customize->add_setting(
+			'nerdywithme_' . $id,
+			array(
+				'default'           => $source['default'],
+				'sanitize_callback' => 'sanitize_title',
+			)
+		);
+
+		$wp_customize->add_control(
+			'nerdywithme_' . $id,
+			array(
+				'label'       => $source['label'],
+				'description' => __('Leave blank to fall back to recent posts.', 'nerdywithme'),
+				'section'     => 'nerdywithme_content_sources',
+				'type'        => 'text',
+			)
+		);
+	}
+
 	$card_sections = array(
 		'home'    => array(
 			'section' => 'nerdywithme_home_social_cards',
@@ -312,6 +367,21 @@ function nerdywithme_customize_register($wp_customize) {
 	}
 }
 add_action('customize_register', 'nerdywithme_customize_register');
+
+/**
+ * Prevent WordPress from canonical-redirecting missing URLs to the homepage.
+ *
+ * This keeps genuine missing routes on the 404 template instead of letting
+ * local preview/server quirks bounce them somewhere "close enough".
+ */
+function nerdywithme_preserve_404_requests($redirect_url, $requested_url) {
+	if (is_404()) {
+		return false;
+	}
+
+	return $redirect_url;
+}
+add_filter('redirect_canonical', 'nerdywithme_preserve_404_requests', 10, 2);
 
 function nerdywithme_sanitize_brand_style($value) {
 	$allowed = array('refined', 'lockup');
@@ -504,6 +574,10 @@ function nerdywithme_get_option($key, $default = '') {
 	return get_theme_mod('nerdywithme_' . $key, $default);
 }
 
+function nerdywithme_get_content_source_slug($key, $default = '') {
+	return sanitize_title((string) get_theme_mod('nerdywithme_' . $key, $default));
+}
+
 function nerdywithme_get_brand_logo_id() {
 	$custom_logo_id = (int) get_theme_mod('custom_logo');
 
@@ -673,6 +747,16 @@ function nerdywithme_get_display_category($post_id = null) {
 	}
 
 	return null;
+}
+
+function nerdywithme_get_single_post_style($post_id = null) {
+	$post_id = $post_id ? $post_id : get_the_ID();
+
+	if (has_category(array('featured', 'editors-pick'), $post_id)) {
+		return 'feature';
+	}
+
+	return 'standard';
 }
 
 function nerdywithme_post_meta($post_id = null) {

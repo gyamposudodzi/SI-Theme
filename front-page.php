@@ -10,9 +10,11 @@ get_header();
 $featured = nerdywithme_get_featured_posts(18);
 $ids      = wp_list_pluck($featured->posts, 'ID');
 $home_social_cards = nerdywithme_get_social_cards('home');
-$hero_query = nerdywithme_get_posts_by_category_name('Featured', 1);
+$hero_source_slug   = nerdywithme_get_content_source_slug('hero_category', 'featured');
+$editor_source_slug = nerdywithme_get_content_source_slug('editors_pick_category', 'editors-pick');
+$hero_query = $hero_source_slug ? nerdywithme_get_posts_by_category_name($hero_source_slug, 1) : nerdywithme_get_featured_posts(1);
 $hero_ids   = wp_list_pluck($hero_query->posts, 'ID');
-$editor_query = nerdywithme_get_posts_by_category_name('Editors Pick', 3);
+$editor_query = $editor_source_slug ? nerdywithme_get_posts_by_category_name($editor_source_slug, 3) : nerdywithme_get_featured_posts(3);
 $editor_ids   = wp_list_pluck($editor_query->posts, 'ID');
 
 $hero_id        = $hero_ids[0] ?? ($ids[0] ?? 0);

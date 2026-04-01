@@ -17,8 +17,10 @@
 	<header class="site-header">
 		<div class="nwm-shell">
 			<?php
-			$mega_posts = nerdywithme_get_featured_posts(2);
-			$search_posts = nerdywithme_get_featured_posts(3);
+			$drawer_posts_slug = nerdywithme_get_content_source_slug('drawer_posts_category', '');
+			$search_posts_slug = nerdywithme_get_content_source_slug('search_recommended_category', '');
+			$mega_posts = $drawer_posts_slug ? nerdywithme_get_posts_by_category_name($drawer_posts_slug, 2) : nerdywithme_get_featured_posts(2);
+			$search_posts = $search_posts_slug ? nerdywithme_get_posts_by_category_name($search_posts_slug, 3) : nerdywithme_get_featured_posts(3);
 			$search_categories = array_slice(nerdywithme_get_primary_categories(), 0, 6);
 			?>
 			<div class="site-header__top">

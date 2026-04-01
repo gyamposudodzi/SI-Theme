@@ -11,15 +11,17 @@
 	$sidebar_social_cards = nerdywithme_get_social_cards('sidebar');
 	$profile_stack_urls   = nerdywithme_get_profile_stack_urls();
 	$profile_card         = nerdywithme_get_profile_card_settings();
+	$top_picks_slug       = nerdywithme_get_content_source_slug('top_picks_category', '');
+	$sidebar_featured_slug = nerdywithme_get_content_source_slug('sidebar_featured_category', 'featured');
 	?>
 	<section class="widget-card widget-card--plain">
 		<h2 class="widget-card__title"><?php esc_html_e('Top Picks', 'nerdywithme'); ?></h2>
-		<?php nerdywithme_ranked_posts(array('post__not_in' => array()), 3); ?>
+		<?php nerdywithme_ranked_posts($top_picks_slug ? array('category_name' => $top_picks_slug) : array('post__not_in' => array()), 3); ?>
 	</section>
 
 	<section class="widget-card widget-card--featured">
 		<h2 class="widget-card__title"><?php esc_html_e('Featured', 'nerdywithme'); ?></h2>
-		<?php nerdywithme_featured_slider_posts(array('category_name' => 'featured'), 3); ?>
+		<?php nerdywithme_featured_slider_posts($sidebar_featured_slug ? array('category_name' => $sidebar_featured_slug) : array(), 3); ?>
 	</section>
 
 	<section class="widget-card widget-card--plain">

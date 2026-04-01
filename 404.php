@@ -8,15 +8,6 @@
 get_header();
 ?>
 
-<section class="page-section">
-	<?php nerdywithme_section_heading(__('Explore Categories', 'nerdywithme')); ?>
-	<div class="category-tiles">
-		<?php foreach (nerdywithme_get_primary_categories() as $category) : ?>
-			<?php nerdywithme_category_card($category); ?>
-		<?php endforeach; ?>
-	</div>
-</section>
-
 <section class="page-section error-404">
 	<div class="error-404__code">404</div>
 	<h1 class="error-404__title"><?php esc_html_e('Oops! We Lost This Page', 'nerdywithme'); ?></h1>

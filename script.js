@@ -115,6 +115,18 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  window.addEventListener("resize", function () {
+    if (window.innerWidth > 820 && body.classList.contains("nav-open")) {
+      closeNav();
+    }
+
+    if (window.innerWidth <= 560 && body.classList.contains("search-open")) {
+      if (searchPanel) {
+        searchPanel.setAttribute("aria-hidden", "false");
+      }
+    }
+  });
+
   document.querySelectorAll("[data-featured-slider]").forEach(function (slider) {
     const slides = Array.from(slider.querySelectorAll("[data-featured-slide]"));
     const dots = Array.from(slider.querySelectorAll("[data-featured-dot]"));

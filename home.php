@@ -7,6 +7,10 @@
 
 get_header();
 
+$posts_page_id = (int) get_option('page_for_posts');
+$blog_title    = $posts_page_id ? get_the_title($posts_page_id) : __('Blog', 'nerdywithme');
+$blog_intro    = $posts_page_id ? get_post_field('post_excerpt', $posts_page_id) : '';
+
 $featured_post = new WP_Query(
 	array(
 		'post_type'           => 'post',
@@ -16,60 +20,68 @@ $featured_post = new WP_Query(
 );
 
 $featured_id = $featured_post->posts[0]->ID ?? 0;
+$grid_ids    = array();
+
+if ($featured_id) {
+	$grid_query = nerdywithme_get_featured_posts(4, array($featured_id));
+	$grid_ids   = wp_list_pluck($grid_query->posts, 'ID');
+	wp_reset_postdata();
+}
 ?>
 
 <section class="page-section archive-hero">
-	<p class="section-intro"><?php esc_html_e('Latest market education from NerdyWithMe', 'nerdywithme'); ?></p>
-	<h1 class="archive-headline"><?php bloginfo('name'); ?> <?php esc_html_e('Journal', 'nerdywithme'); ?></h1>
-	<p class="archive-description"><?php esc_html_e('Practical trading education, technical analysis, automation ideas, and AI-assisted systems for modern traders.', 'nerdywithme'); ?></p>
+	<div class="archive-hero__layout">
+		<div class="archive-hero__content">
+			<p class="section-intro"><?php esc_html_e('Latest market education from NerdyWithMe', 'nerdywithme'); ?></p>
+			<h1 class="archive-headline"><?php echo esc_html($blog_title); ?></h1>
+			<p class="archive-description">
+				<?php
+				echo esc_html(
+					$blog_intro
+						? $blog_intro
+						: __('Practical trading education, technical analysis, automation ideas, and AI-assisted systems for modern traders.', 'nerdywithme')
+				);
+				?>
+			</p>
+		</div>
+		<?php if (function_exists('nerdywithme_tools_render_ad_slot')) : ?>
+			<div class="theme-ad-slot theme-ad-slot--archive-header">
+				<?php nerdywithme_tools_render_ad_slot('archive_header'); ?>
+			</div>
+		<?php endif; ?>
+	</div>
 </section>
 
-<?php if ($featured_id) : ?>
-	<section class="page-section">
-		<div class="split-grid">
-			<div class="lead-card">
-				<?php nerdywithme_card($featured_id); ?>
-			</div>
-			<?php get_sidebar(); ?>
-		</div>
-	</section>
-<?php endif; ?>
-
 <section class="page-section">
-	<?php nerdywithme_section_heading(__('Latest Posts', 'nerdywithme'), __('A rolling feed of trading breakdowns, platform comparisons, and builder-focused market lessons.', 'nerdywithme')); ?>
-	<div class="archive-grid">
-		<div class="post-grid">
-			<?php if (have_posts()) : ?>
-				<?php while (have_posts()) : the_post(); ?>
-					<?php if (get_the_ID() !== $featured_id) : ?>
-						<?php nerdywithme_card(get_the_ID()); ?>
-					<?php endif; ?>
-				<?php endwhile; ?>
-			<?php else : ?>
-				<p><?php esc_html_e('No posts yet. Add your first post and this grid will come alive.', 'nerdywithme'); ?></p>
+	<div class="archive-grid archive-grid--blog">
+		<div class="blog-page">
+			<?php if ($featured_id) : ?>
+				<div class="blog-page__feature">
+					<?php nerdywithme_card($featured_id, 'lead'); ?>
+				</div>
 			<?php endif; ?>
+
+			<div class="blog-page__grid">
+				<?php if (! empty($grid_ids)) : ?>
+					<?php foreach ($grid_ids as $grid_id) : ?>
+						<?php nerdywithme_card($grid_id); ?>
+					<?php endforeach; ?>
+				<?php elseif (have_posts()) : ?>
+					<?php while (have_posts()) : the_post(); ?>
+						<?php if (get_the_ID() !== $featured_id) : ?>
+							<?php nerdywithme_card(get_the_ID()); ?>
+						<?php endif; ?>
+					<?php endwhile; ?>
+				<?php else : ?>
+					<p><?php esc_html_e('No posts yet. Add your first post and this grid will come alive.', 'nerdywithme'); ?></p>
+				<?php endif; ?>
+			</div>
+
+			<div class="pagination-wrap">
+				<?php the_posts_pagination(); ?>
+			</div>
 		</div>
 		<?php get_sidebar(); ?>
-	</div>
-	<div class="pagination-wrap">
-		<?php the_posts_pagination(); ?>
-	</div>
-</section>
-
-<section class="page-section">
-	<div class="triple-columns">
-		<div>
-			<?php nerdywithme_section_heading(__('Starter Reads', 'nerdywithme')); ?>
-			<?php nerdywithme_ranked_posts(array(), 3); ?>
-		</div>
-		<div>
-			<?php nerdywithme_section_heading(__('Systems To Explore', 'nerdywithme')); ?>
-			<?php nerdywithme_compact_posts(array(), 3); ?>
-		</div>
-		<div>
-			<?php nerdywithme_section_heading(__('Quick Lessons', 'nerdywithme')); ?>
-			<?php nerdywithme_compact_posts(array('orderby' => 'rand'), 3); ?>
-		</div>
 	</div>
 </section>
 

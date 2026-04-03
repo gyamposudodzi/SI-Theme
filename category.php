@@ -9,16 +9,25 @@ get_header();
 ?>
 
 <section class="page-section archive-hero category-hero">
-	<p class="section-intro"><?php esc_html_e('Category', 'nerdywithme'); ?></p>
-	<h1 class="archive-headline"><?php single_cat_title(); ?></h1>
-	<div class="archive-description term-description">
-		<?php
-		echo wp_kses_post(
-			category_description()
-				? category_description()
-				: __('A focused collection of posts from this trading track, with the latest breakdowns, tools, and lessons ready to explore.', 'nerdywithme')
-		);
-		?>
+	<div class="archive-hero__layout">
+		<div class="archive-hero__content">
+			<p class="section-intro"><?php esc_html_e('Category', 'nerdywithme'); ?></p>
+			<h1 class="archive-headline"><?php single_cat_title(); ?></h1>
+			<div class="archive-description term-description">
+				<?php
+				echo wp_kses_post(
+					category_description()
+						? category_description()
+						: __('A focused collection of posts from this trading track, with the latest breakdowns, tools, and lessons ready to explore.', 'nerdywithme')
+				);
+				?>
+			</div>
+		</div>
+		<?php if (function_exists('nerdywithme_tools_render_ad_slot')) : ?>
+			<div class="theme-ad-slot theme-ad-slot--archive-header">
+				<?php nerdywithme_tools_render_ad_slot('archive_header'); ?>
+			</div>
+		<?php endif; ?>
 	</div>
 </section>
 

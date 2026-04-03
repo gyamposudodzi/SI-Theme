@@ -9,6 +9,11 @@
 	</main>
 	<footer class="site-footer">
 		<div class="nwm-shell">
+			<?php if (function_exists('nerdywithme_tools_render_ad_slot')) : ?>
+				<div class="theme-ad-slot theme-ad-slot--footer">
+					<?php nerdywithme_tools_render_ad_slot('footer'); ?>
+				</div>
+			<?php endif; ?>
 			<div class="footer-brand">
 				<?php nerdywithme_branding(false); ?>
 				<p class="section-intro"><?php echo esc_html(nerdywithme_get_option('footer_blurb', __('Where trading meets technology: practical market education, automation, AI, and tools for modern traders.', 'nerdywithme'))); ?></p>

@@ -37,6 +37,11 @@ get_header();
 						<div class="entry-content">
 							<?php the_content(); ?>
 						</div>
+						<?php if (function_exists('nerdywithme_tools_render_ad_slot')) : ?>
+							<div class="theme-ad-slot theme-ad-slot--single-inline">
+								<?php nerdywithme_tools_render_ad_slot('single_inline'); ?>
+							</div>
+						<?php endif; ?>
 						<footer class="entry-footer">
 							<?php the_tags('<span class="post-categories">', '', '</span>'); ?>
 						</footer>
@@ -44,7 +49,7 @@ get_header();
 							<?php nerdywithme_section_heading(__('Read Next', 'nerdywithme'), __('Keep building from fundamentals into tools, automation, and smarter decision-making.', 'nerdywithme')); ?>
 							<div class="read-next__grid">
 								<?php
-								$related = nerdywithme_get_featured_posts(3, array(get_the_ID()));
+								$related = nerdywithme_get_related_posts(get_the_ID(), 3);
 								while ($related->have_posts()) :
 									$related->the_post();
 									?>
@@ -88,6 +93,11 @@ get_header();
 						<div class="entry-content">
 							<?php the_content(); ?>
 						</div>
+						<?php if (function_exists('nerdywithme_tools_render_ad_slot')) : ?>
+							<div class="theme-ad-slot theme-ad-slot--single-inline">
+								<?php nerdywithme_tools_render_ad_slot('single_inline'); ?>
+							</div>
+						<?php endif; ?>
 						<footer class="entry-footer">
 							<?php the_tags('<span class="post-categories">', '', '</span>'); ?>
 						</footer>
@@ -95,7 +105,7 @@ get_header();
 							<?php nerdywithme_section_heading(__('Read Next', 'nerdywithme'), __('Keep building from fundamentals into tools, automation, and smarter decision-making.', 'nerdywithme')); ?>
 							<div class="read-next__grid">
 								<?php
-								$related = nerdywithme_get_featured_posts(3, array(get_the_ID()));
+								$related = nerdywithme_get_related_posts(get_the_ID(), 3);
 								while ($related->have_posts()) :
 									$related->the_post();
 									?>

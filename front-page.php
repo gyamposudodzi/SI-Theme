@@ -58,6 +58,12 @@ if (count($editor_ids) < 3) {
 	</div>
 </section>
 
+<?php if (function_exists('nerdywithme_tools_render_ad_slot')) : ?>
+	<section class="page-section theme-ad-slot theme-ad-slot--homepage">
+		<?php nerdywithme_tools_render_ad_slot('homepage_after_hero'); ?>
+	</section>
+<?php endif; ?>
+
 <section class="page-section">
 	<?php nerdywithme_section_heading(__('Connect With My Favorite Apps', 'nerdywithme'), __('Chosen by the editor.', 'nerdywithme')); ?>
 	<div class="app-strip app-strip--social">

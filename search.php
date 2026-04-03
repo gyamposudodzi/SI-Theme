@@ -13,25 +13,34 @@ $results_count = (int) $wp_query->found_posts;
 ?>
 
 <section class="page-section archive-hero search-hero">
-	<p class="section-intro"><?php esc_html_e('Search Results', 'nerdywithme'); ?></p>
-	<h1 class="archive-headline">
-		<?php
-		printf(
-			/* translators: %s: search query. */
-			esc_html__('Results for "%s"', 'nerdywithme'),
-			esc_html($search_query)
-		);
-		?>
-	</h1>
-	<p class="archive-description">
-		<?php
-		printf(
-			/* translators: %d: number of search results. */
-			esc_html(_n('%d article matched your search.', '%d articles matched your search.', $results_count, 'nerdywithme')),
-			esc_html($results_count)
-		);
-		?>
-	</p>
+	<div class="archive-hero__layout">
+		<div class="archive-hero__content">
+			<p class="section-intro"><?php esc_html_e('Search Results', 'nerdywithme'); ?></p>
+			<h1 class="archive-headline">
+				<?php
+				printf(
+					/* translators: %s: search query. */
+					esc_html__('Results for "%s"', 'nerdywithme'),
+					esc_html($search_query)
+				);
+				?>
+			</h1>
+			<p class="archive-description">
+				<?php
+				printf(
+					/* translators: %d: number of search results. */
+					esc_html(_n('%d article matched your search.', '%d articles matched your search.', $results_count, 'nerdywithme')),
+					esc_html($results_count)
+				);
+				?>
+			</p>
+		</div>
+		<?php if (function_exists('nerdywithme_tools_render_ad_slot')) : ?>
+			<div class="theme-ad-slot theme-ad-slot--archive-header">
+				<?php nerdywithme_tools_render_ad_slot('archive_header'); ?>
+			</div>
+		<?php endif; ?>
+	</div>
 </section>
 
 <section class="page-section">

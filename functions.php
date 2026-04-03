@@ -204,6 +204,14 @@ function nerdywithme_customize_register($wp_customize) {
 			'label'   => __('Drawer Latest Posts Category Slug', 'nerdywithme'),
 			'default' => '',
 		),
+		'read_next_category'       => array(
+			'label'   => __('Single Post Read Next Category Slug', 'nerdywithme'),
+			'default' => '',
+		),
+		'404_suggestions_category' => array(
+			'label'   => __('404 Suggestions Category Slug', 'nerdywithme'),
+			'default' => '',
+		),
 	);
 
 	foreach ($content_sources as $id => $source) {
@@ -1008,6 +1016,42 @@ function nerdywithme_get_posts_by_category_name($category_name, $count = 3, $exc
 			'cat'                 => (int) $category->term_id,
 		)
 	);
+}
+
+function nerdywithme_get_related_posts($post_id = null, $count = 3) {
+	$post_id      = $post_id ? $post_id : get_the_ID();
+	$source_slug  = nerdywithme_get_content_source_slug('read_next_category', '');
+	$exclude      = array((int) $post_id);
+
+	if ($source_slug) {
+		return nerdywithme_get_posts_by_category_name($source_slug, $count, $exclude);
+	}
+
+	$display_category = nerdywithme_get_display_category($post_id);
+
+	if ($display_category && ! is_wp_error($display_category)) {
+		return new WP_Query(
+			array(
+				'post_type'           => 'post',
+				'posts_per_page'      => $count,
+				'post__not_in'        => $exclude,
+				'ignore_sticky_posts' => true,
+				'cat'                 => (int) $display_category->term_id,
+			)
+		);
+	}
+
+	return nerdywithme_get_featured_posts($count, $exclude);
+}
+
+function nerdywithme_get_404_suggestion_posts($count = 3) {
+	$source_slug = nerdywithme_get_content_source_slug('404_suggestions_category', '');
+
+	if ($source_slug) {
+		return nerdywithme_get_posts_by_category_name($source_slug, $count);
+	}
+
+	return nerdywithme_get_featured_posts($count);
 }
 
 function nerdywithme_get_primary_categories($count = 6) {

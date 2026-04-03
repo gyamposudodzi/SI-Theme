@@ -1,0 +1,238 @@
+.nwm-tools-admin {
+  max-width: 1220px;
+}
+
+.nwm-tools-admin__hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 24px 28px;
+  margin: 22px 0 20px;
+  background: linear-gradient(135deg, #fffaf4 0%, #ffffff 55%, #f5f8ff 100%);
+  border: 1px solid #eadff3;
+  box-shadow: 0 18px 38px rgba(16, 20, 55, 0.08);
+}
+
+.nwm-tools-admin__hero h1 {
+  margin: 0 0 8px;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.nwm-tools-admin__hero p {
+  margin: 0;
+  max-width: 74ch;
+  color: #5f6686;
+  font-size: 0.96rem;
+  line-height: 1.65;
+}
+
+.nwm-tools-admin__hero-meta {
+  display: grid;
+  gap: 4px;
+  min-width: 120px;
+  padding: 14px 16px;
+  text-align: center;
+  background: #fff;
+  border: 1px solid #eadff3;
+}
+
+.nwm-tools-admin__hero-meta strong {
+  color: #132a78;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.nwm-tools-admin__hero-meta span {
+  color: #ff5f36;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.nwm-tools-admin__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.nwm-tools-admin__tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid #dcdff1;
+  background: #fff;
+  color: #132a78;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.nwm-tools-admin__tab.is-active {
+  background: #fff7f1;
+  border-color: #ffd5c8;
+  color: #ff5f36;
+}
+
+.nwm-tools-admin__panel {
+  display: none;
+  margin-bottom: 22px;
+  padding: 24px;
+  background: #fff;
+  border: 1px solid #eadff3;
+  box-shadow: 0 16px 34px rgba(16, 20, 55, 0.06);
+}
+
+.nwm-tools-admin__panel.is-active {
+  display: block;
+}
+
+.nwm-tools-admin__panel-header {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.nwm-tools-admin__panel-header h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  line-height: 1.05;
+}
+
+.nwm-tools-admin__panel-header p {
+  margin: 0;
+  max-width: 70ch;
+  color: #5f6686;
+}
+
+.nwm-tools-admin__cards {
+  display: grid;
+  gap: 18px;
+}
+
+.nwm-tools-admin__card {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  background: linear-gradient(180deg, #fff, #fffdf9);
+  border: 1px solid #ece7f5;
+}
+
+.nwm-tools-admin__card-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 14px;
+  align-items: start;
+}
+
+.nwm-tools-admin__card-head h3 {
+  margin: 0 0 4px;
+  font-size: 1.08rem;
+  line-height: 1.05;
+}
+
+.nwm-tools-admin__card-head p {
+  margin: 0;
+  color: #69708f;
+}
+
+.nwm-tools-admin__drag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  min-height: 36px;
+  background: #f6f7fb;
+  color: #8c90a8;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: grab;
+}
+
+.nwm-tools-admin__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.nwm-tools-admin__fields {
+  display: grid;
+  gap: 14px;
+}
+
+.nwm-tools-admin__fields label {
+  display: grid;
+  gap: 8px;
+}
+
+.nwm-tools-admin__fields span {
+  color: #132a78;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.nwm-tools-admin__fields input,
+.nwm-tools-admin__fields textarea {
+  width: 100%;
+}
+
+.nwm-tools-admin__cards--seo .nwm-tools-admin__card {
+  gap: 12px;
+}
+
+.nwm-tools-admin__help {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.nwm-tools-admin__help-card {
+  padding: 20px;
+  background: linear-gradient(180deg, #fff, #fffdf9);
+  border: 1px solid #ece7f5;
+}
+
+.nwm-tools-admin__help-card h3 {
+  margin: 0 0 10px;
+}
+
+.nwm-tools-admin__help-card p,
+.nwm-tools-admin__help-card ul {
+  margin: 0;
+  color: #5f6686;
+}
+
+.nwm-tools-admin__help-card ul {
+  padding-left: 18px;
+}
+
+.nwm-tools-admin__card.ui-sortable-helper {
+  box-shadow: 0 18px 36px rgba(16, 20, 55, 0.14);
+}
+
+.nwm-tools-admin__card-placeholder {
+  min-height: 140px;
+  border: 2px dashed #ffd5c8;
+  background: #fff7f1;
+}
+
+@media (max-width: 900px) {
+  .nwm-tools-admin__hero,
+  .nwm-tools-admin__card-head {
+    grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .nwm-tools-admin__hero-meta {
+    justify-self: start;
+  }
+
+  .nwm-tools-admin__help {
+    grid-template-columns: 1fr;
+  }
+}

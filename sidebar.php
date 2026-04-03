@@ -70,4 +70,10 @@
 			</div>
 		</div>
 	</section>
+
+	<?php if (function_exists('nerdywithme_tools_render_ad_slot')) : ?>
+		<section class="widget-card widget-card--plain widget-card--ad">
+			<?php nerdywithme_tools_render_ad_slot('sidebar'); ?>
+		</section>
+	<?php endif; ?>
 </aside>

@@ -37,15 +37,11 @@ class NerdyWithMe_Tools_Shortcodes {
 		$ads      = $settings['ads'] ?? array();
 		$behaviors = $settings['ad_settings'] ?? array();
 		$slot     = sanitize_key($atts['slot']);
-		$content  = $ads[ $slot ] ?? '';
-
-		if (! $content) {
-			return '';
-		}
 
 		$slot_settings = wp_parse_args(
 			isset($behaviors[ $slot ]) && is_array($behaviors[ $slot ]) ? $behaviors[ $slot ] : array(),
 			array(
+				'mode'        => 'markup',
 				'sticky'      => false,
 				'hide_mobile' => false,
 				'style'       => 'standard',
@@ -54,8 +50,25 @@ class NerdyWithMe_Tools_Shortcodes {
 				'width_tablet'  => 'standard',
 				'width_mobile'  => 'full',
 				'align'         => 'left',
+				'offset_desktop' => 108,
+				'offset_tablet'  => 96,
+				'offset_mobile'  => 84,
+				'image_url'      => '',
+				'image_alt'      => '',
+				'target_url'     => '',
+				'eyebrow'        => '',
+				'title'          => '',
+				'copy'           => '',
+				'button_label'   => '',
+				'meta'           => '',
 			)
 		);
+
+		$content = $this->get_slot_rendered_content($slot, $ads[ $slot ] ?? '', $slot_settings);
+
+		if (! $content) {
+			return '';
+		}
 
 		$classes = array(
 			'nwm-ad-slot',
@@ -75,7 +88,100 @@ class NerdyWithMe_Tools_Shortcodes {
 			$classes[] = 'nwm-ad-slot--hide-mobile';
 		}
 
-		return '<div class="' . esc_attr(implode(' ', $classes)) . '">' . do_shortcode(wp_kses_post($content)) . '</div>';
+		$style = sprintf(
+			'--nwm-sticky-top-desktop:%1$spx;--nwm-sticky-top-tablet:%2$spx;--nwm-sticky-top-mobile:%3$spx;',
+			max(0, absint($slot_settings['offset_desktop'])),
+			max(0, absint($slot_settings['offset_tablet'])),
+			max(0, absint($slot_settings['offset_mobile']))
+		);
+
+		return '<div class="' . esc_attr(implode(' ', $classes)) . '" style="' . esc_attr($style) . '">' . do_shortcode(wp_kses_post($content)) . '</div>';
+	}
+
+	/**
+	 * Resolve rendered slot content by mode.
+	 *
+	 * @param string $slot Slot key.
+	 * @param string $markup Raw markup.
+	 * @param array  $slot_settings Slot settings.
+	 * @return string
+	 */
+	private function get_slot_rendered_content($slot, $markup, $slot_settings) {
+		$mode = $slot_settings['mode'] ?? 'markup';
+
+		if ('image' === $mode) {
+			return $this->render_image_ad_slot($slot_settings);
+		}
+
+		if ('promo' === $mode) {
+			return $this->render_promo_ad_slot($slot_settings);
+		}
+
+		return $markup ? do_shortcode(wp_kses_post($markup)) : '';
+	}
+
+	/**
+	 * Render managed promo ad.
+	 *
+	 * @param array $slot_settings Slot settings.
+	 * @return string
+	 */
+	private function render_promo_ad_slot($slot_settings) {
+		if (empty($slot_settings['title'])) {
+			return '';
+		}
+
+		$eyebrow = $slot_settings['eyebrow'] ?: __('Sponsored', 'nerdywithme-tools');
+		$title   = $slot_settings['title'];
+		$copy    = $slot_settings['copy'] ?? '';
+		$button  = $slot_settings['button_label'] ?? '';
+		$meta    = $slot_settings['meta'] ?? '';
+		$url     = $slot_settings['target_url'] ?? '';
+
+		ob_start();
+		?>
+		<div class="nwm-demo-ad nwm-demo-ad--managed">
+			<div class="nwm-demo-ad__body">
+				<p class="nwm-demo-ad__eyebrow"><?php echo esc_html($eyebrow); ?></p>
+				<h3 class="nwm-demo-ad__title"><?php echo esc_html($title); ?></h3>
+				<?php if ($copy) : ?>
+					<p class="nwm-demo-ad__copy"><?php echo esc_html($copy); ?></p>
+				<?php endif; ?>
+			</div>
+			<div class="nwm-demo-ad__actions">
+				<?php if ($button && $url) : ?>
+					<a class="nwm-demo-ad__button" href="<?php echo esc_url($url); ?>"><?php echo esc_html($button); ?></a>
+				<?php elseif ($button) : ?>
+					<span class="nwm-demo-ad__button"><?php echo esc_html($button); ?></span>
+				<?php endif; ?>
+				<?php if ($meta) : ?>
+					<span class="nwm-demo-ad__meta"><?php echo esc_html($meta); ?></span>
+				<?php endif; ?>
+			</div>
+		</div>
+		<?php
+
+		return ob_get_clean();
+	}
+
+	/**
+	 * Render managed image ad.
+	 *
+	 * @param array $slot_settings Slot settings.
+	 * @return string
+	 */
+	private function render_image_ad_slot($slot_settings) {
+		if (empty($slot_settings['image_url'])) {
+			return '';
+		}
+
+		$image = '<img src="' . esc_url($slot_settings['image_url']) . '" alt="' . esc_attr($slot_settings['image_alt'] ?? '') . '">';
+
+		if (! empty($slot_settings['target_url'])) {
+			return '<a class="nwm-managed-ad nwm-managed-ad--image" href="' . esc_url($slot_settings['target_url']) . '">' . $image . '</a>';
+		}
+
+		return '<div class="nwm-managed-ad nwm-managed-ad--image">' . $image . '</div>';
 	}
 
 	/**

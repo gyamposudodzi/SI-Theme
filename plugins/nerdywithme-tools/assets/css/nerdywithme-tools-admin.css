@@ -188,6 +188,14 @@
   align-items: end;
 }
 
+.nwm-tools-admin__fields--ad-content {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.nwm-tools-admin__fields--full {
+  grid-column: 1 / -1;
+}
+
 .nwm-tools-admin__ad-options label {
   display: grid;
   gap: 8px;
@@ -253,6 +261,10 @@
   }
 
   .nwm-tools-admin__ad-options {
+    grid-template-columns: 1fr;
+  }
+
+  .nwm-tools-admin__fields--ad-content {
     grid-template-columns: 1fr;
   }
 }

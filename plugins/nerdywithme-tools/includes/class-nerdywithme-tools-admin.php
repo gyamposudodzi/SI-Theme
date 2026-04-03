@@ -231,6 +231,9 @@ class NerdyWithMe_Tools_Admin {
 		foreach (array_keys($this->get_ad_slot_labels()) as $slot) {
 			$sanitized['ads'][ $slot ] = isset($input['ads'][ $slot ]) ? wp_kses_post($input['ads'][ $slot ]) : '';
 			$sanitized['ad_settings'][ $slot ] = array(
+				'mode'        => isset($input['ad_settings'][ $slot ]['mode']) && array_key_exists($input['ad_settings'][ $slot ]['mode'], $this->get_ad_mode_options())
+					? sanitize_key($input['ad_settings'][ $slot ]['mode'])
+					: 'markup',
 				'sticky'      => ! empty($input['ad_settings'][ $slot ]['sticky']),
 				'hide_mobile' => ! empty($input['ad_settings'][ $slot ]['hide_mobile']),
 				'style'       => isset($input['ad_settings'][ $slot ]['style']) && array_key_exists($input['ad_settings'][ $slot ]['style'], $this->get_ad_style_options())
@@ -248,6 +251,17 @@ class NerdyWithMe_Tools_Admin {
 				'align'       => isset($input['ad_settings'][ $slot ]['align']) && array_key_exists($input['ad_settings'][ $slot ]['align'], $this->get_ad_alignment_options())
 					? sanitize_key($input['ad_settings'][ $slot ]['align'])
 					: 'left',
+				'offset_desktop' => isset($input['ad_settings'][ $slot ]['offset_desktop']) ? max(0, absint($input['ad_settings'][ $slot ]['offset_desktop'])) : 108,
+				'offset_tablet'  => isset($input['ad_settings'][ $slot ]['offset_tablet']) ? max(0, absint($input['ad_settings'][ $slot ]['offset_tablet'])) : 96,
+				'offset_mobile'  => isset($input['ad_settings'][ $slot ]['offset_mobile']) ? max(0, absint($input['ad_settings'][ $slot ]['offset_mobile'])) : 84,
+				'image_url'      => isset($input['ad_settings'][ $slot ]['image_url']) ? esc_url_raw($input['ad_settings'][ $slot ]['image_url']) : '',
+				'image_alt'      => isset($input['ad_settings'][ $slot ]['image_alt']) ? sanitize_text_field($input['ad_settings'][ $slot ]['image_alt']) : '',
+				'target_url'     => isset($input['ad_settings'][ $slot ]['target_url']) ? esc_url_raw($input['ad_settings'][ $slot ]['target_url']) : '',
+				'eyebrow'        => isset($input['ad_settings'][ $slot ]['eyebrow']) ? sanitize_text_field($input['ad_settings'][ $slot ]['eyebrow']) : '',
+				'title'          => isset($input['ad_settings'][ $slot ]['title']) ? sanitize_text_field($input['ad_settings'][ $slot ]['title']) : '',
+				'copy'           => isset($input['ad_settings'][ $slot ]['copy']) ? sanitize_textarea_field($input['ad_settings'][ $slot ]['copy']) : '',
+				'button_label'   => isset($input['ad_settings'][ $slot ]['button_label']) ? sanitize_text_field($input['ad_settings'][ $slot ]['button_label']) : '',
+				'meta'           => isset($input['ad_settings'][ $slot ]['meta']) ? sanitize_text_field($input['ad_settings'][ $slot ]['meta']) : '',
 				'width'       => isset($input['ad_settings'][ $slot ]['width']) && array_key_exists($input['ad_settings'][ $slot ]['width'], $this->get_ad_width_options())
 					? sanitize_key($input['ad_settings'][ $slot ]['width'])
 					: 'standard',
@@ -541,6 +555,14 @@ class NerdyWithMe_Tools_Admin {
 									<textarea name="<?php echo esc_attr(self::OPTION_KEY . '[ads][' . $slot . ']'); ?>" rows="6" class="code"><?php echo esc_textarea($settings['ads'][ $slot ] ?? ''); ?></textarea>
 								</label>
 								<div class="nwm-tools-admin__ad-options">
+									<label>
+										<span><?php esc_html_e('Content mode', 'nerdywithme-tools'); ?></span>
+										<select name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][mode]'); ?>">
+											<?php foreach ($this->get_ad_mode_options() as $mode_key => $mode_label) : ?>
+												<option value="<?php echo esc_attr($mode_key); ?>" <?php selected($settings['ad_settings'][ $slot ]['mode'] ?? 'markup', $mode_key); ?>><?php echo esc_html($mode_label); ?></option>
+											<?php endforeach; ?>
+										</select>
+									</label>
 									<label class="nwm-tools-admin__toggle">
 										<input type="checkbox" name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][sticky]'); ?>" value="1" <?php checked(! empty($settings['ad_settings'][ $slot ]['sticky'])); ?>>
 										<span><?php esc_html_e('Make this slot sticky', 'nerdywithme-tools'); ?></span>
@@ -588,6 +610,52 @@ class NerdyWithMe_Tools_Admin {
 												<option value="<?php echo esc_attr($align_key); ?>" <?php selected($settings['ad_settings'][ $slot ]['align'] ?? 'left', $align_key); ?>><?php echo esc_html($align_label); ?></option>
 											<?php endforeach; ?>
 										</select>
+									</label>
+									<label>
+										<span><?php esc_html_e('Desktop sticky offset (px)', 'nerdywithme-tools'); ?></span>
+										<input type="number" min="0" step="1" name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][offset_desktop]'); ?>" value="<?php echo esc_attr((string) ($settings['ad_settings'][ $slot ]['offset_desktop'] ?? 108)); ?>">
+									</label>
+									<label>
+										<span><?php esc_html_e('Tablet sticky offset (px)', 'nerdywithme-tools'); ?></span>
+										<input type="number" min="0" step="1" name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][offset_tablet]'); ?>" value="<?php echo esc_attr((string) ($settings['ad_settings'][ $slot ]['offset_tablet'] ?? 96)); ?>">
+									</label>
+									<label>
+										<span><?php esc_html_e('Phone sticky offset (px)', 'nerdywithme-tools'); ?></span>
+										<input type="number" min="0" step="1" name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][offset_mobile]'); ?>" value="<?php echo esc_attr((string) ($settings['ad_settings'][ $slot ]['offset_mobile'] ?? 84)); ?>">
+									</label>
+								</div>
+								<div class="nwm-tools-admin__fields nwm-tools-admin__fields--ad-content">
+									<label>
+										<span><?php esc_html_e('Image URL', 'nerdywithme-tools'); ?></span>
+										<input type="url" name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][image_url]'); ?>" value="<?php echo esc_attr($settings['ad_settings'][ $slot ]['image_url'] ?? ''); ?>">
+									</label>
+									<label>
+										<span><?php esc_html_e('Image Alt Text', 'nerdywithme-tools'); ?></span>
+										<input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][image_alt]'); ?>" value="<?php echo esc_attr($settings['ad_settings'][ $slot ]['image_alt'] ?? ''); ?>">
+									</label>
+									<label>
+										<span><?php esc_html_e('Target URL', 'nerdywithme-tools'); ?></span>
+										<input type="url" name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][target_url]'); ?>" value="<?php echo esc_attr($settings['ad_settings'][ $slot ]['target_url'] ?? ''); ?>">
+									</label>
+									<label>
+										<span><?php esc_html_e('Eyebrow', 'nerdywithme-tools'); ?></span>
+										<input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][eyebrow]'); ?>" value="<?php echo esc_attr($settings['ad_settings'][ $slot ]['eyebrow'] ?? ''); ?>">
+									</label>
+									<label>
+										<span><?php esc_html_e('Title', 'nerdywithme-tools'); ?></span>
+										<input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][title]'); ?>" value="<?php echo esc_attr($settings['ad_settings'][ $slot ]['title'] ?? ''); ?>">
+									</label>
+									<label>
+										<span><?php esc_html_e('Button Label', 'nerdywithme-tools'); ?></span>
+										<input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][button_label]'); ?>" value="<?php echo esc_attr($settings['ad_settings'][ $slot ]['button_label'] ?? ''); ?>">
+									</label>
+									<label>
+										<span><?php esc_html_e('Meta Line', 'nerdywithme-tools'); ?></span>
+										<input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][meta]'); ?>" value="<?php echo esc_attr($settings['ad_settings'][ $slot ]['meta'] ?? ''); ?>">
+									</label>
+									<label class="nwm-tools-admin__fields nwm-tools-admin__fields--full">
+										<span><?php esc_html_e('Body Copy', 'nerdywithme-tools'); ?></span>
+										<textarea name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][copy]'); ?>" rows="3"><?php echo esc_textarea($settings['ad_settings'][ $slot ]['copy'] ?? ''); ?></textarea>
 									</label>
 								</div>
 							</article>
@@ -691,6 +759,18 @@ class NerdyWithMe_Tools_Admin {
 				'width_tablet'  => 'standard',
 				'width_mobile'  => 'full',
 				'align'         => 'left',
+				'offset_desktop' => 108,
+				'offset_tablet'  => 96,
+				'offset_mobile'  => 84,
+				'mode'           => 'markup',
+				'image_url'      => '',
+				'image_alt'      => '',
+				'target_url'     => '',
+				'eyebrow'        => '',
+				'title'          => '',
+				'copy'           => '',
+				'button_label'   => '',
+				'meta'           => '',
 			);
 		}
 
@@ -712,6 +792,19 @@ class NerdyWithMe_Tools_Admin {
 			'standard' => __('Standard', 'nerdywithme-tools'),
 			'premium'  => __('Premium', 'nerdywithme-tools'),
 			'minimal'  => __('Minimal', 'nerdywithme-tools'),
+		);
+	}
+
+	/**
+	 * Ad content mode options.
+	 *
+	 * @return array
+	 */
+	private function get_ad_mode_options() {
+		return array(
+			'markup' => __('Raw Markup / Embed', 'nerdywithme-tools'),
+			'promo'  => __('Managed Promo Card', 'nerdywithme-tools'),
+			'image'  => __('Image Banner', 'nerdywithme-tools'),
 		);
 	}
 

@@ -54,34 +54,43 @@ get_header();
 							<?php nerdywithme_tools_render_ad_slot('homepage_after_hero'); ?>
 						</div>
 					<?php endif; ?>
-					<div class="single-content">
-						<div class="entry-content entry-content--tools">
-							<?php the_content(); ?>
-						</div>
-						<section class="read-next read-next--tools">
-							<?php nerdywithme_section_heading(__('Read Next', 'nerdywithme'), __('Keep learning with practical trade setups, platform breakdowns, and system ideas.', 'nerdywithme')); ?>
-							<div class="read-next__grid">
-								<?php
-								$tool_reads = nerdywithme_get_related_posts(get_the_ID(), 3);
-
-								if ($tool_reads->have_posts()) :
-									while ($tool_reads->have_posts()) :
-										$tool_reads->the_post();
-										?>
-										<article class="read-next__item">
-											<a class="read-next__thumb" href="<?php the_permalink(); ?>">
-												<?php the_post_thumbnail('large'); ?>
-											</a>
-											<?php nerdywithme_post_meta(); ?>
-											<h3 class="read-next__title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
-										</article>
-										<?php
-									endwhile;
-									wp_reset_postdata();
-								endif;
-								?>
+					<div class="tools-page-main">
+						<div class="single-content">
+							<div class="entry-content entry-content--tools">
+								<?php the_content(); ?>
 							</div>
-						</section>
+							<section class="read-next read-next--tools">
+								<?php nerdywithme_section_heading(__('Read Next', 'nerdywithme'), __('Keep learning with practical trade setups, platform breakdowns, and system ideas.', 'nerdywithme')); ?>
+								<div class="read-next__grid">
+									<?php
+									$tool_reads = nerdywithme_get_related_posts(get_the_ID(), 3);
+
+									if ($tool_reads->have_posts()) :
+										while ($tool_reads->have_posts()) :
+											$tool_reads->the_post();
+											?>
+											<article class="read-next__item">
+												<a class="read-next__thumb" href="<?php the_permalink(); ?>">
+													<?php the_post_thumbnail('large'); ?>
+												</a>
+												<?php nerdywithme_post_meta(); ?>
+												<h3 class="read-next__title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
+											</article>
+											<?php
+										endwhile;
+										wp_reset_postdata();
+									endif;
+									?>
+								</div>
+							</section>
+						</div>
+						<aside class="tools-page-aside">
+							<?php if (function_exists('nerdywithme_tools_render_ad_slot')) : ?>
+								<div class="theme-ad-slot theme-ad-slot--tools-side">
+									<?php nerdywithme_tools_render_ad_slot('sidebar'); ?>
+								</div>
+							<?php endif; ?>
+						</aside>
 					</div>
 					<?php if (function_exists('nerdywithme_tools_render_ad_slot')) : ?>
 						<div class="theme-ad-slot theme-ad-slot--tools-bottom">

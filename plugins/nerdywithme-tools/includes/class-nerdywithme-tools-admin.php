@@ -159,6 +159,17 @@ class NerdyWithMe_Tools_Admin {
 		);
 
 		add_settings_field(
+			'enable_compound_growth_calculator',
+			__('Enable Compound Growth', 'nerdywithme-tools'),
+			array($this, 'render_checkbox_field'),
+			'nerdywithme-tools',
+			'nerdywithme_tools_calculators',
+			array(
+				'key' => 'enable_compound_growth_calculator',
+			)
+		);
+
+		add_settings_field(
 			'tool_order',
 			__('Tool Order', 'nerdywithme-tools'),
 			array($this, 'render_text_field'),
@@ -206,11 +217,12 @@ class NerdyWithMe_Tools_Admin {
 		$input    = is_array($input) ? $input : array();
 		$sanitized = array(
 			'ads'                           => array(),
+			'ad_settings'                   => array(),
 			'enable_risk_calculator'        => ! empty($input['enable_risk_calculator']),
 			'enable_position_size_calculator' => ! empty($input['enable_position_size_calculator']),
 			'enable_pip_value_calculator'   => ! empty($input['enable_pip_value_calculator']),
 			'enable_profit_target_calculator' => ! empty($input['enable_profit_target_calculator']),
-			'tool_order'                    => isset($input['tool_order']) ? sanitize_text_field($input['tool_order']) : 'risk-calculator,position-size,pip-value,profit-target',
+			'tool_order'                    => isset($input['tool_order']) ? sanitize_text_field($input['tool_order']) : 'risk-calculator,position-size,pip-value,profit-target,compound-growth',
 			'tool_descriptions'             => array(),
 			'tool_summaries'                => array(),
 			'tool_meta_titles'              => array(),
@@ -218,6 +230,28 @@ class NerdyWithMe_Tools_Admin {
 
 		foreach (array_keys($this->get_ad_slot_labels()) as $slot) {
 			$sanitized['ads'][ $slot ] = isset($input['ads'][ $slot ]) ? wp_kses_post($input['ads'][ $slot ]) : '';
+			$sanitized['ad_settings'][ $slot ] = array(
+				'sticky'      => ! empty($input['ad_settings'][ $slot ]['sticky']),
+				'hide_mobile' => ! empty($input['ad_settings'][ $slot ]['hide_mobile']),
+				'style'       => isset($input['ad_settings'][ $slot ]['style']) && array_key_exists($input['ad_settings'][ $slot ]['style'], $this->get_ad_style_options())
+					? sanitize_key($input['ad_settings'][ $slot ]['style'])
+					: 'standard',
+				'width_desktop' => isset($input['ad_settings'][ $slot ]['width_desktop']) && array_key_exists($input['ad_settings'][ $slot ]['width_desktop'], $this->get_ad_width_options())
+					? sanitize_key($input['ad_settings'][ $slot ]['width_desktop'])
+					: 'standard',
+				'width_tablet' => isset($input['ad_settings'][ $slot ]['width_tablet']) && array_key_exists($input['ad_settings'][ $slot ]['width_tablet'], $this->get_ad_width_options())
+					? sanitize_key($input['ad_settings'][ $slot ]['width_tablet'])
+					: 'standard',
+				'width_mobile' => isset($input['ad_settings'][ $slot ]['width_mobile']) && array_key_exists($input['ad_settings'][ $slot ]['width_mobile'], $this->get_ad_width_options())
+					? sanitize_key($input['ad_settings'][ $slot ]['width_mobile'])
+					: 'full',
+				'align'       => isset($input['ad_settings'][ $slot ]['align']) && array_key_exists($input['ad_settings'][ $slot ]['align'], $this->get_ad_alignment_options())
+					? sanitize_key($input['ad_settings'][ $slot ]['align'])
+					: 'left',
+				'width'       => isset($input['ad_settings'][ $slot ]['width']) && array_key_exists($input['ad_settings'][ $slot ]['width'], $this->get_ad_width_options())
+					? sanitize_key($input['ad_settings'][ $slot ]['width'])
+					: 'standard',
+			);
 		}
 
 		foreach ($this->get_tool_description_defaults() as $slug => $description) {
@@ -380,6 +414,8 @@ class NerdyWithMe_Tools_Admin {
 	public function render_page() {
 		$settings     = $this->get_settings();
 		$tools        = $this->get_tool_labels();
+		$tool_keys    = $this->get_tool_setting_keys();
+		$active_count = 0;
 		$descriptions = $settings['tool_descriptions'] ?? $this->get_tool_description_defaults();
 		$summaries    = $settings['tool_summaries'] ?? $this->get_tool_summary_defaults();
 		$meta_titles  = $settings['tool_meta_titles'] ?? $this->get_tool_meta_title_defaults();
@@ -394,6 +430,12 @@ class NerdyWithMe_Tools_Admin {
 				$order[] = $tool_slug;
 			}
 		}
+
+		foreach ($tool_keys as $setting_key) {
+			if (! empty($settings[ $setting_key ])) {
+				++$active_count;
+			}
+		}
 		?>
 		<div class="wrap nwm-tools-admin">
 			<div class="nwm-tools-admin__hero">
@@ -402,8 +444,8 @@ class NerdyWithMe_Tools_Admin {
 					<p><?php esc_html_e('Manage your calculator hub, standalone tool pages, and theme-connected ad placements from one cleaner control center.', 'nerdywithme-tools'); ?></p>
 				</div>
 				<div class="nwm-tools-admin__hero-meta">
-					<strong><?php esc_html_e('Current tools', 'nerdywithme-tools'); ?></strong>
-					<span><?php echo esc_html(count($tools)); ?></span>
+					<strong><?php esc_html_e('Active tools', 'nerdywithme-tools'); ?></strong>
+					<span><?php echo esc_html($active_count); ?></span>
 				</div>
 			</div>
 			<form action="options.php" method="post">
@@ -426,6 +468,7 @@ class NerdyWithMe_Tools_Admin {
 					<div class="nwm-tools-admin__cards" data-nwm-sortable-tools>
 						<?php foreach ($order as $tool_slug) : ?>
 							<?php if (! isset($tools[ $tool_slug ])) { continue; } ?>
+							<?php $setting_key = $tool_keys[ $tool_slug ] ?? ''; ?>
 							<article class="nwm-tools-admin__card" data-tool-id="<?php echo esc_attr($tool_slug); ?>">
 								<div class="nwm-tools-admin__card-head">
 									<div class="nwm-tools-admin__drag" aria-hidden="true">⋮⋮</div>
@@ -434,7 +477,7 @@ class NerdyWithMe_Tools_Admin {
 										<p><code><?php echo esc_html($tool_slug); ?></code></p>
 									</div>
 									<label class="nwm-tools-admin__toggle">
-										<input type="checkbox" name="<?php echo esc_attr(self::OPTION_KEY . '[enable_' . str_replace('-', '_', $tool_slug) . ']'); ?>" value="1" <?php checked(! empty($settings[ 'enable_' . str_replace('-', '_', $tool_slug) ])); ?>>
+										<input type="checkbox" name="<?php echo esc_attr(self::OPTION_KEY . '[' . $setting_key . ']'); ?>" value="1" <?php checked($setting_key && ! empty($settings[ $setting_key ])); ?>>
 										<span><?php esc_html_e('Enabled', 'nerdywithme-tools'); ?></span>
 									</label>
 								</div>
@@ -482,7 +525,7 @@ class NerdyWithMe_Tools_Admin {
 				<section class="nwm-tools-admin__panel" data-nwm-admin-panel="ads">
 					<div class="nwm-tools-admin__panel-header">
 						<h2><?php esc_html_e('Theme Ad Slots', 'nerdywithme-tools'); ?></h2>
-						<p><?php esc_html_e('Paste HTML, banners, affiliate embeds, or shortcode output into the exact slots already wired into the theme.', 'nerdywithme-tools'); ?></p>
+						<p><?php esc_html_e('Paste HTML, banners, affiliate embeds, or shortcode output into the exact slots already wired into the theme, then control their behavior slot by slot.', 'nerdywithme-tools'); ?></p>
 					</div>
 					<div class="nwm-tools-admin__cards">
 						<?php foreach ($this->get_ad_slot_labels() as $slot => $label) : ?>
@@ -497,6 +540,56 @@ class NerdyWithMe_Tools_Admin {
 									<span><?php esc_html_e('Ad Markup', 'nerdywithme-tools'); ?></span>
 									<textarea name="<?php echo esc_attr(self::OPTION_KEY . '[ads][' . $slot . ']'); ?>" rows="6" class="code"><?php echo esc_textarea($settings['ads'][ $slot ] ?? ''); ?></textarea>
 								</label>
+								<div class="nwm-tools-admin__ad-options">
+									<label class="nwm-tools-admin__toggle">
+										<input type="checkbox" name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][sticky]'); ?>" value="1" <?php checked(! empty($settings['ad_settings'][ $slot ]['sticky'])); ?>>
+										<span><?php esc_html_e('Make this slot sticky', 'nerdywithme-tools'); ?></span>
+									</label>
+									<label class="nwm-tools-admin__toggle">
+										<input type="checkbox" name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][hide_mobile]'); ?>" value="1" <?php checked(! empty($settings['ad_settings'][ $slot ]['hide_mobile'])); ?>>
+										<span><?php esc_html_e('Hide on phone widths', 'nerdywithme-tools'); ?></span>
+									</label>
+									<label>
+										<span><?php esc_html_e('Slot style', 'nerdywithme-tools'); ?></span>
+										<select name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][style]'); ?>">
+											<?php foreach ($this->get_ad_style_options() as $style_key => $style_label) : ?>
+												<option value="<?php echo esc_attr($style_key); ?>" <?php selected($settings['ad_settings'][ $slot ]['style'] ?? 'standard', $style_key); ?>><?php echo esc_html($style_label); ?></option>
+											<?php endforeach; ?>
+										</select>
+									</label>
+									<label>
+										<span><?php esc_html_e('Desktop width', 'nerdywithme-tools'); ?></span>
+										<select name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][width_desktop]'); ?>">
+											<?php foreach ($this->get_ad_width_options() as $width_key => $width_label) : ?>
+												<option value="<?php echo esc_attr($width_key); ?>" <?php selected($settings['ad_settings'][ $slot ]['width_desktop'] ?? ($settings['ad_settings'][ $slot ]['width'] ?? 'standard'), $width_key); ?>><?php echo esc_html($width_label); ?></option>
+											<?php endforeach; ?>
+										</select>
+									</label>
+									<label>
+										<span><?php esc_html_e('Tablet width', 'nerdywithme-tools'); ?></span>
+										<select name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][width_tablet]'); ?>">
+											<?php foreach ($this->get_ad_width_options() as $width_key => $width_label) : ?>
+												<option value="<?php echo esc_attr($width_key); ?>" <?php selected($settings['ad_settings'][ $slot ]['width_tablet'] ?? 'standard', $width_key); ?>><?php echo esc_html($width_label); ?></option>
+											<?php endforeach; ?>
+										</select>
+									</label>
+									<label>
+										<span><?php esc_html_e('Phone width', 'nerdywithme-tools'); ?></span>
+										<select name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][width_mobile]'); ?>">
+											<?php foreach ($this->get_ad_width_options() as $width_key => $width_label) : ?>
+												<option value="<?php echo esc_attr($width_key); ?>" <?php selected($settings['ad_settings'][ $slot ]['width_mobile'] ?? 'full', $width_key); ?>><?php echo esc_html($width_label); ?></option>
+											<?php endforeach; ?>
+										</select>
+									</label>
+									<label>
+										<span><?php esc_html_e('Alignment', 'nerdywithme-tools'); ?></span>
+										<select name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][align]'); ?>">
+											<?php foreach ($this->get_ad_alignment_options() as $align_key => $align_label) : ?>
+												<option value="<?php echo esc_attr($align_key); ?>" <?php selected($settings['ad_settings'][ $slot ]['align'] ?? 'left', $align_key); ?>><?php echo esc_html($align_label); ?></option>
+											<?php endforeach; ?>
+										</select>
+									</label>
+								</div>
 							</article>
 						<?php endforeach; ?>
 					</div>
@@ -538,17 +631,31 @@ class NerdyWithMe_Tools_Admin {
 	public function get_settings() {
 		$defaults = array(
 			'ads'                             => array_fill_keys(array_keys($this->get_ad_slot_labels()), ''),
+			'ad_settings'                     => $this->get_ad_behavior_defaults(),
 			'enable_risk_calculator'          => true,
 			'enable_position_size_calculator' => true,
 			'enable_pip_value_calculator'     => true,
 			'enable_profit_target_calculator' => true,
-			'tool_order'                      => 'risk-calculator,position-size,pip-value,profit-target',
+			'enable_compound_growth_calculator' => true,
+			'tool_order'                      => 'risk-calculator,position-size,pip-value,profit-target,compound-growth',
 			'tool_descriptions'               => $this->get_tool_description_defaults(),
 			'tool_summaries'                  => $this->get_tool_summary_defaults(),
 			'tool_meta_titles'               => $this->get_tool_meta_title_defaults(),
 		);
 
-		return wp_parse_args(get_option(self::OPTION_KEY, array()), $defaults);
+		$settings = wp_parse_args(get_option(self::OPTION_KEY, array()), $defaults);
+
+		$settings['ads']         = wp_parse_args(is_array($settings['ads']) ? $settings['ads'] : array(), $defaults['ads']);
+		$settings['ad_settings'] = wp_parse_args(is_array($settings['ad_settings']) ? $settings['ad_settings'] : array(), $defaults['ad_settings']);
+
+		foreach ($defaults['ad_settings'] as $slot => $slot_defaults) {
+			$settings['ad_settings'][ $slot ] = wp_parse_args(
+				is_array($settings['ad_settings'][ $slot ] ?? null) ? $settings['ad_settings'][ $slot ] : array(),
+				$slot_defaults
+			);
+		}
+
+		return $settings;
 	}
 
 	/**
@@ -567,6 +674,75 @@ class NerdyWithMe_Tools_Admin {
 	}
 
 	/**
+	 * Per-slot ad behavior defaults.
+	 *
+	 * @return array
+	 */
+	private function get_ad_behavior_defaults() {
+		$defaults = array();
+
+		foreach (array_keys($this->get_ad_slot_labels()) as $slot) {
+			$defaults[ $slot ] = array(
+				'sticky'      => in_array($slot, array('sidebar', 'archive_header'), true),
+				'hide_mobile' => false,
+				'style'       => 'standard',
+				'width'       => 'standard',
+				'width_desktop' => 'standard',
+				'width_tablet'  => 'standard',
+				'width_mobile'  => 'full',
+				'align'         => 'left',
+			);
+		}
+
+		$defaults['sidebar']['style'] = 'premium';
+		$defaults['sidebar']['width'] = 'wide';
+		$defaults['sidebar']['width_desktop'] = 'wide';
+		$defaults['sidebar']['width_tablet'] = 'standard';
+
+		return $defaults;
+	}
+
+	/**
+	 * Ad style options.
+	 *
+	 * @return array
+	 */
+	private function get_ad_style_options() {
+		return array(
+			'standard' => __('Standard', 'nerdywithme-tools'),
+			'premium'  => __('Premium', 'nerdywithme-tools'),
+			'minimal'  => __('Minimal', 'nerdywithme-tools'),
+		);
+	}
+
+	/**
+	 * Ad width options.
+	 *
+	 * @return array
+	 */
+	private function get_ad_width_options() {
+		return array(
+			'narrow'   => __('Narrow', 'nerdywithme-tools'),
+			'standard' => __('Standard', 'nerdywithme-tools'),
+			'wide'     => __('Wide', 'nerdywithme-tools'),
+			'full'     => __('Full', 'nerdywithme-tools'),
+		);
+	}
+
+	/**
+	 * Ad alignment options.
+	 *
+	 * @return array
+	 */
+	private function get_ad_alignment_options() {
+		return array(
+			'left'   => __('Left', 'nerdywithme-tools'),
+			'center' => __('Center', 'nerdywithme-tools'),
+			'right'  => __('Right', 'nerdywithme-tools'),
+		);
+	}
+
+	/**
 	 * Default tool descriptions.
 	 *
 	 * @return array
@@ -577,6 +753,7 @@ class NerdyWithMe_Tools_Admin {
 			'position-size'   => __('Size a trade from risk amount and stop distance.', 'nerdywithme-tools'),
 			'pip-value'       => __('Estimate pip or point value from lot size.', 'nerdywithme-tools'),
 			'profit-target'   => __('Target and payoff planner.', 'nerdywithme-tools'),
+			'compound-growth' => __('Project compounded account growth over time.', 'nerdywithme-tools'),
 		);
 	}
 
@@ -591,6 +768,22 @@ class NerdyWithMe_Tools_Admin {
 			'position-size'   => __('Position Size', 'nerdywithme-tools'),
 			'pip-value'       => __('Pip / Point Value', 'nerdywithme-tools'),
 			'profit-target'   => __('Profit Target', 'nerdywithme-tools'),
+			'compound-growth' => __('Compound Growth', 'nerdywithme-tools'),
+		);
+	}
+
+	/**
+	 * Setting keys for tool enable toggles.
+	 *
+	 * @return array
+	 */
+	private function get_tool_setting_keys() {
+		return array(
+			'risk-calculator' => 'enable_risk_calculator',
+			'position-size'   => 'enable_position_size_calculator',
+			'pip-value'       => 'enable_pip_value_calculator',
+			'profit-target'   => 'enable_profit_target_calculator',
+			'compound-growth' => 'enable_compound_growth_calculator',
 		);
 	}
 
@@ -605,6 +798,7 @@ class NerdyWithMe_Tools_Admin {
 			'position-size'   => __('Convert a fixed risk amount and stop distance into a cleaner lot size so you stop guessing your exposure on every trade idea.', 'nerdywithme-tools'),
 			'pip-value'       => __('Estimate what each pip or point is worth for your position size, then project the value of a move before you place the trade.', 'nerdywithme-tools'),
 			'profit-target'   => __('Map out the payoff at your target, compare reward to risk, and see the percentage growth a winning trade could add to your account.', 'nerdywithme-tools'),
+			'compound-growth' => __('Project how your account could grow over time with compounded returns, recurring contributions, and a period you choose.', 'nerdywithme-tools'),
 		);
 	}
 
@@ -619,6 +813,7 @@ class NerdyWithMe_Tools_Admin {
 			'position-size'   => __('Position Size Calculator | NerdyWithMe Tools', 'nerdywithme-tools'),
 			'pip-value'       => __('Pip and Point Value Calculator | NerdyWithMe Tools', 'nerdywithme-tools'),
 			'profit-target'   => __('Profit Target Calculator | NerdyWithMe Tools', 'nerdywithme-tools'),
+			'compound-growth' => __('Compound Growth Calculator | NerdyWithMe Tools', 'nerdywithme-tools'),
 		);
 	}
 }

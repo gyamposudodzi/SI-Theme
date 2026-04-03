@@ -35,6 +35,7 @@ class NerdyWithMe_Tools_Shortcodes {
 		);
 		$settings = get_option(NerdyWithMe_Tools_Admin::OPTION_KEY, array());
 		$ads      = $settings['ads'] ?? array();
+		$behaviors = $settings['ad_settings'] ?? array();
 		$slot     = sanitize_key($atts['slot']);
 		$content  = $ads[ $slot ] ?? '';
 
@@ -42,7 +43,39 @@ class NerdyWithMe_Tools_Shortcodes {
 			return '';
 		}
 
-		return '<div class="nwm-ad-slot nwm-ad-slot--' . esc_attr($slot) . '">' . do_shortcode(wp_kses_post($content)) . '</div>';
+		$slot_settings = wp_parse_args(
+			isset($behaviors[ $slot ]) && is_array($behaviors[ $slot ]) ? $behaviors[ $slot ] : array(),
+			array(
+				'sticky'      => false,
+				'hide_mobile' => false,
+				'style'       => 'standard',
+				'width'       => 'standard',
+				'width_desktop' => 'standard',
+				'width_tablet'  => 'standard',
+				'width_mobile'  => 'full',
+				'align'         => 'left',
+			)
+		);
+
+		$classes = array(
+			'nwm-ad-slot',
+			'nwm-ad-slot--' . sanitize_html_class($slot),
+			'nwm-ad-slot--style-' . sanitize_html_class($slot_settings['style']),
+			'nwm-ad-slot--width-desktop-' . sanitize_html_class($slot_settings['width_desktop'] ?: $slot_settings['width']),
+			'nwm-ad-slot--width-tablet-' . sanitize_html_class($slot_settings['width_tablet']),
+			'nwm-ad-slot--width-mobile-' . sanitize_html_class($slot_settings['width_mobile']),
+			'nwm-ad-slot--align-' . sanitize_html_class($slot_settings['align']),
+		);
+
+		if (! empty($slot_settings['sticky'])) {
+			$classes[] = 'nwm-ad-slot--sticky';
+		}
+
+		if (! empty($slot_settings['hide_mobile'])) {
+			$classes[] = 'nwm-ad-slot--hide-mobile';
+		}
+
+		return '<div class="' . esc_attr(implode(' ', $classes)) . '">' . do_shortcode(wp_kses_post($content)) . '</div>';
 	}
 
 	/**
@@ -182,6 +215,14 @@ class NerdyWithMe_Tools_Shortcodes {
 				'meta_title'  => $meta_titles['profit-target'] ?? __('Profit Target Calculator | NerdyWithMe Tools', 'nerdywithme-tools'),
 				'enabled'     => ! isset($settings['enable_profit_target_calculator']) || ! empty($settings['enable_profit_target_calculator']),
 				'render'      => array($this, 'render_profit_target_calculator_inner'),
+			),
+			'compound-growth' => array(
+				'label'       => __('Compound Growth', 'nerdywithme-tools'),
+				'description' => $descriptions['compound-growth'] ?? __('Project compounded account growth over time.', 'nerdywithme-tools'),
+				'summary'     => $summaries['compound-growth'] ?? __('Project how your account could grow over time with compounded returns, recurring contributions, and a period you choose.', 'nerdywithme-tools'),
+				'meta_title'  => $meta_titles['compound-growth'] ?? __('Compound Growth Calculator | NerdyWithMe Tools', 'nerdywithme-tools'),
+				'enabled'     => ! isset($settings['enable_compound_growth_calculator']) || ! empty($settings['enable_compound_growth_calculator']),
+				'render'      => array($this, 'render_compound_growth_calculator_inner'),
 			),
 		);
 
@@ -457,6 +498,74 @@ class NerdyWithMe_Tools_Shortcodes {
 				<div>
 					<strong><?php esc_html_e('Account Growth', 'nerdywithme-tools'); ?></strong>
 					<span data-nwm-profit-growth>0.00%</span>
+				</div>
+			</div>
+		</div>
+		<?php
+
+		return ob_get_clean();
+	}
+
+	/**
+	 * Compound growth calculator renderer.
+	 *
+	 * @return string
+	 */
+	private function render_compound_growth_calculator_inner() {
+		ob_start();
+		?>
+		<div class="nwm-tool-card nwm-tool-card--compound" data-nwm-compound-calculator>
+			<div class="nwm-tool-card__header">
+				<h3><?php esc_html_e('Compound Growth Calculator', 'nerdywithme-tools'); ?></h3>
+				<p><?php esc_html_e('Estimate how your capital could grow over a chosen period with compounded returns and optional recurring contributions.', 'nerdywithme-tools'); ?></p>
+			</div>
+			<div class="nwm-tool-presets" aria-label="<?php esc_attr_e('Compound growth presets', 'nerdywithme-tools'); ?>">
+				<button type="button" class="nwm-tool-presets__button" data-nwm-compound-preset='{"principal":"1000","contribution":"100","rate":"12","years":"5","frequency":"12"}'><?php esc_html_e('Steady Monthly', 'nerdywithme-tools'); ?></button>
+				<button type="button" class="nwm-tool-presets__button" data-nwm-compound-preset='{"principal":"2500","contribution":"150","rate":"18","years":"3","frequency":"52"}'><?php esc_html_e('Weekly Growth', 'nerdywithme-tools'); ?></button>
+				<button type="button" class="nwm-tool-presets__button" data-nwm-compound-preset='{"principal":"5000","contribution":"250","rate":"24","years":"4","frequency":"12"}'><?php esc_html_e('Aggressive Plan', 'nerdywithme-tools'); ?></button>
+			</div>
+			<div class="nwm-tool-grid">
+				<label>
+					<span><?php esc_html_e('Starting Capital', 'nerdywithme-tools'); ?></span>
+					<input type="number" step="0.01" min="0" inputmode="decimal" data-nwm-numeric data-nwm-compound-principal placeholder="1000" value="1000">
+				</label>
+				<label>
+					<span><?php esc_html_e('Contribution Per Period', 'nerdywithme-tools'); ?></span>
+					<input type="number" step="0.01" min="0" inputmode="decimal" data-nwm-numeric data-nwm-compound-contribution placeholder="100" value="100">
+				</label>
+				<label>
+					<span><?php esc_html_e('Annual Return %', 'nerdywithme-tools'); ?></span>
+					<input type="number" step="0.01" min="0" inputmode="decimal" data-nwm-numeric data-nwm-compound-rate placeholder="12" value="12">
+				</label>
+				<label>
+					<span><?php esc_html_e('Years', 'nerdywithme-tools'); ?></span>
+					<input type="number" step="0.1" min="0" inputmode="decimal" data-nwm-numeric data-nwm-compound-years placeholder="5" value="5">
+				</label>
+				<label>
+					<span><?php esc_html_e('Compounds Per Year', 'nerdywithme-tools'); ?></span>
+					<input type="number" step="1" min="1" inputmode="numeric" data-nwm-numeric data-nwm-compound-frequency placeholder="12" value="12">
+				</label>
+			</div>
+			<div class="nwm-tool-results">
+				<div>
+					<strong><?php esc_html_e('Ending Balance', 'nerdywithme-tools'); ?></strong>
+					<span data-nwm-compound-ending>$0.00</span>
+				</div>
+				<div>
+					<strong><?php esc_html_e('Total Contributions', 'nerdywithme-tools'); ?></strong>
+					<span data-nwm-compound-contributions>$0.00</span>
+				</div>
+				<div>
+					<strong><?php esc_html_e('Interest Earned', 'nerdywithme-tools'); ?></strong>
+					<span data-nwm-compound-interest>$0.00</span>
+				</div>
+				<div>
+					<strong><?php esc_html_e('Growth Multiple', 'nerdywithme-tools'); ?></strong>
+					<span data-nwm-compound-multiple>0.00x</span>
+				</div>
+				<div>
+					<strong><?php esc_html_e('Net Profit', 'nerdywithme-tools'); ?></strong>
+					<span data-nwm-compound-profit>$0.00</span>
 				</div>
 			</div>
 		</div>

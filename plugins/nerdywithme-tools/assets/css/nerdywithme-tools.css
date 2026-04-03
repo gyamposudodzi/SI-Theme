@@ -134,6 +134,38 @@
   line-height: 1.6;
 }
 
+.nwm-tool-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.nwm-tool-presets__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid #eadff3;
+  background: #fff;
+  color: #132a78;
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+}
+
+.nwm-tool-presets__button:hover,
+.nwm-tool-presets__button:focus-visible {
+  background: #fff7f1;
+  border-color: #ffd5c8;
+  color: #ff5f36;
+  box-shadow: 0 12px 22px rgba(255, 95, 54, 0.12);
+  transform: translateY(-1px);
+  outline: none;
+}
+
 .nwm-tool-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -197,8 +229,96 @@
   line-height: 1;
 }
 
+.nwm-tool-card--compound {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top right, rgba(255, 95, 54, 0.08), transparent 28%),
+    radial-gradient(circle at bottom left, rgba(19, 42, 120, 0.06), transparent 26%),
+    linear-gradient(180deg, #ffffff, #fffaf5 72%, #f7faff 100%);
+}
+
+.nwm-tool-card--compound::after {
+  content: "";
+  position: absolute;
+  inset: auto -48px -48px auto;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(255, 95, 54, 0.12) 0%, rgba(255, 95, 54, 0) 72%);
+  pointer-events: none;
+}
+
+.nwm-tool-card--compound .nwm-tool-card__header {
+  position: relative;
+  z-index: 1;
+}
+
+.nwm-tool-card--compound .nwm-tool-results div {
+  background: linear-gradient(180deg, #fff8f2, #fff1e6);
+  border-color: #ffd9c8;
+}
+
 .nwm-ad-slot {
   width: 100%;
+}
+
+.nwm-ad-slot--align-left {
+  margin-right: auto;
+  margin-left: 0;
+}
+
+.nwm-ad-slot--align-center {
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.nwm-ad-slot--align-right {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+.nwm-ad-slot--width-desktop-narrow {
+  max-width: 240px;
+}
+
+.nwm-ad-slot--width-desktop-standard {
+  max-width: 300px;
+}
+
+.nwm-ad-slot--width-desktop-wide {
+  max-width: 340px;
+}
+
+.nwm-ad-slot--width-desktop-full {
+  max-width: none;
+}
+
+.nwm-ad-slot--archive_header.nwm-ad-slot--width-desktop-standard,
+.nwm-ad-slot--archive_header.nwm-ad-slot--width-desktop-wide,
+.nwm-ad-slot--archive_header.nwm-ad-slot--width-desktop-full,
+.nwm-ad-slot--homepage_after_hero.nwm-ad-slot--width-desktop-standard,
+.nwm-ad-slot--homepage_after_hero.nwm-ad-slot--width-desktop-wide,
+.nwm-ad-slot--homepage_after_hero.nwm-ad-slot--width-desktop-full,
+.nwm-ad-slot--footer.nwm-ad-slot--width-desktop-standard,
+.nwm-ad-slot--footer.nwm-ad-slot--width-desktop-wide,
+.nwm-ad-slot--footer.nwm-ad-slot--width-desktop-full,
+.nwm-ad-slot--single_inline.nwm-ad-slot--width-desktop-standard,
+.nwm-ad-slot--single_inline.nwm-ad-slot--width-desktop-wide,
+.nwm-ad-slot--single_inline.nwm-ad-slot--width-desktop-full {
+  max-width: none;
+}
+
+.nwm-ad-slot--sticky {
+  position: sticky;
+  top: 108px;
+}
+
+.admin-bar .nwm-ad-slot--sticky {
+  top: 140px;
+}
+
+.nwm-ad-slot--hide-mobile {
+  display: block;
 }
 
 .nwm-ad-slot > * {
@@ -288,6 +408,41 @@
   width: 100%;
 }
 
+.nwm-ad-slot--style-premium .nwm-demo-ad {
+  border-color: #e4d8ef;
+  background:
+    radial-gradient(circle at top right, rgba(255, 95, 54, 0.12), transparent 34%),
+    radial-gradient(circle at bottom left, rgba(19, 42, 120, 0.08), transparent 32%),
+    linear-gradient(145deg, #fff8f2 0%, #ffffff 55%, #f3f7ff 100%);
+  box-shadow: 0 22px 40px rgba(16, 20, 55, 0.1);
+}
+
+.nwm-ad-slot--style-premium .nwm-demo-ad__eyebrow {
+  position: relative;
+  padding-left: 22px;
+}
+
+.nwm-ad-slot--style-premium .nwm-demo-ad__eyebrow::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 14px;
+  height: 1px;
+  background: currentColor;
+  transform: translateY(-50%);
+}
+
+.nwm-ad-slot--style-premium .nwm-demo-ad__title {
+  letter-spacing: -0.05em;
+}
+
+.nwm-ad-slot--style-minimal .nwm-demo-ad {
+  border-color: #ece7f5;
+  background: #fff;
+  box-shadow: none;
+}
+
 .nwm-ad-slot--single_inline .nwm-demo-ad,
 .nwm-demo-ad--inline {
   grid-template-columns: minmax(0, 1.1fr) auto;
@@ -332,6 +487,10 @@
     grid-template-columns: 1fr;
   }
 
+  .nwm-tool-presets {
+    flex-direction: column;
+  }
+
   .nwm-tool-card {
     padding: 20px;
   }
@@ -339,5 +498,44 @@
   .nwm-ad-slot--single_inline .nwm-demo-ad,
   .nwm-demo-ad--inline {
     grid-template-columns: 1fr;
+  }
+
+  .nwm-ad-slot--sticky {
+    position: static;
+  }
+
+  .nwm-ad-slot--hide-mobile {
+    display: none;
+  }
+
+  .nwm-ad-slot--width-mobile-narrow {
+    max-width: 220px;
+  }
+
+  .nwm-ad-slot--width-mobile-standard {
+    max-width: 280px;
+  }
+
+  .nwm-ad-slot--width-mobile-wide,
+  .nwm-ad-slot--width-mobile-full {
+    max-width: none;
+  }
+}
+
+@media (max-width: 1100px) and (min-width: 761px) {
+  .nwm-ad-slot--width-tablet-narrow {
+    max-width: 220px;
+  }
+
+  .nwm-ad-slot--width-tablet-standard {
+    max-width: 280px;
+  }
+
+  .nwm-ad-slot--width-tablet-wide {
+    max-width: 320px;
+  }
+
+  .nwm-ad-slot--width-tablet-full {
+    max-width: none;
   }
 }

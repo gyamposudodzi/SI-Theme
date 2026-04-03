@@ -171,6 +171,59 @@ function nwmUpdateProfitCalculator(calculator) {
   }
 }
 
+function nwmUpdateCompoundCalculator(calculator) {
+  if (!calculator) {
+    return;
+  }
+
+  var principal = parseFloat(calculator.querySelector("[data-nwm-compound-principal]")?.value || "0");
+  var contribution = parseFloat(calculator.querySelector("[data-nwm-compound-contribution]")?.value || "0");
+  var annualRate = parseFloat(calculator.querySelector("[data-nwm-compound-rate]")?.value || "0");
+  var years = parseFloat(calculator.querySelector("[data-nwm-compound-years]")?.value || "0");
+  var frequency = parseFloat(calculator.querySelector("[data-nwm-compound-frequency]")?.value || "0");
+
+  var ratePerPeriod = annualRate > 0 && frequency > 0 ? annualRate / 100 / frequency : 0;
+  var totalPeriods = years > 0 && frequency > 0 ? years * frequency : 0;
+  var endingBalance = principal > 0 ? principal : 0;
+
+  if (totalPeriods > 0 && ratePerPeriod > 0) {
+    endingBalance = principal * Math.pow(1 + ratePerPeriod, totalPeriods);
+    endingBalance += contribution * ((Math.pow(1 + ratePerPeriod, totalPeriods) - 1) / ratePerPeriod);
+  } else if (totalPeriods > 0) {
+    endingBalance = principal + contribution * totalPeriods;
+  }
+
+  var totalContributions = principal + contribution * totalPeriods;
+  var interestEarned = endingBalance - totalContributions;
+  var growthMultiple = principal > 0 ? endingBalance / principal : 0;
+
+  var endingNode = calculator.querySelector("[data-nwm-compound-ending]");
+  var contributionsNode = calculator.querySelector("[data-nwm-compound-contributions]");
+  var interestNode = calculator.querySelector("[data-nwm-compound-interest]");
+  var multipleNode = calculator.querySelector("[data-nwm-compound-multiple]");
+  var profitNode = calculator.querySelector("[data-nwm-compound-profit]");
+
+  if (endingNode) {
+    endingNode.textContent = nwmFormatCurrency(endingBalance);
+  }
+
+  if (contributionsNode) {
+    contributionsNode.textContent = nwmFormatCurrency(totalContributions);
+  }
+
+  if (interestNode) {
+    interestNode.textContent = nwmFormatCurrency(interestEarned);
+  }
+
+  if (multipleNode) {
+    multipleNode.textContent = growthMultiple > 0 ? growthMultiple.toFixed(2) + "x" : "0.00x";
+  }
+
+  if (profitNode) {
+    profitNode.textContent = nwmFormatCurrency(Math.max(endingBalance - principal, 0));
+  }
+}
+
 function nwmActivateToolHubTab(hub, toolId) {
   if (!hub || !toolId) {
     return;
@@ -240,9 +293,42 @@ document.addEventListener("input", function (event) {
   if (profitCalculator) {
     nwmUpdateProfitCalculator(profitCalculator);
   }
+
+  var compoundCalculator = event.target.closest("[data-nwm-compound-calculator]");
+  if (compoundCalculator) {
+    nwmUpdateCompoundCalculator(compoundCalculator);
+  }
 });
 
 document.addEventListener("click", function (event) {
+  var presetButton = event.target.closest("[data-nwm-compound-preset]");
+  if (presetButton) {
+    var calculator = presetButton.closest("[data-nwm-compound-calculator]");
+    if (calculator) {
+      try {
+        var preset = JSON.parse(presetButton.getAttribute("data-nwm-compound-preset") || "{}");
+
+        var principal = calculator.querySelector("[data-nwm-compound-principal]");
+        var contribution = calculator.querySelector("[data-nwm-compound-contribution]");
+        var rate = calculator.querySelector("[data-nwm-compound-rate]");
+        var years = calculator.querySelector("[data-nwm-compound-years]");
+        var frequency = calculator.querySelector("[data-nwm-compound-frequency]");
+
+        if (principal && preset.principal !== undefined) principal.value = preset.principal;
+        if (contribution && preset.contribution !== undefined) contribution.value = preset.contribution;
+        if (rate && preset.rate !== undefined) rate.value = preset.rate;
+        if (years && preset.years !== undefined) years.value = preset.years;
+        if (frequency && preset.frequency !== undefined) frequency.value = preset.frequency;
+
+        nwmUpdateCompoundCalculator(calculator);
+      } catch (error) {
+        // Ignore malformed preset payloads.
+      }
+    }
+
+    return;
+  }
+
   var tab = event.target.closest("[data-nwm-tool-tab]");
   if (!tab) {
     return;
@@ -304,6 +390,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   document.querySelectorAll("[data-nwm-profit-calculator]").forEach(function (calculator) {
     nwmUpdateProfitCalculator(calculator);
+  });
+
+  document.querySelectorAll("[data-nwm-compound-calculator]").forEach(function (calculator) {
+    nwmUpdateCompoundCalculator(calculator);
   });
 
   document.querySelectorAll("[data-nwm-tools-hub]").forEach(function (hub) {

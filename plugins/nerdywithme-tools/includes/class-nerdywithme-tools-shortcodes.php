@@ -622,34 +622,77 @@ class NerdyWithMe_Tools_Shortcodes {
 		?>
 		<div class="nwm-tool-card nwm-tool-card--compound" data-nwm-compound-calculator>
 			<div class="nwm-tool-card__header">
-				<h3><?php esc_html_e('Compound Growth Calculator', 'nerdywithme-tools'); ?></h3>
-				<p><?php esc_html_e('Estimate how your capital could grow over a chosen period with compounded returns and optional recurring contributions.', 'nerdywithme-tools'); ?></p>
+				<h3><?php esc_html_e('Forex Compound Calculator', 'nerdywithme-tools'); ?></h3>
+				<p><?php esc_html_e('Project how your forex trading balance could grow using a percentage return, a chosen compounding schedule, and optional recurring contributions.', 'nerdywithme-tools'); ?></p>
 			</div>
 			<div class="nwm-tool-presets" aria-label="<?php esc_attr_e('Compound growth presets', 'nerdywithme-tools'); ?>">
-				<button type="button" class="nwm-tool-presets__button" data-nwm-compound-preset='{"principal":"1000","contribution":"100","rate":"12","years":"5","frequency":"12"}'><?php esc_html_e('Steady Monthly', 'nerdywithme-tools'); ?></button>
-				<button type="button" class="nwm-tool-presets__button" data-nwm-compound-preset='{"principal":"2500","contribution":"150","rate":"18","years":"3","frequency":"52"}'><?php esc_html_e('Weekly Growth', 'nerdywithme-tools'); ?></button>
-				<button type="button" class="nwm-tool-presets__button" data-nwm-compound-preset='{"principal":"5000","contribution":"250","rate":"24","years":"4","frequency":"12"}'><?php esc_html_e('Aggressive Plan', 'nerdywithme-tools'); ?></button>
+				<button type="button" class="nwm-tool-presets__button" data-nwm-compound-preset='{"currency":"$","principal":"2000","rate":"5","rate_period":"monthly","years":"1","months":"0","frequency":"12","contribution":"0","contribution_frequency":"12"}'><?php esc_html_e('Monthly 5%', 'nerdywithme-tools'); ?></button>
+				<button type="button" class="nwm-tool-presets__button" data-nwm-compound-preset='{"currency":"$","principal":"1000","rate":"1.5","rate_period":"weekly","years":"1","months":"0","frequency":"52","contribution":"50","contribution_frequency":"12"}'><?php esc_html_e('Weekly 1.5%', 'nerdywithme-tools'); ?></button>
+				<button type="button" class="nwm-tool-presets__button" data-nwm-compound-preset='{"currency":"€","principal":"5000","rate":"12","rate_period":"yearly","years":"3","months":"0","frequency":"12","contribution":"250","contribution_frequency":"12"}'><?php esc_html_e('Annual 12%', 'nerdywithme-tools'); ?></button>
 			</div>
 			<div class="nwm-tool-grid">
 				<label>
-					<span><?php esc_html_e('Starting Capital', 'nerdywithme-tools'); ?></span>
-					<input type="number" step="0.01" min="0" inputmode="decimal" data-nwm-numeric data-nwm-compound-principal placeholder="1000" value="1000">
+					<span><?php esc_html_e('Currency', 'nerdywithme-tools'); ?></span>
+					<select data-nwm-compound-currency>
+						<option value="$">$</option>
+						<option value="€">€</option>
+						<option value="£">£</option>
+						<option value="₹">₹</option>
+						<option value="¥">¥</option>
+						<option value=""><?php esc_html_e('None', 'nerdywithme-tools'); ?></option>
+					</select>
 				</label>
 				<label>
-					<span><?php esc_html_e('Contribution Per Period', 'nerdywithme-tools'); ?></span>
-					<input type="number" step="0.01" min="0" inputmode="decimal" data-nwm-numeric data-nwm-compound-contribution placeholder="100" value="100">
+					<span><?php esc_html_e('Start Balance', 'nerdywithme-tools'); ?></span>
+					<input type="number" step="0.01" min="0" inputmode="decimal" data-nwm-numeric data-nwm-compound-principal placeholder="2000" value="2000">
 				</label>
 				<label>
-					<span><?php esc_html_e('Annual Return %', 'nerdywithme-tools'); ?></span>
-					<input type="number" step="0.01" min="0" inputmode="decimal" data-nwm-numeric data-nwm-compound-rate placeholder="12" value="12">
+					<span><?php esc_html_e('Percentage', 'nerdywithme-tools'); ?></span>
+					<input type="number" step="0.01" min="0" inputmode="decimal" data-nwm-numeric data-nwm-compound-rate placeholder="5" value="5">
+				</label>
+				<label>
+					<span><?php esc_html_e('Percentage Period', 'nerdywithme-tools'); ?></span>
+					<select data-nwm-compound-rate-period>
+						<option value="daily"><?php esc_html_e('Daily', 'nerdywithme-tools'); ?></option>
+						<option value="weekly"><?php esc_html_e('Weekly', 'nerdywithme-tools'); ?></option>
+						<option value="monthly" selected><?php esc_html_e('Monthly', 'nerdywithme-tools'); ?></option>
+						<option value="yearly"><?php esc_html_e('Yearly', 'nerdywithme-tools'); ?></option>
+					</select>
 				</label>
 				<label>
 					<span><?php esc_html_e('Years', 'nerdywithme-tools'); ?></span>
-					<input type="number" step="0.1" min="0" inputmode="decimal" data-nwm-numeric data-nwm-compound-years placeholder="5" value="5">
+					<input type="number" step="1" min="0" inputmode="numeric" data-nwm-numeric data-nwm-compound-years placeholder="1" value="1">
 				</label>
 				<label>
-					<span><?php esc_html_e('Compounds Per Year', 'nerdywithme-tools'); ?></span>
-					<input type="number" step="1" min="1" inputmode="numeric" data-nwm-numeric data-nwm-compound-frequency placeholder="12" value="12">
+					<span><?php esc_html_e('Months', 'nerdywithme-tools'); ?></span>
+					<input type="number" step="1" min="0" max="11" inputmode="numeric" data-nwm-numeric data-nwm-compound-months placeholder="0" value="0">
+				</label>
+				<label>
+					<span><?php esc_html_e('Compounding', 'nerdywithme-tools'); ?></span>
+					<select data-nwm-compound-frequency>
+						<option value="365"><?php esc_html_e('Daily (365/yr)', 'nerdywithme-tools'); ?></option>
+						<option value="360"><?php esc_html_e('Daily (360/yr)', 'nerdywithme-tools'); ?></option>
+						<option value="104"><?php esc_html_e('Semi-Weekly (104/yr)', 'nerdywithme-tools'); ?></option>
+						<option value="52"><?php esc_html_e('Weekly (52/yr)', 'nerdywithme-tools'); ?></option>
+						<option value="12" selected><?php esc_html_e('Monthly (12/yr)', 'nerdywithme-tools'); ?></option>
+						<option value="6"><?php esc_html_e('Bi-Monthly (6/yr)', 'nerdywithme-tools'); ?></option>
+						<option value="4"><?php esc_html_e('Quarterly (4/yr)', 'nerdywithme-tools'); ?></option>
+						<option value="2"><?php esc_html_e('Half-Yearly (2/yr)', 'nerdywithme-tools'); ?></option>
+						<option value="1"><?php esc_html_e('Yearly (1/yr)', 'nerdywithme-tools'); ?></option>
+					</select>
+				</label>
+				<label>
+					<span><?php esc_html_e('Additional Contributions', 'nerdywithme-tools'); ?></span>
+					<input type="number" step="0.01" min="0" inputmode="decimal" data-nwm-numeric data-nwm-compound-contribution placeholder="100" value="0">
+				</label>
+				<label>
+					<span><?php esc_html_e('Contribution Frequency', 'nerdywithme-tools'); ?></span>
+					<select data-nwm-compound-contribution-frequency>
+						<option value="12" selected><?php esc_html_e('Monthly', 'nerdywithme-tools'); ?></option>
+						<option value="4"><?php esc_html_e('Quarterly', 'nerdywithme-tools'); ?></option>
+						<option value="2"><?php esc_html_e('Half-Yearly', 'nerdywithme-tools'); ?></option>
+						<option value="1"><?php esc_html_e('Yearly', 'nerdywithme-tools'); ?></option>
+					</select>
 				</label>
 			</div>
 			<div class="nwm-tool-results">
@@ -662,16 +705,48 @@ class NerdyWithMe_Tools_Shortcodes {
 					<span data-nwm-compound-contributions>$0.00</span>
 				</div>
 				<div>
-					<strong><?php esc_html_e('Interest Earned', 'nerdywithme-tools'); ?></strong>
+					<strong><?php esc_html_e('Profit / Earnings', 'nerdywithme-tools'); ?></strong>
 					<span data-nwm-compound-interest>$0.00</span>
 				</div>
 				<div>
-					<strong><?php esc_html_e('Growth Multiple', 'nerdywithme-tools'); ?></strong>
-					<span data-nwm-compound-multiple>0.00x</span>
+					<strong><?php esc_html_e('Total Periods', 'nerdywithme-tools'); ?></strong>
+					<span data-nwm-compound-multiple>0</span>
 				</div>
 				<div>
-					<strong><?php esc_html_e('Net Profit', 'nerdywithme-tools'); ?></strong>
-					<span data-nwm-compound-profit>$0.00</span>
+					<strong><?php esc_html_e('Rate Per Compound Period', 'nerdywithme-tools'); ?></strong>
+					<span data-nwm-compound-profit>0.00%</span>
+				</div>
+			</div>
+			<div class="nwm-tool-breakdown nwm-tool-breakdown--compound">
+				<div class="nwm-tool-breakdown__header">
+					<h4><?php esc_html_e('Projection Breakdown', 'nerdywithme-tools'); ?></h4>
+					<p><?php esc_html_e('A quick snapshot of how the balance changes as compounding continues.', 'nerdywithme-tools'); ?></p>
+				</div>
+				<div class="nwm-tool-chart nwm-tool-chart--compound">
+					<div class="nwm-tool-chart__header">
+						<h4><?php esc_html_e('Growth Path', 'nerdywithme-tools'); ?></h4>
+						<p><?php esc_html_e('See how the projected balance builds as each milestone is reached.', 'nerdywithme-tools'); ?></p>
+					</div>
+					<div class="nwm-tool-chart__bars" data-nwm-compound-chart>
+						<p class="nwm-tool-chart__empty"><?php esc_html_e('Enter your numbers to generate the projection chart.', 'nerdywithme-tools'); ?></p>
+					</div>
+				</div>
+				<div class="nwm-tool-breakdown__table-wrap">
+					<table class="nwm-tool-breakdown__table">
+						<thead>
+							<tr>
+								<th><?php esc_html_e('Period', 'nerdywithme-tools'); ?></th>
+								<th><?php esc_html_e('Balance', 'nerdywithme-tools'); ?></th>
+								<th><?php esc_html_e('Contributions', 'nerdywithme-tools'); ?></th>
+								<th><?php esc_html_e('Profit', 'nerdywithme-tools'); ?></th>
+							</tr>
+						</thead>
+						<tbody data-nwm-compound-breakdown>
+							<tr>
+								<td colspan="4"><?php esc_html_e('Enter your numbers to see the projection.', 'nerdywithme-tools'); ?></td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 			</div>
 		</div>

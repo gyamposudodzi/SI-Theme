@@ -180,7 +180,8 @@
   color: #132a78;
 }
 
-.nwm-tool-grid input {
+.nwm-tool-grid input,
+.nwm-tool-grid select {
   min-height: 48px;
   padding: 0 14px;
   border: 1px solid #ece7f5;
@@ -190,7 +191,8 @@
   transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
 }
 
-.nwm-tool-grid input:focus {
+.nwm-tool-grid input:focus,
+.nwm-tool-grid select:focus {
   outline: none;
   border-color: #132a78;
   box-shadow: 0 0 0 4px rgba(19, 42, 120, 0.08);
@@ -256,6 +258,144 @@
 .nwm-tool-card--compound .nwm-tool-results div {
   background: linear-gradient(180deg, #fff8f2, #fff1e6);
   border-color: #ffd9c8;
+}
+
+.nwm-tool-breakdown {
+  display: grid;
+  gap: 14px;
+  padding-top: 8px;
+}
+
+.nwm-tool-breakdown__header {
+  display: grid;
+  gap: 6px;
+}
+
+.nwm-tool-breakdown__header h4 {
+  margin: 0;
+  color: #132a78;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.nwm-tool-breakdown__header p {
+  margin: 0;
+  color: #69708f;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.nwm-tool-chart {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  background: linear-gradient(180deg, #fffaf5, #fff);
+  border: 1px solid #ece7f5;
+}
+
+.nwm-tool-chart__header {
+  display: grid;
+  gap: 6px;
+}
+
+.nwm-tool-chart__header h4 {
+  margin: 0;
+  color: #132a78;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.nwm-tool-chart__header p {
+  margin: 0;
+  color: #69708f;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.nwm-tool-chart__bars {
+  display: grid;
+  gap: 12px;
+}
+
+.nwm-tool-chart__row {
+  display: grid;
+  gap: 8px;
+}
+
+.nwm-tool-chart__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.nwm-tool-chart__meta strong {
+  color: #132a78;
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.nwm-tool-chart__meta span {
+  color: #ff5f36;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.nwm-tool-chart__track {
+  position: relative;
+  height: 12px;
+  background: #f2e7e1;
+  overflow: hidden;
+}
+
+.nwm-tool-chart__fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #ff835f, #ff5f36);
+}
+
+.nwm-tool-chart__empty {
+  margin: 0;
+  color: #69708f;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.nwm-tool-breakdown__table-wrap {
+  overflow-x: auto;
+}
+
+.nwm-tool-breakdown__table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid #ece7f5;
+}
+
+.nwm-tool-breakdown__table th,
+.nwm-tool-breakdown__table td {
+  padding: 13px 14px;
+  border-bottom: 1px solid #ece7f5;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.nwm-tool-breakdown__table th {
+  color: #132a78;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: #fff8f2;
+}
+
+.nwm-tool-breakdown__table td {
+  color: #4c5476;
+}
+
+.nwm-tool-breakdown__table tbody tr:last-child td {
+  border-bottom: 0;
 }
 
 .nwm-ad-slot {

@@ -181,6 +181,12 @@
   width: 100%;
 }
 
+.nwm-tools-admin__fields.is-hidden,
+.nwm-tools-admin__fields--ad-markup.is-hidden,
+.nwm-tools-admin__fields--ad-content.is-hidden {
+  display: none !important;
+}
+
 .nwm-tools-admin__ad-options {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -194,6 +200,13 @@
 
 .nwm-tools-admin__fields--full {
   grid-column: 1 / -1;
+}
+
+.nwm-tools-admin__media-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
 }
 
 .nwm-tools-admin__ad-options label {

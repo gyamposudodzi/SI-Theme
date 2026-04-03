@@ -2,6 +2,38 @@ function nwmFormatCurrency(value) {
   return "$" + value.toFixed(2);
 }
 
+function nwmFormatCurrencyWithSymbol(symbol, value) {
+  return (symbol || "") + value.toFixed(2);
+}
+
+function nwmGetCompoundPeriodLabel(frequency, period) {
+  if (frequency === 12) {
+    return "Month " + period;
+  }
+
+  if (frequency === 52) {
+    return "Week " + period;
+  }
+
+  if (frequency === 365 || frequency === 360) {
+    return "Day " + period;
+  }
+
+  if (frequency === 4) {
+    return "Quarter " + period;
+  }
+
+  if (frequency === 2) {
+    return "Half-Year " + period;
+  }
+
+  if (frequency === 1) {
+    return "Year " + period;
+  }
+
+  return "Period " + period;
+}
+
 function nwmSanitizeNumericInput(input) {
   if (!input) {
     return;
@@ -176,24 +208,57 @@ function nwmUpdateCompoundCalculator(calculator) {
     return;
   }
 
+  var currency = calculator.querySelector("[data-nwm-compound-currency]")?.value || "$";
   var principal = parseFloat(calculator.querySelector("[data-nwm-compound-principal]")?.value || "0");
   var contribution = parseFloat(calculator.querySelector("[data-nwm-compound-contribution]")?.value || "0");
-  var annualRate = parseFloat(calculator.querySelector("[data-nwm-compound-rate]")?.value || "0");
+  var percentage = parseFloat(calculator.querySelector("[data-nwm-compound-rate]")?.value || "0");
+  var ratePeriod = calculator.querySelector("[data-nwm-compound-rate-period]")?.value || "monthly";
   var years = parseFloat(calculator.querySelector("[data-nwm-compound-years]")?.value || "0");
-  var frequency = parseFloat(calculator.querySelector("[data-nwm-compound-frequency]")?.value || "0");
+  var months = parseFloat(calculator.querySelector("[data-nwm-compound-months]")?.value || "0");
+  var frequency = parseFloat(calculator.querySelector("[data-nwm-compound-frequency]")?.value || "12");
+  var contributionFrequency = parseFloat(calculator.querySelector("[data-nwm-compound-contribution-frequency]")?.value || "12");
 
-  var ratePerPeriod = annualRate > 0 && frequency > 0 ? annualRate / 100 / frequency : 0;
-  var totalPeriods = years > 0 && frequency > 0 ? years * frequency : 0;
+  var periodsPerYearMap = {
+    daily: 365,
+    weekly: 52,
+    monthly: 12,
+    yearly: 1
+  };
+
+  var ratePeriodsPerYear = periodsPerYearMap[ratePeriod] || 12;
+  var totalYears = Math.max(0, years) + Math.max(0, months) / 12;
+  var totalCompoundPeriods = totalYears > 0 && frequency > 0 ? Math.floor(totalYears * frequency + 0.0001) : 0;
+  var baseRate = percentage > 0 ? percentage / 100 : 0;
+  var compoundRate = baseRate > 0 && frequency > 0
+    ? Math.pow(1 + baseRate, ratePeriodsPerYear / frequency) - 1
+    : 0;
+  var contributionInterval = contribution > 0 && contributionFrequency > 0 && frequency > 0
+    ? Math.max(1, Math.round(frequency / contributionFrequency))
+    : 0;
   var endingBalance = principal > 0 ? principal : 0;
+  var addedContributions = 0;
+  var breakdownRows = [];
 
-  if (totalPeriods > 0 && ratePerPeriod > 0) {
-    endingBalance = principal * Math.pow(1 + ratePerPeriod, totalPeriods);
-    endingBalance += contribution * ((Math.pow(1 + ratePerPeriod, totalPeriods) - 1) / ratePerPeriod);
-  } else if (totalPeriods > 0) {
-    endingBalance = principal + contribution * totalPeriods;
+  for (var period = 1; period <= totalCompoundPeriods; period += 1) {
+    if (compoundRate > 0) {
+      endingBalance *= 1 + compoundRate;
+    }
+
+    if (contributionInterval > 0 && period % contributionInterval === 0) {
+      endingBalance += contribution;
+      addedContributions += contribution;
+    }
+
+    breakdownRows.push({
+      period: period,
+      label: nwmGetCompoundPeriodLabel(frequency, period),
+      balance: endingBalance,
+      contributions: principal + addedContributions,
+      profit: endingBalance - (principal + addedContributions)
+    });
   }
 
-  var totalContributions = principal + contribution * totalPeriods;
+  var totalContributions = principal + addedContributions;
   var interestEarned = endingBalance - totalContributions;
   var growthMultiple = principal > 0 ? endingBalance / principal : 0;
 
@@ -202,25 +267,77 @@ function nwmUpdateCompoundCalculator(calculator) {
   var interestNode = calculator.querySelector("[data-nwm-compound-interest]");
   var multipleNode = calculator.querySelector("[data-nwm-compound-multiple]");
   var profitNode = calculator.querySelector("[data-nwm-compound-profit]");
+  var breakdownNode = calculator.querySelector("[data-nwm-compound-breakdown]");
+  var chartNode = calculator.querySelector("[data-nwm-compound-chart]");
 
   if (endingNode) {
-    endingNode.textContent = nwmFormatCurrency(endingBalance);
+    endingNode.textContent = nwmFormatCurrencyWithSymbol(currency, endingBalance);
   }
 
   if (contributionsNode) {
-    contributionsNode.textContent = nwmFormatCurrency(totalContributions);
+    contributionsNode.textContent = nwmFormatCurrencyWithSymbol(currency, totalContributions);
   }
 
   if (interestNode) {
-    interestNode.textContent = nwmFormatCurrency(interestEarned);
+    interestNode.textContent = nwmFormatCurrencyWithSymbol(currency, interestEarned);
   }
 
   if (multipleNode) {
-    multipleNode.textContent = growthMultiple > 0 ? growthMultiple.toFixed(2) + "x" : "0.00x";
+    multipleNode.textContent = totalCompoundPeriods > 0 ? String(totalCompoundPeriods) : "0";
   }
 
   if (profitNode) {
-    profitNode.textContent = nwmFormatCurrency(Math.max(endingBalance - principal, 0));
+    profitNode.textContent = compoundRate > 0 ? (compoundRate * 100).toFixed(2) + "%" : "0.00%";
+  }
+
+  if (breakdownNode) {
+    if (!breakdownRows.length) {
+      breakdownNode.innerHTML = '<tr><td colspan="4">Enter your numbers to see the projection.</td></tr>';
+    } else {
+      breakdownNode.innerHTML = breakdownRows
+        .map(function (row) {
+          return (
+            "<tr>" +
+              "<td>" + row.label + "</td>" +
+              "<td>" + nwmFormatCurrencyWithSymbol(currency, row.balance) + "</td>" +
+              "<td>" + nwmFormatCurrencyWithSymbol(currency, row.contributions) + "</td>" +
+              "<td>" + nwmFormatCurrencyWithSymbol(currency, row.profit) + "</td>" +
+            "</tr>"
+          );
+        })
+        .join("");
+    }
+  }
+
+  if (chartNode) {
+    if (!breakdownRows.length) {
+      chartNode.innerHTML = '<p class="nwm-tool-chart__empty">Enter your numbers to generate the projection chart.</p>';
+    } else {
+      var chartRows = breakdownRows.length > 12
+        ? breakdownRows.filter(function (row, index) {
+            return index === 0 || index === breakdownRows.length - 1 || ((index + 1) % Math.ceil(breakdownRows.length / 8) === 0);
+          })
+        : breakdownRows;
+      var maxBalance = Math.max.apply(null, chartRows.map(function (row) { return row.balance; })) || 1;
+
+      chartNode.innerHTML = chartRows
+        .map(function (row) {
+          var width = Math.max(8, (row.balance / maxBalance) * 100);
+
+          return (
+            '<div class="nwm-tool-chart__row">' +
+              '<div class="nwm-tool-chart__meta">' +
+                '<strong>' + row.label + '</strong>' +
+                '<span>' + nwmFormatCurrencyWithSymbol(currency, row.balance) + '</span>' +
+              '</div>' +
+              '<div class="nwm-tool-chart__track">' +
+                '<span class="nwm-tool-chart__fill" style="width:' + width.toFixed(2) + '%;"></span>' +
+              '</div>' +
+            '</div>'
+          );
+        })
+        .join("");
+    }
   }
 }
 
@@ -277,6 +394,33 @@ document.addEventListener("input", function (event) {
   var calculator = event.target.closest("[data-nwm-risk-calculator]");
   if (calculator) {
     nwmUpdateRiskCalculator(calculator);
+  }
+
+  var positionCalculator = event.target.closest("[data-nwm-position-calculator]");
+  if (positionCalculator) {
+    nwmUpdatePositionCalculator(positionCalculator);
+  }
+
+  var pipCalculator = event.target.closest("[data-nwm-pip-calculator]");
+  if (pipCalculator) {
+    nwmUpdatePipCalculator(pipCalculator);
+  }
+
+  var profitCalculator = event.target.closest("[data-nwm-profit-calculator]");
+  if (profitCalculator) {
+    nwmUpdateProfitCalculator(profitCalculator);
+  }
+
+  var compoundCalculator = event.target.closest("[data-nwm-compound-calculator]");
+  if (compoundCalculator) {
+    nwmUpdateCompoundCalculator(compoundCalculator);
+  }
+});
+
+document.addEventListener("change", function (event) {
+  var riskCalculator = event.target.closest("[data-nwm-risk-calculator]");
+  if (riskCalculator) {
+    nwmUpdateRiskCalculator(riskCalculator);
   }
 
   var positionCalculator = event.target.closest("[data-nwm-position-calculator]");

@@ -37,6 +37,8 @@ class NerdyWithMe_Tools_Admin {
 			return;
 		}
 
+		wp_enqueue_media();
+
 		wp_enqueue_style(
 			'nerdywithme-tools-admin',
 			NERDYWITHME_TOOLS_URL . 'assets/css/nerdywithme-tools-admin.css',
@@ -543,21 +545,21 @@ class NerdyWithMe_Tools_Admin {
 					</div>
 					<div class="nwm-tools-admin__cards">
 						<?php foreach ($this->get_ad_slot_labels() as $slot => $label) : ?>
-							<article class="nwm-tools-admin__card">
+							<article class="nwm-tools-admin__card" data-nwm-ad-card>
 								<div class="nwm-tools-admin__card-head">
 									<div>
 										<h3><?php echo esc_html($label); ?></h3>
 										<p><code><?php echo esc_html($slot); ?></code></p>
 									</div>
 								</div>
-								<label class="nwm-tools-admin__fields">
+								<label class="nwm-tools-admin__fields nwm-tools-admin__fields--ad-markup" data-nwm-ad-group="markup">
 									<span><?php esc_html_e('Ad Markup', 'nerdywithme-tools'); ?></span>
 									<textarea name="<?php echo esc_attr(self::OPTION_KEY . '[ads][' . $slot . ']'); ?>" rows="6" class="code"><?php echo esc_textarea($settings['ads'][ $slot ] ?? ''); ?></textarea>
 								</label>
 								<div class="nwm-tools-admin__ad-options">
 									<label>
 										<span><?php esc_html_e('Content mode', 'nerdywithme-tools'); ?></span>
-										<select name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][mode]'); ?>">
+										<select name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][mode]'); ?>" data-nwm-ad-mode>
 											<?php foreach ($this->get_ad_mode_options() as $mode_key => $mode_label) : ?>
 												<option value="<?php echo esc_attr($mode_key); ?>" <?php selected($settings['ad_settings'][ $slot ]['mode'] ?? 'markup', $mode_key); ?>><?php echo esc_html($mode_label); ?></option>
 											<?php endforeach; ?>
@@ -624,10 +626,13 @@ class NerdyWithMe_Tools_Admin {
 										<input type="number" min="0" step="1" name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][offset_mobile]'); ?>" value="<?php echo esc_attr((string) ($settings['ad_settings'][ $slot ]['offset_mobile'] ?? 84)); ?>">
 									</label>
 								</div>
-								<div class="nwm-tools-admin__fields nwm-tools-admin__fields--ad-content">
+								<div class="nwm-tools-admin__fields nwm-tools-admin__fields--ad-content" data-nwm-ad-group="managed">
 									<label>
 										<span><?php esc_html_e('Image URL', 'nerdywithme-tools'); ?></span>
-										<input type="url" name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][image_url]'); ?>" value="<?php echo esc_attr($settings['ad_settings'][ $slot ]['image_url'] ?? ''); ?>">
+										<div class="nwm-tools-admin__media-field">
+											<input type="url" name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][image_url]'); ?>" value="<?php echo esc_attr($settings['ad_settings'][ $slot ]['image_url'] ?? ''); ?>" data-nwm-media-target>
+											<button type="button" class="button button-secondary" data-nwm-media-open><?php esc_html_e('Choose Image', 'nerdywithme-tools'); ?></button>
+										</div>
 									</label>
 									<label>
 										<span><?php esc_html_e('Image Alt Text', 'nerdywithme-tools'); ?></span>

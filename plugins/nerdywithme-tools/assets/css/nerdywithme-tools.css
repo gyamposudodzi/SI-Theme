@@ -260,6 +260,60 @@
   border-color: #ffd9c8;
 }
 
+.nwm-tool-toolbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.nwm-tool-toolbar__field {
+  display: grid;
+  gap: 8px;
+  min-width: 220px;
+}
+
+.nwm-tool-toolbar__field span {
+  color: #132a78;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.nwm-tool-toolbar__field select {
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid #ece7f5;
+  background: #fff;
+  color: #101437;
+}
+
+.nwm-tool-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.nwm-tool-toolbar__button {
+  min-height: 46px;
+  padding: 0 18px;
+  border: 1px solid #ffd0c3;
+  background: linear-gradient(180deg, #ff845f, #ff5f36);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.nwm-tool-toolbar__status {
+  color: #69708f;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
 .nwm-tool-breakdown {
   display: grid;
   gap: 14px;
@@ -312,9 +366,78 @@
   line-height: 1.6;
 }
 
-.nwm-tool-chart__bars {
+.nwm-tool-chart__canvas {
+  position: relative;
+  min-height: 260px;
+}
+
+.nwm-tool-chart__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.nwm-tool-chart__gridline line {
+  stroke: #efe7e1;
+  stroke-width: 1;
+}
+
+.nwm-tool-chart__gridline text {
+  fill: #8a92b1;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.nwm-tool-chart__line {
+  stroke: #ff5f36;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.nwm-tool-chart__point {
+  fill: #132a78;
+  stroke: #fff;
+  stroke-width: 2;
+  cursor: pointer;
+}
+
+.nwm-tool-chart__label {
+  fill: #132a78;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.nwm-tool-chart__tooltip {
+  position: absolute;
+  z-index: 3;
   display: grid;
-  gap: 12px;
+  gap: 6px;
+  min-width: 190px;
+  max-width: 240px;
+  padding: 12px 14px;
+  background: rgba(16, 20, 55, 0.96);
+  color: #fff;
+  box-shadow: 0 18px 34px rgba(16, 20, 55, 0.24);
+  pointer-events: none;
+  transform: translateY(-100%);
+}
+
+.nwm-tool-chart__tooltip[hidden] {
+  display: none;
+}
+
+.nwm-tool-chart__tooltip-title {
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.nwm-tool-chart__tooltip-row {
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.82rem;
+  line-height: 1.45;
 }
 
 .nwm-tool-chart__row {
@@ -396,6 +519,22 @@
 
 .nwm-tool-breakdown__table tbody tr:last-child td {
   border-bottom: 0;
+}
+
+@media (max-width: 767px) {
+  .nwm-tool-results {
+    grid-template-columns: 1fr;
+  }
+
+  .nwm-tool-toolbar {
+    align-items: stretch;
+  }
+
+  .nwm-tool-toolbar__field,
+  .nwm-tool-toolbar__actions,
+  .nwm-tool-toolbar__button {
+    width: 100%;
+  }
 }
 
 .nwm-ad-slot {

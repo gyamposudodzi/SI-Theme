@@ -916,13 +916,13 @@ function nerdywithme_compact_posts($query_args, $limit = 3) {
 	<div class="compact-list">
 		<?php while ($query->have_posts()) : $query->the_post(); ?>
 			<a class="compact-list__item compact-list__item--featured" href="<?php the_permalink(); ?>">
-				<span class="compact-list__thumb">
+				<div class="compact-list__thumb">
 					<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'thumbnail')); ?>" alt="<?php the_title_attribute(); ?>">
-				</span>
-				<span class="compact-list__content">
+				</div>
+				<div class="compact-list__content">
 					<?php nerdywithme_post_meta(get_the_ID()); ?>
 					<strong class="compact-list__title"><?php the_title(); ?></strong>
-				</span>
+				</div>
 			</a>
 		<?php endwhile; ?>
 	</div>
@@ -949,15 +949,17 @@ function nerdywithme_featured_slider_posts($query_args, $limit = 3) {
 				$query->the_post();
 				?>
 				<article class="featured-slide<?php echo 0 === $index ? ' is-active' : ''; ?>" data-featured-slide>
-					<a class="compact-list__item compact-list__item--featured" href="<?php the_permalink(); ?>">
-						<span class="compact-list__thumb">
-							<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'medium_large')); ?>" alt="<?php the_title_attribute(); ?>">
-						</span>
-						<span class="compact-list__content">
+					<div class="compact-list__item compact-list__item--featured">
+						<a class="compact-list__thumb-link" href="<?php the_permalink(); ?>">
+							<div class="compact-list__thumb">
+								<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'medium_large')); ?>" alt="<?php the_title_attribute(); ?>">
+							</div>
+						</a>
+						<div class="compact-list__content">
 							<?php nerdywithme_post_meta(get_the_ID()); ?>
-							<strong class="compact-list__title"><?php the_title(); ?></strong>
-						</span>
-					</a>
+							<h3 class="compact-list__title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
+						</div>
+					</div>
 				</article>
 				<?php
 				$index++;
@@ -1042,6 +1044,45 @@ function nerdywithme_get_related_posts($post_id = null, $count = 3) {
 	}
 
 	return nerdywithme_get_featured_posts($count, $exclude);
+}
+
+function nerdywithme_add_dropcap_to_first_paragraph($content) {
+	if (! is_string($content) || '' === trim($content)) {
+		return $content;
+	}
+
+	return preg_replace_callback(
+		'/<p([^>]*)>(.*?)<\/p>/is',
+		function ($matches) {
+			$inner = $matches[2];
+
+			if (false !== strpos($inner, 'entry-dropcap')) {
+				return $matches[0];
+			}
+
+			$updated = preg_replace(
+				'/(^|>|\s)([A-Za-z])/',
+				'$1<span class="entry-dropcap">$2</span>',
+				$inner,
+				1
+			);
+
+			if (null === $updated || $updated === $inner) {
+				return $matches[0];
+			}
+
+			return '<p' . $matches[1] . '>' . $updated . '</p>';
+		},
+		$content,
+		1
+	);
+}
+
+function nerdywithme_render_single_content($post_id = null) {
+	$post_id = $post_id ? (int) $post_id : get_the_ID();
+	$content = apply_filters('the_content', get_post_field('post_content', $post_id));
+
+	echo nerdywithme_add_dropcap_to_first_paragraph($content); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 }
 
 function nerdywithme_get_404_suggestion_posts($count = 3) {

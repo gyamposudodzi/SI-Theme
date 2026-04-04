@@ -175,4 +175,37 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
   });
+
+  const readingBar = document.querySelector("[data-reading-bar]");
+  if (readingBar && body.classList.contains("single-post")) {
+    let lastY = window.scrollY || 0;
+    let ticking = false;
+    const threshold = 140;
+
+    function updateReadingBar() {
+      const currentY = window.scrollY || 0;
+      const scrollingDown = currentY > lastY + 4;
+      const scrollingUp = currentY < lastY - 4;
+
+      if (currentY <= threshold) {
+        body.classList.remove("is-reading-down");
+      } else if (scrollingDown) {
+        body.classList.add("is-reading-down");
+      } else if (scrollingUp) {
+        body.classList.remove("is-reading-down");
+      }
+
+      lastY = currentY;
+      ticking = false;
+    }
+
+    window.addEventListener("scroll", function () {
+      if (!ticking) {
+        window.requestAnimationFrame(updateReadingBar);
+        ticking = true;
+      }
+    }, { passive: true });
+
+    updateReadingBar();
+  }
 });

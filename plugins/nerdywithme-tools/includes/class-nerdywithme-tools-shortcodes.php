@@ -392,11 +392,11 @@ class NerdyWithMe_Tools_Shortcodes {
 	private function render_risk_calculator_inner() {
 		ob_start();
 		?>
-		<div class="nwm-tool-card nwm-tool-card--risk" data-nwm-risk-calculator>
-			<div class="nwm-tool-card__header">
-				<h3><?php esc_html_e('Risk Calculator', 'nerdywithme-tools'); ?></h3>
-				<p><?php esc_html_e('Work out how much to risk, your stop distance, suggested position size, and the reward at your target.', 'nerdywithme-tools'); ?></p>
-			</div>
+			<div class="nwm-tool-card nwm-tool-card--risk" data-nwm-risk-calculator>
+				<div class="nwm-tool-card__header">
+					<h3><?php esc_html_e('Risk Calculator', 'nerdywithme-tools'); ?></h3>
+					<p><?php esc_html_e('Work out how much to risk, your stop distance, suggested position size, and the reward at your target.', 'nerdywithme-tools'); ?></p>
+				</div>
 			<div class="nwm-tool-grid">
 				<label>
 					<span><?php esc_html_e('Account Balance', 'nerdywithme-tools'); ?></span>
@@ -695,6 +695,27 @@ class NerdyWithMe_Tools_Shortcodes {
 					</select>
 				</label>
 			</div>
+			<div class="nwm-tool-toolbar nwm-tool-toolbar--compound">
+				<label class="nwm-tool-toolbar__field">
+					<span><?php esc_html_e('Results View', 'nerdywithme-tools'); ?></span>
+					<select data-nwm-compound-view>
+						<option value="monthly" selected><?php esc_html_e('Monthly Summary', 'nerdywithme-tools'); ?></option>
+						<option value="yearly"><?php esc_html_e('Yearly Summary', 'nerdywithme-tools'); ?></option>
+						<option value="period"><?php esc_html_e('Every Period', 'nerdywithme-tools'); ?></option>
+					</select>
+				</label>
+				<label class="nwm-tool-toolbar__field">
+					<span><?php esc_html_e('Chart Style', 'nerdywithme-tools'); ?></span>
+					<select data-nwm-compound-chart-type>
+						<option value="line" selected><?php esc_html_e('Line Chart', 'nerdywithme-tools'); ?></option>
+						<option value="bar"><?php esc_html_e('Bar Chart', 'nerdywithme-tools'); ?></option>
+					</select>
+				</label>
+				<div class="nwm-tool-toolbar__actions">
+					<button type="button" class="nwm-tool-toolbar__button" data-nwm-compound-share><?php esc_html_e('Share Scenario', 'nerdywithme-tools'); ?></button>
+					<span class="nwm-tool-toolbar__status" data-nwm-compound-share-status aria-live="polite"></span>
+				</div>
+			</div>
 			<div class="nwm-tool-results">
 				<div>
 					<strong><?php esc_html_e('Ending Balance', 'nerdywithme-tools'); ?></strong>
@@ -725,9 +746,9 @@ class NerdyWithMe_Tools_Shortcodes {
 				<div class="nwm-tool-chart nwm-tool-chart--compound">
 					<div class="nwm-tool-chart__header">
 						<h4><?php esc_html_e('Growth Path', 'nerdywithme-tools'); ?></h4>
-						<p><?php esc_html_e('See how the projected balance builds as each milestone is reached.', 'nerdywithme-tools'); ?></p>
+						<p><?php esc_html_e('Follow the projected balance over time with a cleaner line view.', 'nerdywithme-tools'); ?></p>
 					</div>
-					<div class="nwm-tool-chart__bars" data-nwm-compound-chart>
+					<div class="nwm-tool-chart__canvas" data-nwm-compound-chart>
 						<p class="nwm-tool-chart__empty"><?php esc_html_e('Enter your numbers to generate the projection chart.', 'nerdywithme-tools'); ?></p>
 					</div>
 				</div>

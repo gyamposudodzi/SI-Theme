@@ -13,8 +13,43 @@ get_header();
 		<?php
 		$single_style = nerdywithme_get_single_post_style(get_the_ID());
 		$summary      = get_the_excerpt() ? get_the_excerpt() : wp_trim_words(wp_strip_all_tags(get_the_content()), 28);
+		$previous_post = get_previous_post();
+		$next_post     = get_next_post();
 		?>
 		<article <?php post_class('single-post single-post--' . $single_style); ?>>
+			<div class="reading-bar" data-reading-bar aria-label="<?php esc_attr_e('Article navigation', 'nerdywithme'); ?>">
+				<div class="reading-bar__slot reading-bar__slot--prev">
+					<?php if ($previous_post) : ?>
+						<a class="reading-bar__link reading-bar__link--prev" href="<?php echo esc_url(get_permalink($previous_post)); ?>">
+							<span class="reading-bar__arrow" aria-hidden="true">&lsaquo;</span>
+							<span class="reading-bar__tooltip" role="tooltip"><?php echo esc_html__('Previous article:', 'nerdywithme'); ?> <?php echo esc_html(get_the_title($previous_post)); ?></span>
+							<span class="reading-bar__thumb">
+								<img src="<?php echo esc_url(nerdywithme_get_post_image($previous_post->ID, 'thumbnail')); ?>" alt="<?php echo esc_attr(get_the_title($previous_post)); ?>">
+							</span>
+							<span class="reading-bar__text">
+								<strong><?php echo esc_html(get_the_title($previous_post)); ?></strong>
+							</span>
+						</a>
+					<?php endif; ?>
+				</div>
+				<div class="reading-bar__current">
+					<strong><?php the_title(); ?></strong>
+				</div>
+				<div class="reading-bar__slot reading-bar__slot--next">
+					<?php if ($next_post) : ?>
+						<a class="reading-bar__link reading-bar__link--next" href="<?php echo esc_url(get_permalink($next_post)); ?>">
+							<span class="reading-bar__text">
+								<strong><?php echo esc_html(get_the_title($next_post)); ?></strong>
+							</span>
+							<span class="reading-bar__thumb">
+								<img src="<?php echo esc_url(nerdywithme_get_post_image($next_post->ID, 'thumbnail')); ?>" alt="<?php echo esc_attr(get_the_title($next_post)); ?>">
+							</span>
+							<span class="reading-bar__arrow" aria-hidden="true">&rsaquo;</span>
+							<span class="reading-bar__tooltip" role="tooltip"><?php echo esc_html__('Next article:', 'nerdywithme'); ?> <?php echo esc_html(get_the_title($next_post)); ?></span>
+						</a>
+					<?php endif; ?>
+				</div>
+			</div>
 			<?php if ('feature' === $single_style) : ?>
 				<header class="single-hero single-hero--feature">
 					<?php nerdywithme_post_meta(get_the_ID()); ?>
@@ -35,7 +70,7 @@ get_header();
 				<div class="single-layout">
 					<div class="single-content">
 						<div class="entry-content">
-							<?php the_content(); ?>
+							<?php nerdywithme_render_single_content(get_the_ID()); ?>
 						</div>
 						<?php if (function_exists('nerdywithme_tools_render_ad_slot')) : ?>
 							<div class="theme-ad-slot theme-ad-slot--single-inline">
@@ -91,7 +126,7 @@ get_header();
 							</div>
 						</header>
 						<div class="entry-content">
-							<?php the_content(); ?>
+							<?php nerdywithme_render_single_content(get_the_ID()); ?>
 						</div>
 						<?php if (function_exists('nerdywithme_tools_render_ad_slot')) : ?>
 							<div class="theme-ad-slot theme-ad-slot--single-inline">

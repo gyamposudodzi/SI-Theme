@@ -34,6 +34,281 @@ function nwmGetCompoundPeriodLabel(frequency, period) {
   return "Period " + period;
 }
 
+function nwmGetCompoundRowsForView(rows, frequency, totalMonths, view) {
+  if (!rows.length || frequency <= 0 || view === "period") {
+    return rows;
+  }
+
+  var targetCount = view === "yearly"
+    ? Math.max(1, Math.ceil(totalMonths / 12))
+    : Math.max(1, totalMonths);
+  var summaryRows = [];
+  var seenPeriods = {};
+
+  for (var index = 1; index <= targetCount; index += 1) {
+    var targetPeriod = view === "yearly"
+      ? Math.ceil(index * frequency)
+      : Math.ceil((index / 12) * frequency);
+    var rowIndex = Math.min(rows.length - 1, Math.max(0, targetPeriod - 1));
+    var row = rows[rowIndex];
+
+    if (!row || seenPeriods[row.period]) {
+      continue;
+    }
+
+    seenPeriods[row.period] = true;
+    summaryRows.push({
+      period: row.period,
+      label: view === "yearly" ? "Year " + index : "Month " + index,
+      balance: row.balance,
+      contributions: row.contributions,
+      profit: row.profit
+    });
+  }
+
+  var lastRow = rows[rows.length - 1];
+
+  if (lastRow && !seenPeriods[lastRow.period]) {
+    summaryRows.push({
+      period: lastRow.period,
+      label: view === "yearly" ? "Final Year" : "Final Month",
+      balance: lastRow.balance,
+      contributions: lastRow.contributions,
+      profit: lastRow.profit
+    });
+  }
+
+  return summaryRows.length ? summaryRows : rows;
+}
+
+function nwmBuildCompoundShareUrl(calculator) {
+  if (!calculator || typeof window === "undefined") {
+    return "";
+  }
+
+  var url = new URL(window.location.href);
+  var params = url.searchParams;
+  var fields = {
+    currency: "[data-nwm-compound-currency]",
+    principal: "[data-nwm-compound-principal]",
+    rate: "[data-nwm-compound-rate]",
+    rate_period: "[data-nwm-compound-rate-period]",
+    years: "[data-nwm-compound-years]",
+    months: "[data-nwm-compound-months]",
+    frequency: "[data-nwm-compound-frequency]",
+    contribution: "[data-nwm-compound-contribution]",
+    contribution_frequency: "[data-nwm-compound-contribution-frequency]",
+    view: "[data-nwm-compound-view]",
+    chart: "[data-nwm-compound-chart-type]"
+  };
+
+  Object.keys(fields).forEach(function (key) {
+    var field = calculator.querySelector(fields[key]);
+    var value = field ? String(field.value || "").trim() : "";
+
+    if (value) {
+      params.set(key, value);
+    } else {
+      params.delete(key);
+    }
+  });
+
+  return url.toString();
+}
+
+function nwmPopulateCompoundCalculatorFromUrl(calculator) {
+  if (!calculator || typeof window === "undefined") {
+    return;
+  }
+
+  var params = new URLSearchParams(window.location.search);
+  var fields = {
+    currency: "[data-nwm-compound-currency]",
+    principal: "[data-nwm-compound-principal]",
+    rate: "[data-nwm-compound-rate]",
+    rate_period: "[data-nwm-compound-rate-period]",
+    years: "[data-nwm-compound-years]",
+    months: "[data-nwm-compound-months]",
+    frequency: "[data-nwm-compound-frequency]",
+    contribution: "[data-nwm-compound-contribution]",
+    contribution_frequency: "[data-nwm-compound-contribution-frequency]",
+    view: "[data-nwm-compound-view]",
+    chart: "[data-nwm-compound-chart-type]"
+  };
+
+  Object.keys(fields).forEach(function (key) {
+    if (!params.has(key)) {
+      return;
+    }
+
+    var field = calculator.querySelector(fields[key]);
+
+    if (field) {
+      field.value = params.get(key) || field.value;
+    }
+  });
+}
+
+function nwmSetCompoundShareStatus(calculator, message) {
+  var statusNode = calculator?.querySelector("[data-nwm-compound-share-status]");
+
+  if (!statusNode) {
+    return;
+  }
+
+  statusNode.textContent = message || "";
+
+  if (message) {
+    window.setTimeout(function () {
+      if (statusNode.textContent === message) {
+        statusNode.textContent = "";
+      }
+    }, 2200);
+  }
+}
+
+function nwmGetCompoundChartLabelIndexes(length) {
+  if (length <= 1) {
+    return { 0: true };
+  }
+
+  var indexes = {};
+  indexes[0] = true;
+  indexes[length - 1] = true;
+  var steps = Math.min(5, length - 1);
+
+  for (var index = 1; index < steps; index += 1) {
+    indexes[Math.round((index * (length - 1)) / steps)] = true;
+  }
+
+  return indexes;
+}
+
+function nwmRenderCompoundLineChart(chartNode, rows, currency) {
+  if (!chartNode) {
+    return;
+  }
+
+  if (!rows.length) {
+    chartNode.innerHTML = '<p class="nwm-tool-chart__empty">Enter your numbers to generate the projection chart.</p>';
+    return;
+  }
+
+  var width = 720;
+  var height = 260;
+  var paddingLeft = 88;
+  var paddingRight = 24;
+  var paddingTop = 20;
+  var paddingBottom = 42;
+  var chartHeight = height - paddingTop - paddingBottom;
+  var chartWidth = width - paddingLeft - paddingRight;
+  var maxBalance = Math.max.apply(null, rows.map(function (row) { return row.balance; })) || 1;
+  var minBalance = Math.min.apply(null, rows.map(function (row) { return row.balance; })) || 0;
+  var balanceRange = Math.max(1, maxBalance - minBalance);
+
+  var points = rows.map(function (row, index) {
+    var ratioX = rows.length === 1 ? 0.5 : index / (rows.length - 1);
+    var ratioY = (row.balance - minBalance) / balanceRange;
+    var x = paddingLeft + ratioX * chartWidth;
+    var y = paddingTop + chartHeight - ratioY * chartHeight;
+
+    return {
+      x: x,
+      y: y,
+      label: row.label,
+      balance: row.balance
+    };
+  });
+
+  var polyline = points.map(function (point) {
+    return point.x.toFixed(2) + "," + point.y.toFixed(2);
+  }).join(" ");
+  var labelIndexes = nwmGetCompoundChartLabelIndexes(points.length);
+
+  var gridLines = [0, 0.25, 0.5, 0.75, 1].map(function (step) {
+    var y = paddingTop + chartHeight - step * chartHeight;
+    var balance = minBalance + step * balanceRange;
+
+    return (
+        '<g class="nwm-tool-chart__gridline">' +
+        '<line x1="' + paddingLeft + '" y1="' + y.toFixed(2) + '" x2="' + (width - paddingRight) + '" y2="' + y.toFixed(2) + '"></line>' +
+        '<text x="8" y="' + (y + 4).toFixed(2) + '">' + nwmFormatCurrencyWithSymbol(currency, balance) + '</text>' +
+      '</g>'
+    );
+  }).join("");
+
+  var pointMarkup = points.map(function (point, index) {
+    var anchor = index === points.length - 1 ? "end" : index === 0 ? "start" : "middle";
+    var label = labelIndexes[index]
+      ? '<text class="nwm-tool-chart__label" text-anchor="' + anchor + '" x="' + point.x.toFixed(2) + '" y="' + (height - 12) + '">' + point.label + '</text>'
+      : "";
+    var detailLabel = point.label.replace(/"/g, "&quot;");
+    var detailBalance = nwmFormatCurrencyWithSymbol(currency, rows[index].balance).replace(/"/g, "&quot;");
+    var detailContributions = nwmFormatCurrencyWithSymbol(currency, rows[index].contributions).replace(/"/g, "&quot;");
+    var detailProfit = nwmFormatCurrencyWithSymbol(currency, rows[index].profit).replace(/"/g, "&quot;");
+
+    return (
+      '<g class="nwm-tool-chart__point-group">' +
+        '<circle class="nwm-tool-chart__point" tabindex="0" cx="' + point.x.toFixed(2) + '" cy="' + point.y.toFixed(2) + '" r="4"' +
+          ' data-nwm-compound-chart-point' +
+          ' data-tooltip-label="' + detailLabel + '"' +
+          ' data-tooltip-balance="' + detailBalance + '"' +
+          ' data-tooltip-contributions="' + detailContributions + '"' +
+          ' data-tooltip-profit="' + detailProfit + '"' +
+        '></circle>' +
+        label +
+      '</g>'
+    );
+  }).join("");
+
+  chartNode.innerHTML =
+    '<svg class="nwm-tool-chart__svg" viewBox="0 0 ' + width + " " + height + '" role="img" aria-label="Compound growth line chart">' +
+      gridLines +
+      '<polyline class="nwm-tool-chart__line" fill="none" points="' + polyline + '"></polyline>' +
+      pointMarkup +
+    '</svg>' +
+    '<div class="nwm-tool-chart__tooltip" data-nwm-compound-chart-tooltip hidden>' +
+      '<strong class="nwm-tool-chart__tooltip-title"></strong>' +
+      '<span class="nwm-tool-chart__tooltip-row" data-nwm-tooltip-balance></span>' +
+      '<span class="nwm-tool-chart__tooltip-row" data-nwm-tooltip-contributions></span>' +
+      '<span class="nwm-tool-chart__tooltip-row" data-nwm-tooltip-profit></span>' +
+    '</div>';
+}
+
+function nwmRenderCompoundBarChart(chartNode, rows, currency) {
+  if (!chartNode) {
+    return;
+  }
+
+  if (!rows.length) {
+    chartNode.innerHTML = '<p class="nwm-tool-chart__empty">Enter your numbers to generate the projection chart.</p>';
+    return;
+  }
+
+  var sampleRows = rows.length > 10
+    ? rows.filter(function (row, index) {
+        return index === 0 || index === rows.length - 1 || ((index + 1) % Math.ceil(rows.length / 6) === 0);
+      })
+    : rows;
+  var maxBalance = Math.max.apply(null, sampleRows.map(function (row) { return row.balance; })) || 1;
+
+  chartNode.innerHTML = sampleRows.map(function (row) {
+    var width = Math.max(8, (row.balance / maxBalance) * 100);
+
+    return (
+      '<div class="nwm-tool-chart__row">' +
+        '<div class="nwm-tool-chart__meta">' +
+          '<strong>' + row.label + '</strong>' +
+          '<span>' + nwmFormatCurrencyWithSymbol(currency, row.balance) + '</span>' +
+        '</div>' +
+        '<div class="nwm-tool-chart__track">' +
+          '<span class="nwm-tool-chart__fill" style="width:' + width.toFixed(2) + '%;"></span>' +
+        '</div>' +
+      '</div>'
+    );
+  }).join("");
+}
+
 function nwmSanitizeNumericInput(input) {
   if (!input) {
     return;
@@ -217,6 +492,8 @@ function nwmUpdateCompoundCalculator(calculator) {
   var months = parseFloat(calculator.querySelector("[data-nwm-compound-months]")?.value || "0");
   var frequency = parseFloat(calculator.querySelector("[data-nwm-compound-frequency]")?.value || "12");
   var contributionFrequency = parseFloat(calculator.querySelector("[data-nwm-compound-contribution-frequency]")?.value || "12");
+  var view = calculator.querySelector("[data-nwm-compound-view]")?.value || "monthly";
+  var chartType = calculator.querySelector("[data-nwm-compound-chart-type]")?.value || "line";
 
   var periodsPerYearMap = {
     daily: 365,
@@ -227,6 +504,7 @@ function nwmUpdateCompoundCalculator(calculator) {
 
   var ratePeriodsPerYear = periodsPerYearMap[ratePeriod] || 12;
   var totalYears = Math.max(0, years) + Math.max(0, months) / 12;
+  var totalMonths = Math.max(1, Math.round(totalYears * 12));
   var totalCompoundPeriods = totalYears > 0 && frequency > 0 ? Math.floor(totalYears * frequency + 0.0001) : 0;
   var baseRate = percentage > 0 ? percentage / 100 : 0;
   var compoundRate = baseRate > 0 && frequency > 0
@@ -269,6 +547,7 @@ function nwmUpdateCompoundCalculator(calculator) {
   var profitNode = calculator.querySelector("[data-nwm-compound-profit]");
   var breakdownNode = calculator.querySelector("[data-nwm-compound-breakdown]");
   var chartNode = calculator.querySelector("[data-nwm-compound-chart]");
+  var displayedRows = nwmGetCompoundRowsForView(breakdownRows, frequency, totalMonths, view);
 
   if (endingNode) {
     endingNode.textContent = nwmFormatCurrencyWithSymbol(currency, endingBalance);
@@ -291,10 +570,10 @@ function nwmUpdateCompoundCalculator(calculator) {
   }
 
   if (breakdownNode) {
-    if (!breakdownRows.length) {
+    if (!displayedRows.length) {
       breakdownNode.innerHTML = '<tr><td colspan="4">Enter your numbers to see the projection.</td></tr>';
     } else {
-      breakdownNode.innerHTML = breakdownRows
+      breakdownNode.innerHTML = displayedRows
         .map(function (row) {
           return (
             "<tr>" +
@@ -309,35 +588,10 @@ function nwmUpdateCompoundCalculator(calculator) {
     }
   }
 
-  if (chartNode) {
-    if (!breakdownRows.length) {
-      chartNode.innerHTML = '<p class="nwm-tool-chart__empty">Enter your numbers to generate the projection chart.</p>';
-    } else {
-      var chartRows = breakdownRows.length > 12
-        ? breakdownRows.filter(function (row, index) {
-            return index === 0 || index === breakdownRows.length - 1 || ((index + 1) % Math.ceil(breakdownRows.length / 8) === 0);
-          })
-        : breakdownRows;
-      var maxBalance = Math.max.apply(null, chartRows.map(function (row) { return row.balance; })) || 1;
-
-      chartNode.innerHTML = chartRows
-        .map(function (row) {
-          var width = Math.max(8, (row.balance / maxBalance) * 100);
-
-          return (
-            '<div class="nwm-tool-chart__row">' +
-              '<div class="nwm-tool-chart__meta">' +
-                '<strong>' + row.label + '</strong>' +
-                '<span>' + nwmFormatCurrencyWithSymbol(currency, row.balance) + '</span>' +
-              '</div>' +
-              '<div class="nwm-tool-chart__track">' +
-                '<span class="nwm-tool-chart__fill" style="width:' + width.toFixed(2) + '%;"></span>' +
-              '</div>' +
-            '</div>'
-          );
-        })
-        .join("");
-    }
+  if (chartType === "bar") {
+    nwmRenderCompoundBarChart(chartNode, displayedRows, currency);
+  } else {
+    nwmRenderCompoundLineChart(chartNode, displayedRows, currency);
   }
 }
 
@@ -455,14 +709,24 @@ document.addEventListener("click", function (event) {
         var principal = calculator.querySelector("[data-nwm-compound-principal]");
         var contribution = calculator.querySelector("[data-nwm-compound-contribution]");
         var rate = calculator.querySelector("[data-nwm-compound-rate]");
+        var ratePeriod = calculator.querySelector("[data-nwm-compound-rate-period]");
         var years = calculator.querySelector("[data-nwm-compound-years]");
+        var months = calculator.querySelector("[data-nwm-compound-months]");
         var frequency = calculator.querySelector("[data-nwm-compound-frequency]");
+        var contributionFrequency = calculator.querySelector("[data-nwm-compound-contribution-frequency]");
+        var currency = calculator.querySelector("[data-nwm-compound-currency]");
+        var view = calculator.querySelector("[data-nwm-compound-view]");
 
         if (principal && preset.principal !== undefined) principal.value = preset.principal;
         if (contribution && preset.contribution !== undefined) contribution.value = preset.contribution;
         if (rate && preset.rate !== undefined) rate.value = preset.rate;
+        if (ratePeriod && preset.rate_period !== undefined) ratePeriod.value = preset.rate_period;
         if (years && preset.years !== undefined) years.value = preset.years;
+        if (months && preset.months !== undefined) months.value = preset.months;
         if (frequency && preset.frequency !== undefined) frequency.value = preset.frequency;
+        if (contributionFrequency && preset.contribution_frequency !== undefined) contributionFrequency.value = preset.contribution_frequency;
+        if (currency && preset.currency !== undefined) currency.value = preset.currency;
+        if (view && preset.view !== undefined) view.value = preset.view;
 
         nwmUpdateCompoundCalculator(calculator);
       } catch (error) {
@@ -470,6 +734,45 @@ document.addEventListener("click", function (event) {
       }
     }
 
+    return;
+  }
+
+  var shareButton = event.target.closest("[data-nwm-compound-share]");
+  if (shareButton) {
+    var shareCalculator = shareButton.closest("[data-nwm-compound-calculator]");
+    var shareUrl = nwmBuildCompoundShareUrl(shareCalculator);
+    var shareTitle = "Forex Compound Calculator Scenario";
+    var shareText = "Check this forex compound projection.";
+
+    if (!shareCalculator || !shareUrl) {
+      return;
+    }
+
+    if (navigator.share) {
+      navigator.share({
+        title: shareTitle,
+        text: shareText,
+        url: shareUrl
+      }).then(function () {
+        nwmSetCompoundShareStatus(shareCalculator, "Shared.");
+      }).catch(function () {
+        // Ignore dismissed share sheets.
+      });
+
+      return;
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(shareUrl).then(function () {
+        nwmSetCompoundShareStatus(shareCalculator, "Link copied.");
+      }).catch(function () {
+        nwmSetCompoundShareStatus(shareCalculator, shareUrl);
+      });
+
+      return;
+    }
+
+    nwmSetCompoundShareStatus(shareCalculator, shareUrl);
     return;
   }
 
@@ -519,6 +822,86 @@ document.addEventListener("keydown", function (event) {
   nwmActivateToolHubTab(hub, tabs[nextIndex].getAttribute("data-nwm-tool-tab"));
 });
 
+function nwmShowCompoundChartTooltip(point, event) {
+  var chart = point.closest("[data-nwm-compound-chart]");
+  var tooltip = chart?.querySelector("[data-nwm-compound-chart-tooltip]");
+
+  if (!chart || !tooltip) {
+    return;
+  }
+
+  var titleNode = tooltip.querySelector(".nwm-tool-chart__tooltip-title");
+  var balanceNode = tooltip.querySelector("[data-nwm-tooltip-balance]");
+  var contributionsNode = tooltip.querySelector("[data-nwm-tooltip-contributions]");
+  var profitNode = tooltip.querySelector("[data-nwm-tooltip-profit]");
+
+  if (titleNode) {
+    titleNode.textContent = point.getAttribute("data-tooltip-label") || "";
+  }
+
+  if (balanceNode) {
+    balanceNode.textContent = "Balance: " + (point.getAttribute("data-tooltip-balance") || "");
+  }
+
+  if (contributionsNode) {
+    contributionsNode.textContent = "Contributions: " + (point.getAttribute("data-tooltip-contributions") || "");
+  }
+
+  if (profitNode) {
+    profitNode.textContent = "Profit: " + (point.getAttribute("data-tooltip-profit") || "");
+  }
+
+  var chartRect = chart.getBoundingClientRect();
+  var sourceRect = event ? { left: event.clientX, top: event.clientY } : point.getBoundingClientRect();
+  var left = sourceRect.left - chartRect.left + 14;
+  var top = sourceRect.top - chartRect.top - 14;
+
+  tooltip.hidden = false;
+  tooltip.style.left = left + "px";
+  tooltip.style.top = top + "px";
+}
+
+function nwmHideCompoundChartTooltip(point) {
+  var chart = point.closest("[data-nwm-compound-chart]");
+  var tooltip = chart?.querySelector("[data-nwm-compound-chart-tooltip]");
+
+  if (tooltip) {
+    tooltip.hidden = true;
+  }
+}
+
+document.addEventListener("mousemove", function (event) {
+  var point = event.target.closest("[data-nwm-compound-chart-point]");
+
+  if (point) {
+    nwmShowCompoundChartTooltip(point, event);
+  }
+});
+
+document.addEventListener("mouseleave", function (event) {
+  var point = event.target.closest ? event.target.closest("[data-nwm-compound-chart-point]") : null;
+
+  if (point) {
+    nwmHideCompoundChartTooltip(point);
+  }
+}, true);
+
+document.addEventListener("focusin", function (event) {
+  var point = event.target.closest("[data-nwm-compound-chart-point]");
+
+  if (point) {
+    nwmShowCompoundChartTooltip(point);
+  }
+});
+
+document.addEventListener("focusout", function (event) {
+  var point = event.target.closest("[data-nwm-compound-chart-point]");
+
+  if (point) {
+    nwmHideCompoundChartTooltip(point);
+  }
+});
+
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll("[data-nwm-risk-calculator]").forEach(function (calculator) {
     nwmUpdateRiskCalculator(calculator);
@@ -537,6 +920,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   document.querySelectorAll("[data-nwm-compound-calculator]").forEach(function (calculator) {
+    nwmPopulateCompoundCalculatorFromUrl(calculator);
     nwmUpdateCompoundCalculator(calculator);
   });
 
@@ -560,6 +944,22 @@ document.addEventListener("DOMContentLoaded", function () {
     if (targetTab) {
       nwmActivateToolHubTab(hub, targetTab.getAttribute("data-nwm-tool-tab"));
     }
+  });
+});
+
+window.addEventListener("popstate", function () {
+  document.querySelectorAll("[data-nwm-tools-hub]").forEach(function (hub) {
+    var locationTool = nwmGetToolFromLocation(hub);
+    var targetTab = locationTool ? hub.querySelector('[data-nwm-tool-tab="' + locationTool + '"]') : hub.querySelector("[data-nwm-tool-tab]");
+
+    if (targetTab) {
+      nwmActivateToolHubTab(hub, targetTab.getAttribute("data-nwm-tool-tab"));
+    }
+  });
+
+  document.querySelectorAll("[data-nwm-compound-calculator]").forEach(function (calculator) {
+    nwmPopulateCompoundCalculatorFromUrl(calculator);
+    nwmUpdateCompoundCalculator(calculator);
   });
 });
 

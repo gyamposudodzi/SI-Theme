@@ -178,6 +178,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const readingBar = document.querySelector("[data-reading-bar]");
   if (readingBar && body.classList.contains("single-post")) {
+    const readingArticle = document.querySelector("[data-reading-article]");
+    const readingProgress = readingBar.querySelector("[data-reading-progress]");
     let lastY = window.scrollY || 0;
     let ticking = false;
     const threshold = 140;
@@ -193,6 +195,17 @@ document.addEventListener("DOMContentLoaded", function () {
         body.classList.add("is-reading-down");
       } else if (scrollingUp) {
         body.classList.remove("is-reading-down");
+      }
+
+      if (readingArticle && readingProgress) {
+        const articleTop = readingArticle.offsetTop;
+        const articleHeight = readingArticle.offsetHeight;
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
+        const progressStart = articleTop;
+        const progressDistance = Math.max(articleHeight - viewportHeight, 1);
+        const rawProgress = ((currentY - progressStart) / progressDistance) * 100;
+        const clampedProgress = Math.max(0, Math.min(100, rawProgress));
+        readingProgress.style.width = clampedProgress + "%";
       }
 
       lastY = currentY;

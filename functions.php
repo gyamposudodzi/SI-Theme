@@ -61,6 +61,7 @@ function nerdywithme_enqueue_assets() {
 
 	wp_enqueue_style('nerdywithme-fonts', esc_url($fonts_url), array(), null);
 	wp_enqueue_style('nerdywithme-style', get_stylesheet_uri(), array('nerdywithme-fonts'), $style_version);
+	wp_add_inline_style('nerdywithme-style', nerdywithme_reader_bar_custom_css());
 	wp_enqueue_script(
 		'nerdywithme-script',
 		get_template_directory_uri() . '/script.js',
@@ -176,6 +177,14 @@ function nerdywithme_customize_register($wp_customize) {
 		array(
 			'title'    => __('Curated Content Sources', 'nerdywithme'),
 			'priority' => 34,
+		)
+	);
+
+	$wp_customize->add_section(
+		'nerdywithme_reader_bar',
+		array(
+			'title'    => __('Reader Bar', 'nerdywithme'),
+			'priority' => 35,
 		)
 	);
 
@@ -373,6 +382,76 @@ function nerdywithme_customize_register($wp_customize) {
 			)
 		);
 	}
+
+	$reader_bar_colors = array(
+		'reader_bar_bg'             => array(
+			'label'   => __('Reader Bar Background', 'nerdywithme'),
+			'default' => '#ffffff',
+		),
+		'reader_bar_text'           => array(
+			'label'   => __('Reader Bar Text', 'nerdywithme'),
+			'default' => '#132a78',
+		),
+		'reader_bar_accent'         => array(
+			'label'   => __('Reader Bar Accent', 'nerdywithme'),
+			'default' => '#ff5f36',
+		),
+		'reader_bar_progress_start' => array(
+			'label'   => __('Progress Start Color', 'nerdywithme'),
+			'default' => '#ff5f36',
+		),
+		'reader_bar_progress_end'   => array(
+			'label'   => __('Progress End Color', 'nerdywithme'),
+			'default' => '#ff6aa2',
+		),
+		'reader_bar_progress_track' => array(
+			'label'   => __('Progress Track Color', 'nerdywithme'),
+			'default' => '#eef1f7',
+		),
+	);
+
+	foreach ($reader_bar_colors as $id => $config) {
+		$wp_customize->add_setting(
+			'nerdywithme_' . $id,
+			array(
+				'default'           => $config['default'],
+				'sanitize_callback' => 'sanitize_hex_color',
+			)
+		);
+
+		$wp_customize->add_control(
+			new WP_Customize_Color_Control(
+				$wp_customize,
+				'nerdywithme_' . $id,
+				array(
+					'label'   => $config['label'],
+					'section' => 'nerdywithme_reader_bar',
+				)
+			)
+		);
+	}
+
+	$wp_customize->add_setting(
+		'nerdywithme_reader_bar_size',
+		array(
+			'default'           => 'standard',
+			'sanitize_callback' => 'nerdywithme_sanitize_reader_bar_size',
+		)
+	);
+
+	$wp_customize->add_control(
+		'nerdywithme_reader_bar_size',
+		array(
+			'label'   => __('Reader Bar Size', 'nerdywithme'),
+			'section' => 'nerdywithme_reader_bar',
+			'type'    => 'select',
+			'choices' => array(
+				'compact'  => __('Compact', 'nerdywithme'),
+				'standard' => __('Standard', 'nerdywithme'),
+				'large'    => __('Large', 'nerdywithme'),
+			),
+		)
+	);
 }
 add_action('customize_register', 'nerdywithme_customize_register');
 
@@ -394,6 +473,11 @@ add_filter('redirect_canonical', 'nerdywithme_preserve_404_requests', 10, 2);
 function nerdywithme_sanitize_brand_style($value) {
 	$allowed = array('refined', 'lockup');
 	return in_array($value, $allowed, true) ? $value : 'refined';
+}
+
+function nerdywithme_sanitize_reader_bar_size($value) {
+	$allowed = array('compact', 'standard', 'large');
+	return in_array($value, $allowed, true) ? $value : 'standard';
 }
 
 function nerdywithme_card_tone_choices() {
@@ -580,6 +664,63 @@ function nerdywithme_site_title_lockup_markup() {
 
 function nerdywithme_get_option($key, $default = '') {
 	return get_theme_mod('nerdywithme_' . $key, $default);
+}
+
+function nerdywithme_reader_bar_custom_css() {
+	$size = nerdywithme_sanitize_reader_bar_size(get_theme_mod('nerdywithme_reader_bar_size', 'standard'));
+
+	$size_map = array(
+		'compact'  => array(
+			'padding_y'          => '14px',
+			'padding_x'          => '22px',
+			'mobile_padding_y'   => '10px',
+			'mobile_padding_x'   => '12px',
+			'progress_height'    => '3px',
+			'mobile_progress'    => '2px',
+		),
+		'standard' => array(
+			'padding_y'          => '18px',
+			'padding_x'          => '28px',
+			'mobile_padding_y'   => '12px',
+			'mobile_padding_x'   => '14px',
+			'progress_height'    => '4px',
+			'mobile_progress'    => '3px',
+		),
+		'large'    => array(
+			'padding_y'          => '22px',
+			'padding_x'          => '32px',
+			'mobile_padding_y'   => '14px',
+			'mobile_padding_x'   => '16px',
+			'progress_height'    => '5px',
+			'mobile_progress'    => '4px',
+		),
+	);
+
+	$sizes = $size_map[ $size ];
+
+	$bg             = sanitize_hex_color(get_theme_mod('nerdywithme_reader_bar_bg', '#ffffff')) ?: '#ffffff';
+	$text           = sanitize_hex_color(get_theme_mod('nerdywithme_reader_bar_text', '#132a78')) ?: '#132a78';
+	$accent         = sanitize_hex_color(get_theme_mod('nerdywithme_reader_bar_accent', '#ff5f36')) ?: '#ff5f36';
+	$progress_start = sanitize_hex_color(get_theme_mod('nerdywithme_reader_bar_progress_start', '#ff5f36')) ?: '#ff5f36';
+	$progress_end   = sanitize_hex_color(get_theme_mod('nerdywithme_reader_bar_progress_end', '#ff6aa2')) ?: '#ff6aa2';
+	$progress_track = sanitize_hex_color(get_theme_mod('nerdywithme_reader_bar_progress_track', '#eef1f7')) ?: '#eef1f7';
+
+	$css  = ":root{";
+	$css .= "--nwm-reader-bar-bg: {$bg};";
+	$css .= "--nwm-reader-bar-text: {$text};";
+	$css .= "--nwm-reader-bar-accent: {$accent};";
+	$css .= "--nwm-reader-bar-progress-start: {$progress_start};";
+	$css .= "--nwm-reader-bar-progress-end: {$progress_end};";
+	$css .= "--nwm-reader-bar-progress-track: {$progress_track};";
+	$css .= "--nwm-reader-bar-padding-y: {$sizes['padding_y']};";
+	$css .= "--nwm-reader-bar-padding-x: {$sizes['padding_x']};";
+	$css .= "--nwm-reader-bar-mobile-padding-y: {$sizes['mobile_padding_y']};";
+	$css .= "--nwm-reader-bar-mobile-padding-x: {$sizes['mobile_padding_x']};";
+	$css .= "--nwm-reader-bar-progress-height: {$sizes['progress_height']};";
+	$css .= "--nwm-reader-bar-mobile-progress-height: {$sizes['mobile_progress']};";
+	$css .= "}";
+
+	return $css;
 }
 
 function nerdywithme_get_content_source_slug($key, $default = '') {
@@ -1078,11 +1219,77 @@ function nerdywithme_add_dropcap_to_first_paragraph($content) {
 	);
 }
 
-function nerdywithme_render_single_content($post_id = null) {
+function nerdywithme_prepare_single_content($post_id = null) {
 	$post_id = $post_id ? (int) $post_id : get_the_ID();
 	$content = apply_filters('the_content', get_post_field('post_content', $post_id));
+	$content = nerdywithme_add_dropcap_to_first_paragraph($content);
 
-	echo nerdywithme_add_dropcap_to_first_paragraph($content); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	return nerdywithme_attach_table_of_contents($content);
+}
+
+function nerdywithme_attach_table_of_contents($content) {
+	$toc_items = array();
+	$id_counts = array();
+
+	$processed = preg_replace_callback(
+		'/<h([2-3])([^>]*)>(.*?)<\/h\1>/is',
+		function ($matches) use (&$toc_items, &$id_counts) {
+			$level = (int) $matches[1];
+			$attrs = $matches[2];
+			$inner = $matches[3];
+
+			$id = '';
+			if (preg_match('/\sid=["\']([^"\']+)["\']/', $attrs, $id_match)) {
+				$id = $id_match[1];
+			} else {
+				$title = trim(wp_strip_all_tags($inner));
+				$base  = sanitize_title($title);
+				if (! $base) {
+					$base = 'section';
+				}
+				$index = isset($id_counts[ $base ]) ? $id_counts[ $base ] + 1 : 1;
+				$id_counts[ $base ] = $index;
+				$id = $base . ($index > 1 ? '-' . $index : '');
+				$attrs .= ' id="' . esc_attr($id) . '"';
+			}
+
+			$toc_items[] = array(
+				'id'    => $id,
+				'label' => trim(wp_strip_all_tags($inner)),
+				'level' => $level,
+			);
+
+			return '<h' . $level . $attrs . '>' . $inner . '</h' . $level . '>';
+		},
+		$content
+	);
+
+	if (count($toc_items) < 2) {
+		return array(
+			'toc'     => '',
+			'content' => $processed,
+		);
+	}
+
+	$toc = '<nav class="toc" aria-label="' . esc_attr__('Table of contents', 'nerdywithme') . '">';
+	$toc .= '<div class="toc__title">' . esc_html__('Table Of Contents', 'nerdywithme') . '</div>';
+	$toc .= '<ul class="toc__list">';
+	foreach ($toc_items as $item) {
+		if (! $item['label']) {
+			continue;
+		}
+		$level_class = $item['level'] === 3 ? ' toc__item--sub' : '';
+		$toc .= '<li class="toc__item' . $level_class . '">';
+		$toc .= '<a href="#' . esc_attr($item['id']) . '">' . esc_html($item['label']) . '</a>';
+		$toc .= '</li>';
+	}
+	$toc .= '</ul>';
+	$toc .= '</nav>';
+
+	return array(
+		'toc'     => $toc,
+		'content' => $processed,
+	);
 }
 
 function nerdywithme_get_404_suggestion_posts($count = 3) {

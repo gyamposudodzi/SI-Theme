@@ -1715,14 +1715,28 @@ textarea { min-height: 160px; padding: 16px 18px; }
   grid-template-columns: minmax(0, 1fr) minmax(280px, 0.95fr) minmax(0, 1fr);
   align-items: center;
   gap: 18px;
-  padding: 18px 28px;
-  background: rgba(255, 255, 255, 0.98);
+  padding: var(--nwm-reader-bar-padding-y, 18px) var(--nwm-reader-bar-padding-x, 28px) calc(var(--nwm-reader-bar-padding-y, 18px) - 8px);
+  background: var(--nwm-reader-bar-bg, #ffffff);
   border-bottom: 1px solid #eceef4;
   box-shadow: 0 10px 24px rgba(16, 20, 55, 0.08);
   transform: translateY(-100%);
   opacity: 0;
   pointer-events: none;
   transition: transform 0.22s ease, opacity 0.22s ease;
+}
+.reading-bar__progress {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: var(--nwm-reader-bar-progress-height, 4px);
+  overflow: hidden;
+  background: var(--nwm-reader-bar-progress-track, #eef1f7);
+}
+.reading-bar__progress-fill {
+  display: block;
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--nwm-reader-bar-progress-start, var(--nwm-secondary)), var(--nwm-reader-bar-progress-end, var(--nwm-sugar-pink)));
+  transition: width 0.14s ease;
 }
 .reading-bar__slot,
 .reading-bar__current {
@@ -1756,7 +1770,7 @@ textarea { min-height: 160px; padding: 16px 18px; }
 .reading-bar__text strong,
 .reading-bar__current strong {
   display: block;
-  color: var(--nwm-primary);
+  color: var(--nwm-reader-bar-text, var(--nwm-primary));
   font-size: 1rem;
   line-height: 1.15;
   font-weight: 800;
@@ -1771,7 +1785,7 @@ textarea { min-height: 160px; padding: 16px 18px; }
   font-size: 1.18rem;
 }
 .reading-bar__arrow {
-  color: var(--nwm-secondary);
+  color: var(--nwm-reader-bar-accent, var(--nwm-secondary));
   font-size: 2rem;
   line-height: 1;
 }
@@ -1815,7 +1829,7 @@ body.single-post.is-reading-down .site-header {
 }
 .reading-bar__link:hover .reading-bar__text strong,
 .reading-bar__link:focus-visible .reading-bar__text strong {
-  color: var(--nwm-secondary);
+  color: var(--nwm-reader-bar-accent, var(--nwm-secondary));
 }
 .single-hero__image {
   overflow: hidden;
@@ -1972,6 +1986,40 @@ body.single-post.is-reading-down .site-header {
 .entry-content strong {
   color: var(--nwm-primary);
   font-weight: 800;
+}
+.toc {
+  margin: 28px 0 36px;
+  padding: 22px 24px;
+  border: 1px solid var(--nwm-border);
+  background: #fff;
+  box-shadow: var(--nwm-shadow);
+}
+.toc__title {
+  font-size: 0.98rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--nwm-primary);
+  margin-bottom: 12px;
+}
+.toc__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.toc__item a {
+  color: var(--nwm-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+.toc__item a:hover,
+.toc__item a:focus-visible {
+  color: var(--nwm-secondary);
+}
+.toc__item--sub {
+  padding-left: 14px;
 }
 .entry-dropcap {
   float: left;
@@ -2851,7 +2899,7 @@ body.home .hot-grid__feature .card__title {
   .reading-bar {
     grid-template-columns: auto minmax(0, 1fr) auto;
     gap: 10px;
-    padding: 12px 14px;
+    padding: var(--nwm-reader-bar-mobile-padding-y, 12px) var(--nwm-reader-bar-mobile-padding-x, 14px) calc(var(--nwm-reader-bar-mobile-padding-y, 12px) - 4px);
   }
   .reading-bar__slot {
     display: block;
@@ -2881,6 +2929,9 @@ body.home .hot-grid__feature .card__title {
   }
   .reading-bar__arrow {
     font-size: 1.6rem;
+  }
+  .reading-bar__progress {
+    height: var(--nwm-reader-bar-mobile-progress-height, 3px);
   }
   .error-404__code {
     width: 248px;

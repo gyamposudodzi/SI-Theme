@@ -15,8 +15,9 @@ get_header();
 		$summary      = get_the_excerpt() ? get_the_excerpt() : wp_trim_words(wp_strip_all_tags(get_the_content()), 28);
 		$previous_post = get_previous_post();
 		$next_post     = get_next_post();
+		$prepared      = nerdywithme_prepare_single_content(get_the_ID());
 		?>
-		<article <?php post_class('single-post single-post--' . $single_style); ?>>
+		<article <?php post_class('single-post single-post--' . $single_style); ?> data-reading-article>
 			<div class="reading-bar" data-reading-bar aria-label="<?php esc_attr_e('Article navigation', 'nerdywithme'); ?>">
 				<div class="reading-bar__slot reading-bar__slot--prev">
 					<?php if ($previous_post) : ?>
@@ -49,6 +50,9 @@ get_header();
 						</a>
 					<?php endif; ?>
 				</div>
+				<div class="reading-bar__progress" aria-hidden="true">
+					<span class="reading-bar__progress-fill" data-reading-progress></span>
+				</div>
 			</div>
 			<?php if ('feature' === $single_style) : ?>
 				<header class="single-hero single-hero--feature">
@@ -70,7 +74,8 @@ get_header();
 				<div class="single-layout">
 					<div class="single-content">
 						<div class="entry-content">
-							<?php nerdywithme_render_single_content(get_the_ID()); ?>
+							<?php echo $prepared['toc']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+							<?php echo $prepared['content']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						</div>
 						<?php if (function_exists('nerdywithme_tools_render_ad_slot')) : ?>
 							<div class="theme-ad-slot theme-ad-slot--single-inline">
@@ -126,7 +131,8 @@ get_header();
 							</div>
 						</header>
 						<div class="entry-content">
-							<?php nerdywithme_render_single_content(get_the_ID()); ?>
+							<?php echo $prepared['toc']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+							<?php echo $prepared['content']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						</div>
 						<?php if (function_exists('nerdywithme_tools_render_ad_slot')) : ?>
 							<div class="theme-ad-slot theme-ad-slot--single-inline">

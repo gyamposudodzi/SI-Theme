@@ -221,4 +221,57 @@ document.addEventListener("DOMContentLoaded", function () {
 
     updateReadingBar();
   }
+
+  const toc = document.querySelector("[data-toc]");
+  if (toc) {
+    const tocLinks = Array.from(toc.querySelectorAll('a[href^="#"]'));
+    const tocMap = new Map();
+    tocLinks.forEach(function (link) {
+      const id = link.getAttribute("href").slice(1);
+      const target = document.getElementById(id);
+      if (target) {
+        tocMap.set(target, link);
+      }
+    });
+
+    if (tocMap.size) {
+      const observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting && tocMap.has(entry.target)) {
+              tocLinks.forEach(function (link) {
+                link.classList.remove("is-active");
+              });
+              tocMap.get(entry.target).classList.add("is-active");
+            }
+          });
+        },
+        {
+          rootMargin: "-20% 0px -65% 0px",
+          threshold: 0.1,
+        }
+      );
+
+      tocMap.forEach(function (_link, heading) {
+        observer.observe(heading);
+      });
+    }
+
+    const tocDockThreshold = toc.offsetTop;
+    function updateTocDock() {
+      if (window.innerWidth >= 1100) {
+        if (window.scrollY >= tocDockThreshold - 12) {
+          body.classList.add("toc-docked");
+        } else {
+          body.classList.remove("toc-docked");
+        }
+      } else {
+        body.classList.remove("toc-docked");
+      }
+    }
+
+    updateTocDock();
+    window.addEventListener("scroll", updateTocDock, { passive: true });
+    window.addEventListener("resize", updateTocDock);
+  }
 });

@@ -73,8 +73,8 @@ get_header();
 				</header>
 				<div class="single-layout">
 					<div class="single-content">
+						<?php echo str_replace('<nav class="toc"', '<nav class="toc" data-toc', $prepared['toc']); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						<div class="entry-content">
-							<?php echo $prepared['toc']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							<?php echo $prepared['content']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						</div>
 						<?php if (function_exists('nerdywithme_tools_render_ad_slot')) : ?>
@@ -130,8 +130,8 @@ get_header();
 								<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'full')); ?>" alt="<?php the_title_attribute(); ?>">
 							</div>
 						</header>
+						<?php echo str_replace('<nav class="toc"', '<nav class="toc" data-toc', $prepared['toc']); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						<div class="entry-content">
-							<?php echo $prepared['toc']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 							<?php echo $prepared['content']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 						</div>
 						<?php if (function_exists('nerdywithme_tools_render_ad_slot')) : ?>

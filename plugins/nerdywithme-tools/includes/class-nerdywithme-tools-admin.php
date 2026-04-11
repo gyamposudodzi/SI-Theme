@@ -233,6 +233,7 @@ class NerdyWithMe_Tools_Admin {
 		foreach (array_keys($this->get_ad_slot_labels()) as $slot) {
 			$sanitized['ads'][ $slot ] = isset($input['ads'][ $slot ]) ? wp_kses_post($input['ads'][ $slot ]) : '';
 			$sanitized['ad_settings'][ $slot ] = array(
+				'enabled'     => ! empty($input['ad_settings'][ $slot ]['enabled']),
 				'mode'        => isset($input['ad_settings'][ $slot ]['mode']) && array_key_exists($input['ad_settings'][ $slot ]['mode'], $this->get_ad_mode_options())
 					? sanitize_key($input['ad_settings'][ $slot ]['mode'])
 					: 'markup',
@@ -557,6 +558,10 @@ class NerdyWithMe_Tools_Admin {
 									<textarea name="<?php echo esc_attr(self::OPTION_KEY . '[ads][' . $slot . ']'); ?>" rows="6" class="code"><?php echo esc_textarea($settings['ads'][ $slot ] ?? ''); ?></textarea>
 								</label>
 								<div class="nwm-tools-admin__ad-options">
+									<label class="nwm-tools-admin__toggle">
+										<input type="checkbox" name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][enabled]'); ?>" value="1" <?php checked(! empty($settings['ad_settings'][ $slot ]['enabled'])); ?>>
+										<span><?php esc_html_e('Enable this slot', 'nerdywithme-tools'); ?></span>
+									</label>
 									<label>
 										<span><?php esc_html_e('Content mode', 'nerdywithme-tools'); ?></span>
 										<select name="<?php echo esc_attr(self::OPTION_KEY . '[ad_settings][' . $slot . '][mode]'); ?>" data-nwm-ad-mode>
@@ -756,6 +761,7 @@ class NerdyWithMe_Tools_Admin {
 
 		foreach (array_keys($this->get_ad_slot_labels()) as $slot) {
 			$defaults[ $slot ] = array(
+				'enabled'     => true,
 				'sticky'      => in_array($slot, array('sidebar', 'archive_header'), true),
 				'hide_mobile' => false,
 				'style'       => 'standard',

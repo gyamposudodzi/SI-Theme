@@ -41,6 +41,7 @@ class NerdyWithMe_Tools_Shortcodes {
 		$slot_settings = wp_parse_args(
 			isset($behaviors[ $slot ]) && is_array($behaviors[ $slot ]) ? $behaviors[ $slot ] : array(),
 			array(
+				'enabled'     => true,
 				'mode'        => 'markup',
 				'sticky'      => false,
 				'hide_mobile' => false,
@@ -63,6 +64,10 @@ class NerdyWithMe_Tools_Shortcodes {
 				'meta'           => '',
 			)
 		);
+
+		if (empty($slot_settings['enabled'])) {
+			return '';
+		}
 
 		$content = $this->get_slot_rendered_content($slot, $ads[ $slot ] ?? '', $slot_settings);
 

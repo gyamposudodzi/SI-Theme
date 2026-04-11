@@ -1,0 +1,847 @@
+.nwm-tools-hub {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 26px;
+  align-items: start;
+}
+
+.nwm-tools-hub__nav {
+  display: grid;
+  gap: 16px;
+  padding: 24px 24px 18px;
+  background: linear-gradient(180deg, #fff, #fff9f4);
+  border: 1px solid #ece7f5;
+  box-shadow: 0 20px 44px rgba(16, 20, 55, 0.08);
+}
+
+.nwm-tools-hub__nav-header {
+  display: grid;
+  gap: 6px;
+}
+
+.nwm-tools-hub__nav-header h2,
+.nwm-tools-hub__pane-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #132a78;
+}
+
+.nwm-tools-hub__nav-header p,
+.nwm-tools-hub__pane-header p {
+  margin: 0;
+  color: #69708f;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.nwm-tools-hub__menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.nwm-tools-hub__tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid #eadff3;
+  background: #fff;
+  color: #132a78;
+  box-shadow: 0 10px 22px rgba(16, 20, 55, 0.04);
+  flex: 0 1 auto;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+  text-decoration: none;
+}
+
+.nwm-tools-hub__tab:hover,
+.nwm-tools-hub__tab.is-active {
+  background: #fff7f1;
+  border-color: #ffd5c8;
+  color: #ff5f36;
+  box-shadow: 0 14px 28px rgba(255, 95, 54, 0.12);
+  transform: translateY(-1px);
+}
+
+.nwm-tools-hub__tab-label {
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.nwm-tools-hub__panes {
+  min-width: 0;
+}
+
+.nwm-tools-hub__pane {
+  display: none;
+  gap: 18px;
+  align-content: start;
+}
+
+.nwm-tools-hub__pane.is-active {
+  display: grid;
+}
+
+.nwm-tools-hub__pane-header {
+  display: grid;
+  gap: 6px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #ece7f5;
+}
+
+.nwm-tools-hub__pane-body {
+  display: grid;
+  gap: 18px;
+}
+
+.nwm-tool-card--placeholder {
+  min-height: 240px;
+  place-content: center;
+  background: linear-gradient(180deg, #fff, #fffaf6);
+}
+
+.nwm-tool-card {
+  display: grid;
+  gap: 20px;
+  padding: 26px;
+  background: linear-gradient(180deg, #ffffff, #fffdfa);
+  border: 1px solid #ece7f5;
+  box-shadow: 0 22px 42px rgba(16, 20, 55, 0.08);
+  max-width: 100%;
+}
+
+.nwm-tool-card__header {
+  display: grid;
+  gap: 8px;
+  max-width: 72ch;
+}
+
+.nwm-tool-card__header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #132a78;
+}
+
+.nwm-tool-card__header p {
+  margin: 0;
+  color: #69708f;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.nwm-tool-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.nwm-tool-presets__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid #eadff3;
+  background: #fff;
+  color: #132a78;
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
+}
+
+.nwm-tool-presets__button:hover,
+.nwm-tool-presets__button:focus-visible {
+  background: #fff7f1;
+  border-color: #ffd5c8;
+  color: #ff5f36;
+  box-shadow: 0 12px 22px rgba(255, 95, 54, 0.12);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.nwm-tool-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.nwm-tool-grid label {
+  display: grid;
+  gap: 9px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #132a78;
+}
+
+.nwm-tool-grid input,
+.nwm-tool-grid select {
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid #ece7f5;
+  background: #fff;
+  color: #101437;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.nwm-tool-grid input:focus,
+.nwm-tool-grid select:focus {
+  outline: none;
+  border-color: #132a78;
+  box-shadow: 0 0 0 4px rgba(19, 42, 120, 0.08);
+}
+
+.nwm-tool-grid input::placeholder {
+  color: #9aa0bb;
+}
+
+.nwm-tool-results {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.nwm-tool-results div {
+  display: grid;
+  gap: 7px;
+  padding: 18px;
+  background: linear-gradient(180deg, #fff7f1, #fff3ea);
+  border: 1px solid #ffe0d1;
+  box-shadow: 0 14px 26px rgba(255, 95, 54, 0.08);
+}
+
+.nwm-tool-results strong {
+  color: #132a78;
+  font-size: 0.84rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.nwm-tool-results span {
+  color: #ff5f36;
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.nwm-tool-card--compound {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at top right, rgba(255, 95, 54, 0.08), transparent 28%),
+    radial-gradient(circle at bottom left, rgba(19, 42, 120, 0.06), transparent 26%),
+    linear-gradient(180deg, #ffffff, #fffaf5 72%, #f7faff 100%);
+}
+
+.nwm-tool-card--compound::after {
+  content: "";
+  position: absolute;
+  inset: auto -48px -48px auto;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(255, 95, 54, 0.12) 0%, rgba(255, 95, 54, 0) 72%);
+  pointer-events: none;
+}
+
+.nwm-tool-card--compound .nwm-tool-card__header {
+  position: relative;
+  z-index: 1;
+}
+
+.nwm-tool-card--compound .nwm-tool-results div {
+  background: linear-gradient(180deg, #fff8f2, #fff1e6);
+  border-color: #ffd9c8;
+}
+
+.nwm-tool-toolbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.nwm-tool-toolbar__field {
+  display: grid;
+  gap: 8px;
+  min-width: 220px;
+}
+
+.nwm-tool-toolbar__field span {
+  color: #132a78;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.nwm-tool-toolbar__field select {
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid #ece7f5;
+  background: #fff;
+  color: #101437;
+}
+
+.nwm-tool-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.nwm-tool-toolbar__button {
+  min-height: 46px;
+  padding: 0 18px;
+  border: 1px solid #ffd0c3;
+  background: linear-gradient(180deg, #ff845f, #ff5f36);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.nwm-tool-toolbar__status {
+  color: #69708f;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.nwm-tool-breakdown {
+  display: grid;
+  gap: 14px;
+  padding-top: 8px;
+}
+
+.nwm-tool-breakdown__header {
+  display: grid;
+  gap: 6px;
+}
+
+.nwm-tool-breakdown__header h4 {
+  margin: 0;
+  color: #132a78;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.nwm-tool-breakdown__header p {
+  margin: 0;
+  color: #69708f;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.nwm-tool-chart {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  background: linear-gradient(180deg, #fffaf5, #fff);
+  border: 1px solid #ece7f5;
+}
+
+.nwm-tool-chart__header {
+  display: grid;
+  gap: 6px;
+}
+
+.nwm-tool-chart__header h4 {
+  margin: 0;
+  color: #132a78;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.nwm-tool-chart__header p {
+  margin: 0;
+  color: #69708f;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.nwm-tool-chart__canvas {
+  position: relative;
+  min-height: 260px;
+}
+
+.nwm-tool-chart__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.nwm-tool-chart__gridline line {
+  stroke: #efe7e1;
+  stroke-width: 1;
+}
+
+.nwm-tool-chart__gridline text {
+  fill: #8a92b1;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.nwm-tool-chart__line {
+  stroke: #ff5f36;
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.nwm-tool-chart__point {
+  fill: #132a78;
+  stroke: #fff;
+  stroke-width: 2;
+  cursor: pointer;
+}
+
+.nwm-tool-chart__label {
+  fill: #132a78;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.nwm-tool-chart__tooltip {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  gap: 6px;
+  min-width: 190px;
+  max-width: 240px;
+  padding: 12px 14px;
+  background: rgba(16, 20, 55, 0.96);
+  color: #fff;
+  box-shadow: 0 18px 34px rgba(16, 20, 55, 0.24);
+  pointer-events: none;
+  transform: translateY(-100%);
+}
+
+.nwm-tool-chart__tooltip[hidden] {
+  display: none;
+}
+
+.nwm-tool-chart__tooltip-title {
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.nwm-tool-chart__tooltip-row {
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.nwm-tool-chart__row {
+  display: grid;
+  gap: 8px;
+}
+
+.nwm-tool-chart__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.nwm-tool-chart__meta strong {
+  color: #132a78;
+  font-size: 0.84rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.nwm-tool-chart__meta span {
+  color: #ff5f36;
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.nwm-tool-chart__track {
+  position: relative;
+  height: 12px;
+  background: #f2e7e1;
+  overflow: hidden;
+}
+
+.nwm-tool-chart__fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #ff835f, #ff5f36);
+}
+
+.nwm-tool-chart__empty {
+  margin: 0;
+  color: #69708f;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.nwm-tool-breakdown__table-wrap {
+  overflow-x: auto;
+}
+
+.nwm-tool-breakdown__table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border: 1px solid #ece7f5;
+}
+
+.nwm-tool-breakdown__table th,
+.nwm-tool-breakdown__table td {
+  padding: 13px 14px;
+  border-bottom: 1px solid #ece7f5;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.nwm-tool-breakdown__table th {
+  color: #132a78;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: #fff8f2;
+}
+
+.nwm-tool-breakdown__table td {
+  color: #4c5476;
+}
+
+.nwm-tool-breakdown__table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+@media (max-width: 767px) {
+  .nwm-tool-results {
+    grid-template-columns: 1fr;
+  }
+
+  .nwm-tool-toolbar {
+    align-items: stretch;
+  }
+
+  .nwm-tool-toolbar__field,
+  .nwm-tool-toolbar__actions,
+  .nwm-tool-toolbar__button {
+    width: 100%;
+  }
+}
+
+.nwm-ad-slot {
+  width: 100%;
+}
+
+.nwm-ad-slot--align-left {
+  margin-right: auto;
+  margin-left: 0;
+}
+
+.nwm-ad-slot--align-center {
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.nwm-ad-slot--align-right {
+  margin-right: 0;
+  margin-left: auto;
+}
+
+.nwm-ad-slot--width-desktop-narrow {
+  max-width: 240px;
+}
+
+.nwm-ad-slot--width-desktop-standard {
+  max-width: 300px;
+}
+
+.nwm-ad-slot--width-desktop-wide {
+  max-width: 340px;
+}
+
+.nwm-ad-slot--width-desktop-full {
+  max-width: none;
+}
+
+.nwm-ad-slot--archive_header.nwm-ad-slot--width-desktop-standard,
+.nwm-ad-slot--archive_header.nwm-ad-slot--width-desktop-wide,
+.nwm-ad-slot--archive_header.nwm-ad-slot--width-desktop-full,
+.nwm-ad-slot--homepage_after_hero.nwm-ad-slot--width-desktop-standard,
+.nwm-ad-slot--homepage_after_hero.nwm-ad-slot--width-desktop-wide,
+.nwm-ad-slot--homepage_after_hero.nwm-ad-slot--width-desktop-full,
+.nwm-ad-slot--footer.nwm-ad-slot--width-desktop-standard,
+.nwm-ad-slot--footer.nwm-ad-slot--width-desktop-wide,
+.nwm-ad-slot--footer.nwm-ad-slot--width-desktop-full,
+.nwm-ad-slot--single_inline.nwm-ad-slot--width-desktop-standard,
+.nwm-ad-slot--single_inline.nwm-ad-slot--width-desktop-wide,
+.nwm-ad-slot--single_inline.nwm-ad-slot--width-desktop-full {
+  max-width: none;
+}
+
+.nwm-ad-slot--sticky {
+  position: sticky;
+  top: var(--nwm-sticky-top-desktop, 108px);
+}
+
+.admin-bar .nwm-ad-slot--sticky {
+  top: calc(var(--nwm-sticky-top-desktop, 108px) + 32px);
+}
+
+.nwm-ad-slot--hide-mobile {
+  display: block;
+}
+
+.nwm-ad-slot > * {
+  max-width: 100%;
+}
+
+.nwm-demo-ad {
+  display: grid;
+  gap: 14px;
+  padding: 24px;
+  border: 1px solid #eadff3;
+  background: linear-gradient(135deg, #fffaf4 0%, #ffffff 52%, #f5f8ff 100%);
+  box-shadow: 0 18px 34px rgba(16, 20, 55, 0.08);
+}
+
+.nwm-demo-ad__eyebrow {
+  margin: 0;
+  color: #ff5f36;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.nwm-demo-ad__title {
+  margin: 0;
+  color: #132a78;
+  font-size: clamp(1.45rem, 2vw, 2.1rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+}
+
+.nwm-demo-ad__copy {
+  margin: 0;
+  max-width: 54ch;
+  color: #69708f;
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.nwm-demo-ad__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.nwm-demo-ad__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 20px;
+  background: #ff5f36;
+  color: #fff;
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.nwm-demo-ad__meta {
+  color: #69708f;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.nwm-managed-ad--image {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #eadff3;
+  box-shadow: 0 18px 34px rgba(16, 20, 55, 0.08);
+}
+
+.nwm-managed-ad--image img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.nwm-ad-slot--sidebar .nwm-demo-ad,
+.nwm-demo-ad--sidebar {
+  padding: 18px;
+  gap: 10px;
+  background: linear-gradient(180deg, #ffffff, #fff7f1);
+}
+
+.nwm-ad-slot--sidebar .nwm-demo-ad__title,
+.nwm-demo-ad--sidebar .nwm-demo-ad__title {
+  font-size: 1.3rem;
+}
+
+.nwm-ad-slot--sidebar .nwm-demo-ad__copy,
+.nwm-demo-ad--sidebar .nwm-demo-ad__copy {
+  font-size: 0.9rem;
+}
+
+.nwm-ad-slot--sidebar .nwm-demo-ad__button,
+.nwm-demo-ad--sidebar .nwm-demo-ad__button {
+  width: 100%;
+}
+
+.nwm-ad-slot--style-premium .nwm-demo-ad {
+  border-color: #e4d8ef;
+  background:
+    radial-gradient(circle at top right, rgba(255, 95, 54, 0.12), transparent 34%),
+    radial-gradient(circle at bottom left, rgba(19, 42, 120, 0.08), transparent 32%),
+    linear-gradient(145deg, #fff8f2 0%, #ffffff 55%, #f3f7ff 100%);
+  box-shadow: 0 22px 40px rgba(16, 20, 55, 0.1);
+}
+
+.nwm-ad-slot--style-premium .nwm-demo-ad__eyebrow {
+  position: relative;
+  padding-left: 22px;
+}
+
+.nwm-ad-slot--style-premium .nwm-demo-ad__eyebrow::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 14px;
+  height: 1px;
+  background: currentColor;
+  transform: translateY(-50%);
+}
+
+.nwm-ad-slot--style-premium .nwm-demo-ad__title {
+  letter-spacing: -0.05em;
+}
+
+.nwm-ad-slot--style-minimal .nwm-demo-ad {
+  border-color: #ece7f5;
+  background: #fff;
+  box-shadow: none;
+}
+
+.nwm-ad-slot--single_inline .nwm-demo-ad,
+.nwm-demo-ad--inline {
+  grid-template-columns: minmax(0, 1.1fr) auto;
+  align-items: center;
+  gap: 18px;
+}
+
+.nwm-demo-ad__body {
+  display: grid;
+  gap: 10px;
+}
+
+.nwm-ad-slot--footer .nwm-demo-ad,
+.nwm-demo-ad--footer {
+  justify-items: center;
+  text-align: center;
+}
+
+.nwm-ad-slot--footer .nwm-demo-ad__copy,
+.nwm-demo-ad--footer .nwm-demo-ad__copy {
+  max-width: 62ch;
+}
+
+@media (max-width: 760px) {
+  .nwm-tools-hub__nav,
+  .nwm-tools-hub__pane {
+    padding: 0;
+  }
+
+  .nwm-tools-hub__nav {
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .nwm-tools-hub__menu {
+    flex-direction: column;
+  }
+
+  .nwm-tool-grid,
+  .nwm-tool-results {
+    grid-template-columns: 1fr;
+  }
+
+  .nwm-tool-presets {
+    flex-direction: column;
+  }
+
+  .nwm-tool-card {
+    padding: 20px;
+  }
+
+  .nwm-ad-slot--single_inline .nwm-demo-ad,
+  .nwm-demo-ad--inline {
+    grid-template-columns: 1fr;
+  }
+
+  .nwm-ad-slot--sticky {
+    position: sticky;
+    top: var(--nwm-sticky-top-mobile, 84px);
+  }
+
+  .admin-bar .nwm-ad-slot--sticky {
+    top: calc(var(--nwm-sticky-top-mobile, 84px) + 32px);
+  }
+
+  .nwm-ad-slot--hide-mobile {
+    display: none;
+  }
+
+  .nwm-ad-slot--width-mobile-narrow {
+    max-width: 220px;
+  }
+
+  .nwm-ad-slot--width-mobile-standard {
+    max-width: 280px;
+  }
+
+  .nwm-ad-slot--width-mobile-wide,
+  .nwm-ad-slot--width-mobile-full {
+    max-width: none;
+  }
+}
+
+@media (max-width: 1100px) and (min-width: 761px) {
+  .nwm-ad-slot--sticky {
+    top: var(--nwm-sticky-top-tablet, 96px);
+  }
+
+  .admin-bar .nwm-ad-slot--sticky {
+    top: calc(var(--nwm-sticky-top-tablet, 96px) + 32px);
+  }
+
+  .nwm-ad-slot--width-tablet-narrow {
+    max-width: 220px;
+  }
+
+  .nwm-ad-slot--width-tablet-standard {
+    max-width: 280px;
+  }
+
+  .nwm-ad-slot--width-tablet-wide {
+    max-width: 320px;
+  }
+
+  .nwm-ad-slot--width-tablet-full {
+    max-width: none;
+  }
+}

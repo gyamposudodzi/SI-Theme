@@ -1,14 +1,14 @@
 {
   "name": "nerdywithme-tools",
   "version": "[TODO: 1.2.0]",
-  "description": "[TODO: Brief plugin description]",
+  "description": "[TODO: A tool set for the nerdywithme theme]",
   "author": {
-    "name": "[TODO: Author Name]",
-    "email": "[TODO: author@example.com]",
-    "url": "[TODO: https://github.com/author]"
+    "name": "[TODO: Gyamposu Dodzi]",
+    "email": "[TODO: admin@nerdywithme.com]",
+    "url": "[TODO: https://github.com/gyamposudodzi]"
   },
-  "homepage": "[TODO: https://docs.example.com/plugin]",
-  "repository": "[TODO: https://github.com/author/plugin]",
+  "homepage": "[TODO: https://nerdywithme.com/tools]",
+  "repository": "[TODO: https://github.com/gyamposudodzi/SI-THEME]",
   "license": "[TODO: MIT]",
   "keywords": [
     "[TODO: keyword1]",
@@ -19,7 +19,7 @@
   "mcpServers": "[TODO: ./.mcp.json]",
   "apps": "[TODO: ./.app.json]",
   "interface": {
-    "displayName": "[TODO: Plugin Display Name]",
+    "displayName": "[TODO: NWM Tools]",
     "shortDescription": "[TODO: Short description for subtitle]",
     "longDescription": "[TODO: Long description for details page]",
     "developerName": "[TODO: Nerdywithme]",

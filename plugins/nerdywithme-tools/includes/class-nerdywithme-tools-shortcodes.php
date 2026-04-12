@@ -219,7 +219,19 @@ class NerdyWithMe_Tools_Shortcodes {
 		}
 
 		$requested_tool = sanitize_key((string) get_query_var('nwm_tool'));
-		$active_tool    = isset($tools[ $requested_tool ]) ? $requested_tool : array_key_first($tools);
+		$active_tool_id = array_key_first($tools);
+		$active_tool_slug = $active_tool_id;
+
+		if ($requested_tool) {
+			foreach ($tools as $tool_id => $tool) {
+				$tool_slug = $tool['slug'] ?? $tool_id;
+				if ($requested_tool === $tool_id || $requested_tool === $tool_slug) {
+					$active_tool_id   = $tool_id;
+					$active_tool_slug = $tool_slug;
+					break;
+				}
+			}
+		}
 
 		ob_start();
 		?>
@@ -231,12 +243,13 @@ class NerdyWithMe_Tools_Shortcodes {
 				</div>
 				<div class="nwm-tools-hub__menu">
 					<?php foreach ($tools as $tool_id => $tool) : ?>
+						<?php $tool_slug = $tool['slug'] ?? $tool_id; ?>
 						<a
-							class="nwm-tools-hub__tab<?php echo $tool_id === $active_tool ? ' is-active' : ''; ?>"
+							class="nwm-tools-hub__tab<?php echo $tool_slug === $active_tool_slug ? ' is-active' : ''; ?>"
 							href="<?php echo esc_url($this->get_tool_url($tool_id)); ?>"
-							data-nwm-tool-tab="<?php echo esc_attr($tool_id); ?>"
+							data-nwm-tool-tab="<?php echo esc_attr($tool_slug); ?>"
 							title="<?php echo esc_attr($tool['description']); ?>"
-							aria-current="<?php echo $tool_id === $active_tool ? 'page' : 'false'; ?>"
+							aria-current="<?php echo $tool_slug === $active_tool_slug ? 'page' : 'false'; ?>"
 						>
 							<span class="nwm-tools-hub__tab-label"><?php echo esc_html($tool['label']); ?></span>
 						</a>
@@ -245,10 +258,11 @@ class NerdyWithMe_Tools_Shortcodes {
 			</nav>
 			<div class="nwm-tools-hub__panes">
 				<?php foreach ($tools as $tool_id => $tool) : ?>
+					<?php $tool_slug = $tool['slug'] ?? $tool_id; ?>
 					<section
-						class="nwm-tools-hub__pane<?php echo $tool_id === $active_tool ? ' is-active' : ''; ?>"
-						data-nwm-tool-pane="<?php echo esc_attr($tool_id); ?>"
-						<?php echo $tool_id === $active_tool ? '' : 'hidden'; ?>
+						class="nwm-tools-hub__pane<?php echo $tool_slug === $active_tool_slug ? ' is-active' : ''; ?>"
+						data-nwm-tool-pane="<?php echo esc_attr($tool_slug); ?>"
+						<?php echo $tool_slug === $active_tool_slug ? '' : 'hidden'; ?>
 					>
 						<div class="nwm-tools-hub__pane-header">
 							<h3><?php echo esc_html($tool['label']); ?></h3>
@@ -279,8 +293,10 @@ class NerdyWithMe_Tools_Shortcodes {
 	public function get_tool_url($tool_id) {
 		$tools_page = get_page_by_path('tools');
 		$base_url   = $tools_page ? get_permalink($tools_page) : home_url('/tools/');
+		$registry   = $this->get_tool_registry();
+		$tool_slug  = isset($registry[ $tool_id ]['slug']) ? $registry[ $tool_id ]['slug'] : sanitize_title($tool_id);
 
-		return trailingslashit(trailingslashit($base_url) . sanitize_title($tool_id));
+		return trailingslashit(trailingslashit($base_url) . sanitize_title($tool_slug));
 	}
 
 	/**
@@ -290,13 +306,18 @@ class NerdyWithMe_Tools_Shortcodes {
 	 */
 	public function get_tool_registry() {
 		$settings      = get_option(NerdyWithMe_Tools_Admin::OPTION_KEY, array());
+		$label_defaults = $this->get_tool_label_defaults();
+		$slug_defaults  = $this->get_tool_slug_defaults();
+		$label_overrides = is_array($settings['tool_labels'] ?? null) ? $settings['tool_labels'] : array();
+		$slug_overrides  = is_array($settings['tool_slugs'] ?? null) ? $settings['tool_slugs'] : array();
 		$descriptions  = $settings['tool_descriptions'] ?? array();
 		$summaries     = $settings['tool_summaries'] ?? array();
 		$meta_titles   = $settings['tool_meta_titles'] ?? array();
 		$tool_order    = array_filter(array_map('sanitize_key', array_map('trim', explode(',', (string) ($settings['tool_order'] ?? '')))));
 		$registry = array(
 			'risk-calculator' => array(
-				'label'       => __('Risk Calculator', 'nerdywithme-tools'),
+				'label'       => sanitize_text_field($label_overrides['risk-calculator'] ?? $label_defaults['risk-calculator']),
+				'slug'        => $this->sanitize_tool_slug($slug_overrides['risk-calculator'] ?? $slug_defaults['risk-calculator'], 'risk-calculator'),
 				'description' => $descriptions['risk-calculator'] ?? __('Risk, size, and reward planning.', 'nerdywithme-tools'),
 				'summary'     => $summaries['risk-calculator'] ?? __('Plan safer trades by calculating how much capital to risk, how far your stop sits from entry, and what position size fits your rules before you execute.', 'nerdywithme-tools'),
 				'meta_title'  => $meta_titles['risk-calculator'] ?? __('Risk Calculator for Trade Sizing | NerdyWithMe Tools', 'nerdywithme-tools'),
@@ -304,7 +325,8 @@ class NerdyWithMe_Tools_Shortcodes {
 				'render'      => array($this, 'render_risk_calculator_inner'),
 			),
 			'position-size' => array(
-				'label'       => __('Position Size', 'nerdywithme-tools'),
+				'label'       => sanitize_text_field($label_overrides['position-size'] ?? $label_defaults['position-size']),
+				'slug'        => $this->sanitize_tool_slug($slug_overrides['position-size'] ?? $slug_defaults['position-size'], 'position-size'),
 				'description' => $descriptions['position-size'] ?? __('Size a trade from risk amount and stop distance.', 'nerdywithme-tools'),
 				'summary'     => $summaries['position-size'] ?? __('Convert a fixed risk amount and stop distance into a cleaner lot size so you stop guessing your exposure on every trade idea.', 'nerdywithme-tools'),
 				'meta_title'  => $meta_titles['position-size'] ?? __('Position Size Calculator | NerdyWithMe Tools', 'nerdywithme-tools'),
@@ -312,7 +334,8 @@ class NerdyWithMe_Tools_Shortcodes {
 				'render'      => array($this, 'render_position_size_calculator_inner'),
 			),
 			'pip-value' => array(
-				'label'       => __('Pip / Point Value', 'nerdywithme-tools'),
+				'label'       => sanitize_text_field($label_overrides['pip-value'] ?? $label_defaults['pip-value']),
+				'slug'        => $this->sanitize_tool_slug($slug_overrides['pip-value'] ?? $slug_defaults['pip-value'], 'pip-value'),
 				'description' => $descriptions['pip-value'] ?? __('Estimate pip or point value from lot size.', 'nerdywithme-tools'),
 				'summary'     => $summaries['pip-value'] ?? __('Estimate what each pip or point is worth for your position size, then project the value of a move before you place the trade.', 'nerdywithme-tools'),
 				'meta_title'  => $meta_titles['pip-value'] ?? __('Pip and Point Value Calculator | NerdyWithMe Tools', 'nerdywithme-tools'),
@@ -320,7 +343,8 @@ class NerdyWithMe_Tools_Shortcodes {
 				'render'      => array($this, 'render_pip_value_calculator_inner'),
 			),
 			'profit-target' => array(
-				'label'       => __('Profit Target', 'nerdywithme-tools'),
+				'label'       => sanitize_text_field($label_overrides['profit-target'] ?? $label_defaults['profit-target']),
+				'slug'        => $this->sanitize_tool_slug($slug_overrides['profit-target'] ?? $slug_defaults['profit-target'], 'profit-target'),
 				'description' => $descriptions['profit-target'] ?? __('Target and payoff planner.', 'nerdywithme-tools'),
 				'summary'     => $summaries['profit-target'] ?? __('Map out the payoff at your target, compare reward to risk, and see the percentage growth a winning trade could add to your account.', 'nerdywithme-tools'),
 				'meta_title'  => $meta_titles['profit-target'] ?? __('Profit Target Calculator | NerdyWithMe Tools', 'nerdywithme-tools'),
@@ -328,7 +352,8 @@ class NerdyWithMe_Tools_Shortcodes {
 				'render'      => array($this, 'render_profit_target_calculator_inner'),
 			),
 			'compound-growth' => array(
-				'label'       => __('Compound Growth', 'nerdywithme-tools'),
+				'label'       => sanitize_text_field($label_overrides['compound-growth'] ?? $label_defaults['compound-growth']),
+				'slug'        => $this->sanitize_tool_slug($slug_overrides['compound-growth'] ?? $slug_defaults['compound-growth'], 'compound-growth'),
 				'description' => $descriptions['compound-growth'] ?? __('Project compounded account growth over time.', 'nerdywithme-tools'),
 				'summary'     => $summaries['compound-growth'] ?? __('Project how your account could grow over time with compounded returns, recurring contributions, and a period you choose.', 'nerdywithme-tools'),
 				'meta_title'  => $meta_titles['compound-growth'] ?? __('Compound Growth Calculator | NerdyWithMe Tools', 'nerdywithme-tools'),
@@ -343,6 +368,20 @@ class NerdyWithMe_Tools_Shortcodes {
 				return ! empty($tool['enabled']);
 			}
 		);
+
+		$used_slugs = array();
+		foreach ($registry as $tool_id => &$tool) {
+			$slug = $tool['slug'] ?? $tool_id;
+			if (isset($used_slugs[ $slug ])) {
+				$slug = $tool_id;
+			}
+			if (isset($used_slugs[ $slug ])) {
+				$slug = $slug . '-' . $tool_id;
+			}
+			$tool['slug'] = $slug;
+			$used_slugs[ $slug ] = true;
+		}
+		unset($tool);
 
 		if (! empty($tool_order)) {
 			$ordered_registry = array();
@@ -374,19 +413,65 @@ class NerdyWithMe_Tools_Shortcodes {
 		$tools          = $this->get_tool_registry();
 		$requested_tool = sanitize_key((string) get_query_var('nwm_tool'));
 
-		if ($requested_tool && isset($tools[ $requested_tool ])) {
-			return array_merge(
-				$tools[ $requested_tool ],
-				array(
-					'id'         => $requested_tool,
-					'url'        => $this->get_tool_url($requested_tool),
-					'summary'    => $tools[ $requested_tool ]['summary'] ?? '',
-					'meta_title' => $tools[ $requested_tool ]['meta_title'] ?? '',
-				)
-			);
+		if ($requested_tool) {
+			foreach ($tools as $tool_id => $tool) {
+				if ($requested_tool === $tool_id || $requested_tool === ($tool['slug'] ?? '')) {
+					return array_merge(
+						$tool,
+						array(
+							'id'         => $tool_id,
+							'url'        => $this->get_tool_url($tool_id),
+							'summary'    => $tool['summary'] ?? '',
+							'meta_title' => $tool['meta_title'] ?? '',
+						)
+					);
+				}
+			}
 		}
 
 		return null;
+	}
+
+	/**
+	 * Default tool labels.
+	 *
+	 * @return array
+	 */
+	private function get_tool_label_defaults() {
+		return array(
+			'risk-calculator' => __('Risk Calculator', 'nerdywithme-tools'),
+			'position-size'   => __('Position Size', 'nerdywithme-tools'),
+			'pip-value'       => __('Pip / Point Value', 'nerdywithme-tools'),
+			'profit-target'   => __('Profit Target', 'nerdywithme-tools'),
+			'compound-growth' => __('Compound Growth', 'nerdywithme-tools'),
+		);
+	}
+
+	/**
+	 * Default tool slugs.
+	 *
+	 * @return array
+	 */
+	private function get_tool_slug_defaults() {
+		return array(
+			'risk-calculator' => 'risk-calculator',
+			'position-size'   => 'position-size',
+			'pip-value'       => 'pip-value',
+			'profit-target'   => 'profit-target',
+			'compound-growth' => 'compound-growth',
+		);
+	}
+
+	/**
+	 * Sanitize tool slug.
+	 *
+	 * @param string $slug Input slug.
+	 * @param string $fallback Fallback slug.
+	 * @return string
+	 */
+	private function sanitize_tool_slug($slug, $fallback) {
+		$sanitized = sanitize_title($slug);
+		return $sanitized ? $sanitized : sanitize_title($fallback);
 	}
 
 	/**

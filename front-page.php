@@ -25,8 +25,10 @@ $hot_pair_ids   = array_slice($remaining_ids, 4, 2);
 $hot_strip_ids  = array_slice($remaining_ids, 6, 4);
 $popular_ids    = array_slice($remaining_ids, 2, 7);
 $starter_query  = nerdywithme_get_featured_posts(3, array_merge(array($hero_id), $editor_ids));
-$builder_query  = nerdywithme_get_featured_posts(3, array_merge(array($hero_id, $hot_pair_ids[0] ?? 0), $editor_ids));
-$quick_query    = nerdywithme_get_featured_posts(3, array_merge(array($hero_id, $hot_pair_ids[0] ?? 0, $hot_pair_ids[1] ?? 0), $editor_ids));
+$starter_ids    = wp_list_pluck($starter_query->posts, 'ID');
+$builder_query  = nerdywithme_get_featured_posts(3, array_merge(array($hero_id, $hot_pair_ids[0] ?? 0), $editor_ids, $starter_ids));
+$builder_ids    = wp_list_pluck($builder_query->posts, 'ID');
+$quick_query    = nerdywithme_get_featured_posts(3, array_merge(array($hero_id, $hot_pair_ids[0] ?? 0, $hot_pair_ids[1] ?? 0), $editor_ids, $starter_ids, $builder_ids));
 
 if (count($editor_ids) < 3) {
 	$fallback_editor_ids = array_slice(array_values(array_diff($ids, array($hero_id), $hero_side_ids, $hot_pair_ids, $hot_strip_ids)), 0, 3 - count($editor_ids));

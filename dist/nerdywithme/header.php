@@ -64,6 +64,9 @@
 					</div>
 					<div class="mega-panel__group">
 						<h2><?php esc_html_e('Explore', 'nerdywithme'); ?></h2>
+						<div class="mega-panel__links-slot" data-mega-menu-slot></div>
+					</div>
+					<div class="mega-panel__menu-templates" aria-hidden="true">
 						<?php
 						wp_nav_menu(
 							array(
@@ -72,6 +75,17 @@
 								'menu_class'     => 'mega-panel__links',
 								'depth'          => 1,
 								'fallback_cb'    => 'nerdywithme_drawer_menu_fallback',
+							)
+						);
+						?>
+						<?php
+						wp_nav_menu(
+							array(
+								'theme_location' => 'primary',
+								'container'      => false,
+								'menu_class'     => 'mega-panel__links',
+								'depth'          => 1,
+								'fallback_cb'    => 'nerdywithme_primary_menu_fallback',
 							)
 						);
 						?>

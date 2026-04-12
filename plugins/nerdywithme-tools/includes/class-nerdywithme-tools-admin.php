@@ -228,6 +228,8 @@ class NerdyWithMe_Tools_Admin {
 			'tool_descriptions'             => array(),
 			'tool_summaries'                => array(),
 			'tool_meta_titles'              => array(),
+			'tool_labels'                   => array(),
+			'tool_slugs'                    => array(),
 		);
 
 		foreach (array_keys($this->get_ad_slot_labels()) as $slot) {
@@ -281,6 +283,15 @@ class NerdyWithMe_Tools_Admin {
 
 		foreach ($this->get_tool_meta_title_defaults() as $slug => $meta_title) {
 			$sanitized['tool_meta_titles'][ $slug ] = isset($input['tool_meta_titles'][ $slug ]) ? sanitize_text_field($input['tool_meta_titles'][ $slug ]) : $meta_title;
+		}
+
+		foreach ($this->get_tool_label_defaults() as $slug => $label) {
+			$sanitized['tool_labels'][ $slug ] = isset($input['tool_labels'][ $slug ]) ? sanitize_text_field($input['tool_labels'][ $slug ]) : $label;
+		}
+
+		foreach ($this->get_tool_slug_defaults() as $slug => $default_slug) {
+			$raw = isset($input['tool_slugs'][ $slug ]) ? sanitize_title($input['tool_slugs'][ $slug ]) : $default_slug;
+			$sanitized['tool_slugs'][ $slug ] = $raw ? $raw : $default_slug;
 		}
 
 		return $sanitized;
@@ -436,6 +447,8 @@ class NerdyWithMe_Tools_Admin {
 		$descriptions = $settings['tool_descriptions'] ?? $this->get_tool_description_defaults();
 		$summaries    = $settings['tool_summaries'] ?? $this->get_tool_summary_defaults();
 		$meta_titles  = $settings['tool_meta_titles'] ?? $this->get_tool_meta_title_defaults();
+		$tool_labels  = $settings['tool_labels'] ?? $this->get_tool_label_defaults();
+		$tool_slugs   = $settings['tool_slugs'] ?? $this->get_tool_slug_defaults();
 		$order        = array_filter(array_map('sanitize_key', array_map('trim', explode(',', (string) ($settings['tool_order'] ?? '')))));
 
 		if (empty($order)) {
@@ -499,6 +512,15 @@ class NerdyWithMe_Tools_Admin {
 									</label>
 								</div>
 								<div class="nwm-tools-admin__fields">
+									<label>
+										<span><?php esc_html_e('Tool Name', 'nerdywithme-tools'); ?></span>
+										<input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[tool_labels][' . $tool_slug . ']'); ?>" value="<?php echo esc_attr($tool_labels[ $tool_slug ] ?? $tools[ $tool_slug ]); ?>">
+									</label>
+									<label>
+										<span><?php esc_html_e('Tool Slug (URL)', 'nerdywithme-tools'); ?></span>
+										<input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[tool_slugs][' . $tool_slug . ']'); ?>" value="<?php echo esc_attr($tool_slugs[ $tool_slug ] ?? $tool_slug); ?>" placeholder="<?php echo esc_attr($tool_slug); ?>">
+										<small class="description"><?php esc_html_e('Used for /tools/your-slug/. Keep it short and unique. Save, then re-save Permalinks if URLs do not update.', 'nerdywithme-tools'); ?></small>
+									</label>
 									<label>
 										<span><?php esc_html_e('Tooltip / Tab Description', 'nerdywithme-tools'); ?></span>
 										<input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[tool_descriptions][' . $tool_slug . ']'); ?>" value="<?php echo esc_attr($descriptions[ $tool_slug ] ?? ''); ?>">
@@ -719,6 +741,8 @@ class NerdyWithMe_Tools_Admin {
 			'tool_descriptions'               => $this->get_tool_description_defaults(),
 			'tool_summaries'                  => $this->get_tool_summary_defaults(),
 			'tool_meta_titles'               => $this->get_tool_meta_title_defaults(),
+			'tool_labels'                     => $this->get_tool_label_defaults(),
+			'tool_slugs'                      => $this->get_tool_slug_defaults(),
 		);
 
 		$settings = wp_parse_args(get_option(self::OPTION_KEY, array()), $defaults);
@@ -732,6 +756,9 @@ class NerdyWithMe_Tools_Admin {
 				$slot_defaults
 			);
 		}
+
+		$settings['tool_labels'] = wp_parse_args(is_array($settings['tool_labels']) ? $settings['tool_labels'] : array(), $defaults['tool_labels']);
+		$settings['tool_slugs']  = wp_parse_args(is_array($settings['tool_slugs']) ? $settings['tool_slugs'] : array(), $defaults['tool_slugs']);
 
 		return $settings;
 	}
@@ -862,17 +889,51 @@ class NerdyWithMe_Tools_Admin {
 	}
 
 	/**
-	 * Tool labels.
+	 * Default tool labels.
 	 *
 	 * @return array
 	 */
-	private function get_tool_labels() {
+	private function get_tool_label_defaults() {
 		return array(
 			'risk-calculator' => __('Risk Calculator', 'nerdywithme-tools'),
 			'position-size'   => __('Position Size', 'nerdywithme-tools'),
 			'pip-value'       => __('Pip / Point Value', 'nerdywithme-tools'),
 			'profit-target'   => __('Profit Target', 'nerdywithme-tools'),
 			'compound-growth' => __('Compound Growth', 'nerdywithme-tools'),
+		);
+	}
+
+	/**
+	 * Tool labels.
+	 *
+	 * @return array
+	 */
+	private function get_tool_labels() {
+		$defaults = $this->get_tool_label_defaults();
+		$settings = $this->get_settings();
+		$labels   = is_array($settings['tool_labels'] ?? null) ? $settings['tool_labels'] : array();
+		$output   = array();
+
+		foreach ($defaults as $slug => $label) {
+			$value = sanitize_text_field($labels[ $slug ] ?? $label);
+			$output[ $slug ] = $value ? $value : $label;
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Default tool slugs.
+	 *
+	 * @return array
+	 */
+	private function get_tool_slug_defaults() {
+		return array(
+			'risk-calculator' => 'risk-calculator',
+			'position-size'   => 'position-size',
+			'pip-value'       => 'pip-value',
+			'profit-target'   => 'profit-target',
+			'compound-growth' => 'compound-growth',
 		);
 	}
 

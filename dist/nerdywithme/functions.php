@@ -69,8 +69,22 @@ function nerdywithme_enqueue_assets() {
 		$script_version,
 		true
 	);
+	wp_script_add_data('nerdywithme-script', 'defer', true);
 }
 add_action('wp_enqueue_scripts', 'nerdywithme_enqueue_assets');
+
+function nerdywithme_resource_hints($urls, $relation_type) {
+	if ('preconnect' === $relation_type) {
+		$urls[] = 'https://fonts.googleapis.com';
+		$urls[] = array(
+			'href'        => 'https://fonts.gstatic.com',
+			'crossorigin' => 'anonymous',
+		);
+	}
+
+	return $urls;
+}
+add_filter('wp_resource_hints', 'nerdywithme_resource_hints', 10, 2);
 
 function nerdywithme_customize_register($wp_customize) {
 	$wp_customize->add_section(
@@ -144,6 +158,49 @@ function nerdywithme_customize_register($wp_customize) {
 				'label'   => $option['label'],
 				'section' => 'nerdywithme_theme_options',
 				'type'    => ('footer_blurb' === $id || 'header_cta_label' === $id) ? 'text' : 'url',
+			)
+		);
+	}
+
+	$social_link_defaults = array(
+		array('platform' => 'facebook', 'url' => '#'),
+		array('platform' => 'x', 'url' => '#'),
+		array('platform' => 'instagram', 'url' => '#'),
+	);
+
+	for ($i = 1; $i <= 3; $i++) {
+		$default = $social_link_defaults[ $i - 1 ];
+
+		$wp_customize->add_setting(
+			'nerdywithme_social_link_' . $i . '_platform',
+			array(
+				'default'           => $default['platform'],
+				'sanitize_callback' => 'nerdywithme_sanitize_social_platform',
+			)
+		);
+		$wp_customize->add_control(
+			'nerdywithme_social_link_' . $i . '_platform',
+			array(
+				'label'   => sprintf(__('Social Link %d Platform', 'nerdywithme'), $i),
+				'section' => 'nerdywithme_theme_options',
+				'type'    => 'select',
+				'choices' => nerdywithme_social_platform_choices(),
+			)
+		);
+
+		$wp_customize->add_setting(
+			'nerdywithme_social_link_' . $i . '_url',
+			array(
+				'default'           => $default['url'],
+				'sanitize_callback' => 'esc_url_raw',
+			)
+		);
+		$wp_customize->add_control(
+			'nerdywithme_social_link_' . $i . '_url',
+			array(
+				'label'   => sprintf(__('Social Link %d URL', 'nerdywithme'), $i),
+				'section' => 'nerdywithme_theme_options',
+				'type'    => 'url',
 			)
 		);
 	}
@@ -279,6 +336,7 @@ function nerdywithme_customize_register($wp_customize) {
 			);
 
 			$text_fields = array(
+				'platform' => __('Platform', 'nerdywithme'),
 				'icon_text' => __('Fallback Icon Text', 'nerdywithme'),
 				'handle'    => __('Handle', 'nerdywithme'),
 				'description' => __('Description', 'nerdywithme'),
@@ -289,7 +347,7 @@ function nerdywithme_customize_register($wp_customize) {
 					$base . $field,
 					array(
 						'default'           => $defaults[ $field ],
-						'sanitize_callback' => 'sanitize_text_field',
+						'sanitize_callback' => 'platform' === $field ? 'nerdywithme_sanitize_social_platform' : 'sanitize_text_field',
 					)
 				);
 				$wp_customize->add_control(
@@ -297,7 +355,8 @@ function nerdywithme_customize_register($wp_customize) {
 					array(
 						'label'   => sprintf(__('Card %1$d %2$s', 'nerdywithme'), $i, $label),
 						'section' => $config['section'],
-						'type'    => 'text',
+						'type'    => 'platform' === $field ? 'select' : 'text',
+						'choices' => 'platform' === $field ? nerdywithme_social_platform_choices() : array(),
 					)
 				);
 			}
@@ -452,6 +511,27 @@ function nerdywithme_customize_register($wp_customize) {
 			),
 		)
 	);
+
+	$wp_customize->add_setting(
+		'nerdywithme_reader_bar_scope',
+		array(
+			'default'           => 'full',
+			'sanitize_callback' => 'nerdywithme_sanitize_reader_bar_scope',
+		)
+	);
+
+	$wp_customize->add_control(
+		'nerdywithme_reader_bar_scope',
+		array(
+			'label'   => __('Reader Bar Width', 'nerdywithme'),
+			'section' => 'nerdywithme_reader_bar',
+			'type'    => 'select',
+			'choices' => array(
+				'full'    => __('Full Width', 'nerdywithme'),
+				'content' => __('Match Content Width', 'nerdywithme'),
+			),
+		)
+	);
 }
 add_action('customize_register', 'nerdywithme_customize_register');
 
@@ -486,6 +566,72 @@ function nerdywithme_sanitize_reader_bar_size($value) {
 	return in_array($value, $allowed, true) ? $value : 'standard';
 }
 
+function nerdywithme_sanitize_reader_bar_scope($value) {
+	$allowed = array('full', 'content');
+	return in_array($value, $allowed, true) ? $value : 'full';
+}
+
+function nerdywithme_reader_bar_body_class($classes) {
+	$scope = nerdywithme_sanitize_reader_bar_scope(get_theme_mod('nerdywithme_reader_bar_scope', 'full'));
+	if ('content' === $scope) {
+		$classes[] = 'reader-bar--content';
+	}
+	return $classes;
+}
+add_filter('body_class', 'nerdywithme_reader_bar_body_class');
+
+function nerdywithme_social_platform_choices() {
+	return array(
+		'custom'     => __('Custom', 'nerdywithme'),
+		'facebook'   => __('Facebook', 'nerdywithme'),
+		'x'          => __('X (Twitter)', 'nerdywithme'),
+		'instagram'  => __('Instagram', 'nerdywithme'),
+		'youtube'    => __('YouTube', 'nerdywithme'),
+		'tiktok'     => __('TikTok', 'nerdywithme'),
+		'discord'    => __('Discord', 'nerdywithme'),
+		'telegram'   => __('Telegram', 'nerdywithme'),
+		'linkedin'   => __('LinkedIn', 'nerdywithme'),
+		'github'     => __('GitHub', 'nerdywithme'),
+		'reddit'     => __('Reddit', 'nerdywithme'),
+		'tradingview' => __('TradingView', 'nerdywithme'),
+		'whatsapp'   => __('WhatsApp', 'nerdywithme'),
+		'snapchat'   => __('Snapchat', 'nerdywithme'),
+		'threads'    => __('Threads', 'nerdywithme'),
+		'twitch'     => __('Twitch', 'nerdywithme'),
+		'newsletter' => __('Newsletter', 'nerdywithme'),
+		'website'    => __('Website', 'nerdywithme'),
+	);
+}
+
+function nerdywithme_sanitize_social_platform($value) {
+	$allowed = array_keys(nerdywithme_social_platform_choices());
+	return in_array($value, $allowed, true) ? $value : 'custom';
+}
+
+function nerdywithme_social_platform_meta($platform) {
+	$map = array(
+		'facebook'   => array('label' => 'Facebook', 'icon' => 'f'),
+		'x'          => array('label' => 'X', 'icon' => 'x'),
+		'instagram'  => array('label' => 'Instagram', 'icon' => 'ig'),
+		'youtube'    => array('label' => 'YouTube', 'icon' => 'yt'),
+		'tiktok'     => array('label' => 'TikTok', 'icon' => 'tt'),
+		'discord'    => array('label' => 'Discord', 'icon' => 'dc'),
+		'telegram'   => array('label' => 'Telegram', 'icon' => 'tg'),
+		'linkedin'   => array('label' => 'LinkedIn', 'icon' => 'in'),
+		'github'     => array('label' => 'GitHub', 'icon' => 'gh'),
+		'reddit'     => array('label' => 'Reddit', 'icon' => 'rd'),
+		'tradingview' => array('label' => 'TradingView', 'icon' => 'tv'),
+		'whatsapp'   => array('label' => 'WhatsApp', 'icon' => 'wa'),
+		'snapchat'   => array('label' => 'Snapchat', 'icon' => 'sc'),
+		'threads'    => array('label' => 'Threads', 'icon' => 'th'),
+		'twitch'     => array('label' => 'Twitch', 'icon' => 'tw'),
+		'newsletter' => array('label' => 'Newsletter', 'icon' => 'nl'),
+		'website'    => array('label' => 'Website', 'icon' => 'ww'),
+	);
+
+	return $map[ $platform ] ?? array('label' => 'Custom', 'icon' => '');
+}
+
 function nerdywithme_card_tone_choices() {
 	return array(
 		'green'  => __('Green', 'nerdywithme'),
@@ -503,6 +649,7 @@ function nerdywithme_sanitize_card_tone($value) {
 function nerdywithme_default_home_social_cards() {
 	return array(
 		array(
+			'platform'    => 'tradingview',
 			'tone'        => 'green',
 			'icon_text'   => 'TV',
 			'handle'      => '@nerdywithme',
@@ -510,6 +657,7 @@ function nerdywithme_default_home_social_cards() {
 			'url'         => '#',
 		),
 		array(
+			'platform'    => 'x',
 			'tone'        => 'pink',
 			'icon_text'   => 'X',
 			'handle'      => '@nerdywithme',
@@ -517,6 +665,7 @@ function nerdywithme_default_home_social_cards() {
 			'url'         => '#',
 		),
 		array(
+			'platform'    => 'instagram',
 			'tone'        => 'orange',
 			'icon_text'   => 'IG',
 			'handle'      => '@nerdywithme',
@@ -524,6 +673,7 @@ function nerdywithme_default_home_social_cards() {
 			'url'         => '#',
 		),
 		array(
+			'platform'    => 'github',
 			'tone'        => 'blue',
 			'icon_text'   => 'GH',
 			'handle'      => '@nerdywithme',
@@ -536,6 +686,7 @@ function nerdywithme_default_home_social_cards() {
 function nerdywithme_default_sidebar_social_cards() {
 	return array(
 		array(
+			'platform'    => 'tradingview',
 			'tone'        => 'green',
 			'icon_text'   => 'TV',
 			'handle'      => '@nerdywithme',
@@ -543,6 +694,7 @@ function nerdywithme_default_sidebar_social_cards() {
 			'url'         => '#',
 		),
 		array(
+			'platform'    => 'x',
 			'tone'        => 'pink',
 			'icon_text'   => 'X',
 			'handle'      => '@nerdywithme',
@@ -550,6 +702,7 @@ function nerdywithme_default_sidebar_social_cards() {
 			'url'         => '#',
 		),
 		array(
+			'platform'    => 'github',
 			'tone'        => 'blue',
 			'icon_text'   => 'GH',
 			'handle'      => '@nerdywithme',
@@ -568,14 +721,22 @@ function nerdywithme_get_social_cards($context = 'home') {
 		$base    = 'nerdywithme_' . $context . '_social_' . $i . '_';
 		$default = $defaults[ $i - 1 ];
 		$image_id = absint(get_theme_mod($base . 'icon_image', 0));
+		$platform = nerdywithme_sanitize_social_platform(get_theme_mod($base . 'platform', $default['platform']));
+		$platform_meta = nerdywithme_social_platform_meta($platform);
+		$icon_text = sanitize_text_field(get_theme_mod($base . 'icon_text', $default['icon_text']));
+		if ('custom' !== $platform) {
+			$icon_text = $platform_meta['icon'] ?: $icon_text;
+		}
 
 		$cards[] = array(
+			'platform'    => $platform,
 			'tone'        => nerdywithme_sanitize_card_tone(get_theme_mod($base . 'tone', $default['tone'])),
-			'icon_text'   => sanitize_text_field(get_theme_mod($base . 'icon_text', $default['icon_text'])),
+			'icon_text'   => $icon_text,
 			'handle'      => sanitize_text_field(get_theme_mod($base . 'handle', $default['handle'])),
 			'description' => sanitize_text_field(get_theme_mod($base . 'description', $default['description'])),
 			'url'         => esc_url(get_theme_mod($base . 'url', $default['url'])),
 			'icon_image'  => $image_id ? wp_get_attachment_image_url($image_id, 'thumbnail') : '',
+			'label'       => $platform_meta['label'] ?: __('Custom', 'nerdywithme'),
 		);
 	}
 
@@ -759,23 +920,43 @@ function nerdywithme_get_brand_logo_id() {
 }
 
 function nerdywithme_social_links() {
-	return array(
-		array(
-			'label' => __('Facebook', 'nerdywithme'),
-			'text'  => 'f',
-			'url'   => nerdywithme_get_option('facebook_url', '#'),
-		),
-		array(
-			'label' => __('X', 'nerdywithme'),
-			'text'  => 'x',
-			'url'   => nerdywithme_get_option('x_url', '#'),
-		),
-		array(
-			'label' => __('Instagram', 'nerdywithme'),
-			'text'  => 'ig',
-			'url'   => nerdywithme_get_option('instagram_url', '#'),
-		),
-	);
+	$links = array();
+
+	for ($i = 1; $i <= 3; $i++) {
+		$platform = nerdywithme_sanitize_social_platform(get_theme_mod('nerdywithme_social_link_' . $i . '_platform', 'custom'));
+		$url      = esc_url(get_theme_mod('nerdywithme_social_link_' . $i . '_url', '#'));
+		if (! $url) {
+			continue;
+		}
+		$meta = nerdywithme_social_platform_meta($platform);
+		$links[] = array(
+			'label' => $meta['label'] ?: __('Social', 'nerdywithme'),
+			'text'  => $meta['icon'] ?: '•',
+			'url'   => $url,
+		);
+	}
+
+	if (! $links) {
+		return array(
+			array(
+				'label' => __('Facebook', 'nerdywithme'),
+				'text'  => 'f',
+				'url'   => nerdywithme_get_option('facebook_url', '#'),
+			),
+			array(
+				'label' => __('X', 'nerdywithme'),
+				'text'  => 'x',
+				'url'   => nerdywithme_get_option('x_url', '#'),
+			),
+			array(
+				'label' => __('Instagram', 'nerdywithme'),
+				'text'  => 'ig',
+				'url'   => nerdywithme_get_option('instagram_url', '#'),
+			),
+		);
+	}
+
+	return $links;
 }
 
 function nerdywithme_render_social_links() {

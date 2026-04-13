@@ -100,6 +100,10 @@ class NerdyWithMe_Tools_Plugin {
 	 * @return void
 	 */
 	public function enqueue_assets() {
+		if (! is_page('tools') && ! get_query_var('nwm_tool')) {
+			return;
+		}
+
 		$css_path = NERDYWITHME_TOOLS_PATH . 'assets/css/nerdywithme-tools.css';
 		$css_url  = NERDYWITHME_TOOLS_URL . 'assets/css/nerdywithme-tools.css';
 		if (! file_exists($css_path)) {

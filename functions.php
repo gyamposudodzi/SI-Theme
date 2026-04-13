@@ -69,8 +69,22 @@ function nerdywithme_enqueue_assets() {
 		$script_version,
 		true
 	);
+	wp_script_add_data('nerdywithme-script', 'defer', true);
 }
 add_action('wp_enqueue_scripts', 'nerdywithme_enqueue_assets');
+
+function nerdywithme_resource_hints($urls, $relation_type) {
+	if ('preconnect' === $relation_type) {
+		$urls[] = 'https://fonts.googleapis.com';
+		$urls[] = array(
+			'href'        => 'https://fonts.gstatic.com',
+			'crossorigin' => 'anonymous',
+		);
+	}
+
+	return $urls;
+}
+add_filter('wp_resource_hints', 'nerdywithme_resource_hints', 10, 2);
 
 function nerdywithme_customize_register($wp_customize) {
 	$wp_customize->add_section(
@@ -497,6 +511,27 @@ function nerdywithme_customize_register($wp_customize) {
 			),
 		)
 	);
+
+	$wp_customize->add_setting(
+		'nerdywithme_reader_bar_scope',
+		array(
+			'default'           => 'full',
+			'sanitize_callback' => 'nerdywithme_sanitize_reader_bar_scope',
+		)
+	);
+
+	$wp_customize->add_control(
+		'nerdywithme_reader_bar_scope',
+		array(
+			'label'   => __('Reader Bar Width', 'nerdywithme'),
+			'section' => 'nerdywithme_reader_bar',
+			'type'    => 'select',
+			'choices' => array(
+				'full'    => __('Full Width', 'nerdywithme'),
+				'content' => __('Match Content Width', 'nerdywithme'),
+			),
+		)
+	);
 }
 add_action('customize_register', 'nerdywithme_customize_register');
 
@@ -530,6 +565,20 @@ function nerdywithme_sanitize_reader_bar_size($value) {
 	$allowed = array('compact', 'standard', 'large');
 	return in_array($value, $allowed, true) ? $value : 'standard';
 }
+
+function nerdywithme_sanitize_reader_bar_scope($value) {
+	$allowed = array('full', 'content');
+	return in_array($value, $allowed, true) ? $value : 'full';
+}
+
+function nerdywithme_reader_bar_body_class($classes) {
+	$scope = nerdywithme_sanitize_reader_bar_scope(get_theme_mod('nerdywithme_reader_bar_scope', 'full'));
+	if ('content' === $scope) {
+		$classes[] = 'reader-bar--content';
+	}
+	return $classes;
+}
+add_filter('body_class', 'nerdywithme_reader_bar_body_class');
 
 function nerdywithme_social_platform_choices() {
 	return array(

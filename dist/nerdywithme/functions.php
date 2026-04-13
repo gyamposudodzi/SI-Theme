@@ -745,7 +745,7 @@ function nerdywithme_get_social_cards($context = 'home') {
 
 function nerdywithme_render_card_icon($card, $icon_class) {
 	if (! empty($card['icon_image'])) {
-		return '<span class="' . esc_attr($icon_class) . '"><img src="' . esc_url($card['icon_image']) . '" alt=""></span>';
+		return '<span class="' . esc_attr($icon_class) . '"><img src="' . esc_url($card['icon_image']) . '" alt="" loading="lazy" decoding="async"></span>';
 	}
 
 	return '<span class="' . esc_attr($icon_class) . '">' . esc_html($card['icon_text']) . '</span>';
@@ -804,6 +804,27 @@ function nerdywithme_get_post_image($post_id, $size = 'large') {
 	}
 
 	return nerdywithme_fallback_image();
+}
+
+function nerdywithme_get_post_image_tag($post_id, $size = 'large', $attrs = array(), $sizes = '') {
+	$classes = array('nwm-img');
+
+	if ($post_id && has_post_thumbnail($post_id)) {
+		$defaults = array(
+			'class'   => implode(' ', $classes),
+			'loading' => 'lazy',
+			'decoding' => 'async',
+		);
+		$attrs = wp_parse_args($attrs, $defaults);
+		if ($sizes) {
+			$attrs['sizes'] = $sizes;
+		}
+		return wp_get_attachment_image(get_post_thumbnail_id($post_id), $size, false, $attrs);
+	}
+
+	$alt = $attrs['alt'] ?? '';
+	$size_attr = $sizes ? ' sizes="' . esc_attr($sizes) . '"' : '';
+	return '<img src="' . esc_url(nerdywithme_fallback_image()) . '" alt="' . esc_attr($alt) . '" class="' . esc_attr(implode(' ', $classes)) . '" loading="lazy" decoding="async"' . $size_attr . '>';
 }
 
 function nerdywithme_site_title_markup() {
@@ -1057,7 +1078,7 @@ function nerdywithme_category_card($category) {
 	?>
 	<article class="category-pill">
 		<a class="category-pill__thumb" href="<?php echo esc_url(get_category_link($category)); ?>">
-			<img src="<?php echo esc_url(nerdywithme_get_post_image($image_id, 'medium_large')); ?>" alt="<?php echo esc_attr($category->name); ?>">
+			<?php echo nerdywithme_get_post_image_tag($image_id, 'medium_large', array('alt' => $category->name), '(max-width: 1100px) 45vw, 260px'); ?>
 		</a>
 		<div class="category-pill__name"><?php echo esc_html($category->name); ?></div>
 		<p class="section-intro">
@@ -1133,7 +1154,7 @@ function nerdywithme_card($post_id, $variant = 'standard') {
 	?>
 	<article <?php post_class('card card--' . $variant, $post_id); ?>>
 		<a class="card__thumb" href="<?php echo esc_url(get_permalink($post_id)); ?>">
-			<img src="<?php echo esc_url(nerdywithme_get_post_image($post_id, 'large')); ?>" alt="<?php echo esc_attr(get_the_title($post_id)); ?>">
+			<?php echo nerdywithme_get_post_image_tag($post_id, 'large', array('alt' => get_the_title($post_id)), '(max-width: 1100px) 100vw, 560px'); ?>
 		</a>
 		<div class="card__content">
 			<?php nerdywithme_post_meta($post_id); ?>
@@ -1153,7 +1174,7 @@ function nerdywithme_mini_post($post_id) {
 	?>
 	<article class="mini-post">
 		<a class="mini-post__thumb" href="<?php echo esc_url(get_permalink($post_id)); ?>">
-			<img src="<?php echo esc_url(nerdywithme_get_post_image($post_id, 'medium_large')); ?>" alt="<?php echo esc_attr(get_the_title($post_id)); ?>">
+			<?php echo nerdywithme_get_post_image_tag($post_id, 'medium_large', array('alt' => get_the_title($post_id)), '(max-width: 1100px) 45vw, 260px'); ?>
 		</a>
 		<div>
 			<?php nerdywithme_post_meta($post_id); ?>
@@ -1170,7 +1191,7 @@ function nerdywithme_row_post($post_id) {
 	?>
 	<article class="row-post">
 		<a class="row-post__thumb" href="<?php echo esc_url(get_permalink($post_id)); ?>">
-			<img src="<?php echo esc_url(nerdywithme_get_post_image($post_id, 'medium_large')); ?>" alt="<?php echo esc_attr(get_the_title($post_id)); ?>">
+			<?php echo nerdywithme_get_post_image_tag($post_id, 'medium_large', array('alt' => get_the_title($post_id)), '(max-width: 1100px) 45vw, 320px'); ?>
 		</a>
 		<div class="row-post__content">
 			<?php nerdywithme_post_meta($post_id); ?>
@@ -1215,7 +1236,7 @@ function nerdywithme_ranked_posts($query_args, $limit = 3) {
 				<a class="rank-list__media" href="<?php the_permalink(); ?>">
 					<span class="rank-list__thumb">
 						<span class="rank-list__count"><?php echo esc_html((string) $rank); ?></span>
-						<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'thumbnail')); ?>" alt="<?php the_title_attribute(); ?>">
+						<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'thumbnail', array('alt' => get_the_title()), '104px'); ?>
 					</span>
 				</a>
 				<div class="rank-list__body">
@@ -1245,7 +1266,7 @@ function nerdywithme_compact_posts($query_args, $limit = 3) {
 		<?php while ($query->have_posts()) : $query->the_post(); ?>
 			<a class="compact-list__item compact-list__item--featured" href="<?php the_permalink(); ?>">
 				<div class="compact-list__thumb">
-					<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'thumbnail')); ?>" alt="<?php the_title_attribute(); ?>">
+					<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'thumbnail', array('alt' => get_the_title()), '90px'); ?>
 				</div>
 				<div class="compact-list__content">
 					<?php nerdywithme_post_meta(get_the_ID()); ?>
@@ -1280,7 +1301,7 @@ function nerdywithme_featured_slider_posts($query_args, $limit = 3) {
 					<div class="compact-list__item compact-list__item--featured">
 						<a class="compact-list__thumb-link" href="<?php the_permalink(); ?>">
 							<div class="compact-list__thumb">
-								<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'medium_large')); ?>" alt="<?php the_title_attribute(); ?>">
+								<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'medium_large', array('alt' => get_the_title()), '(max-width: 1100px) 60vw, 240px'); ?>
 							</div>
 						</a>
 						<div class="compact-list__content">

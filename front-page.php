@@ -42,7 +42,7 @@ if (count($editor_ids) < 3) {
 		<?php if ($hero_id) : ?>
 			<article class="compact-hero-card">
 				<a class="compact-hero-card__thumb" href="<?php echo esc_url(get_permalink($hero_id)); ?>">
-					<img src="<?php echo esc_url(nerdywithme_get_post_image($hero_id, 'large')); ?>" alt="<?php echo esc_attr(get_the_title($hero_id)); ?>">
+					<?php echo nerdywithme_get_post_image_tag($hero_id, 'nwm-hero', array('alt' => get_the_title($hero_id), 'loading' => 'eager', 'fetchpriority' => 'high'), '100vw'); ?>
 				</a>
 				<div class="compact-hero-card__content">
 					<?php nerdywithme_post_meta($hero_id); ?>
@@ -127,7 +127,7 @@ if (count($editor_ids) < 3) {
 					<article class="list-post list-post--circle">
 						<a class="list-post__media" href="<?php the_permalink(); ?>">
 							<span class="compact-list__thumb compact-list__thumb--circle">
-								<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'thumbnail')); ?>" alt="<?php the_title_attribute(); ?>">
+								<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-thumb', array('alt' => get_the_title()), '(max-width: 1100px) 18vw, 104px'); ?>
 							</span>
 						</a>
 						<div class="list-post__body">
@@ -150,7 +150,7 @@ if (count($editor_ids) < 3) {
 					<article class="list-post list-post--circle">
 						<a class="list-post__media" href="<?php the_permalink(); ?>">
 							<span class="compact-list__thumb compact-list__thumb--circle">
-								<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'thumbnail')); ?>" alt="<?php the_title_attribute(); ?>">
+								<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-thumb', array('alt' => get_the_title()), '(max-width: 1100px) 18vw, 104px'); ?>
 							</span>
 						</a>
 						<div class="list-post__body">
@@ -170,7 +170,7 @@ if (count($editor_ids) < 3) {
 					<article class="list-post list-post--circle">
 						<a class="list-post__media" href="<?php the_permalink(); ?>">
 							<span class="compact-list__thumb compact-list__thumb--circle">
-								<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'thumbnail')); ?>" alt="<?php the_title_attribute(); ?>">
+								<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-thumb', array('alt' => get_the_title()), '(max-width: 1100px) 18vw, 104px'); ?>
 							</span>
 						</a>
 						<div class="list-post__body">

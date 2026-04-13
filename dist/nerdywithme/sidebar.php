@@ -41,14 +41,14 @@
 		<div class="profile-card">
 			<div class="profile-card__stack" aria-hidden="true">
 				<span class="profile-card__layer profile-card__layer--back">
-					<img src="<?php echo esc_url($profile_stack_urls[0]); ?>" alt="">
+					<img src="<?php echo esc_url($profile_stack_urls[0]); ?>" alt="" loading="lazy" decoding="async">
 				</span>
 				<span class="profile-card__layer profile-card__layer--mid">
-					<img src="<?php echo esc_url($profile_stack_urls[1]); ?>" alt="">
+					<img src="<?php echo esc_url($profile_stack_urls[1]); ?>" alt="" loading="lazy" decoding="async">
 				</span>
 				<span class="profile-card__post">
 					<span class="profile-card__post-image">
-						<img src="<?php echo esc_url($profile_stack_urls[2]); ?>" alt="">
+						<img src="<?php echo esc_url($profile_stack_urls[2]); ?>" alt="" loading="lazy" decoding="async">
 					</span>
 					<span class="profile-card__post-ui">
 						<span class="profile-card__post-actions">

@@ -25,8 +25,10 @@ $hot_pair_ids   = array_slice($remaining_ids, 4, 2);
 $hot_strip_ids  = array_slice($remaining_ids, 6, 4);
 $popular_ids    = array_slice($remaining_ids, 2, 7);
 $starter_query  = nerdywithme_get_featured_posts(3, array_merge(array($hero_id), $editor_ids));
-$builder_query  = nerdywithme_get_featured_posts(3, array_merge(array($hero_id, $hot_pair_ids[0] ?? 0), $editor_ids));
-$quick_query    = nerdywithme_get_featured_posts(3, array_merge(array($hero_id, $hot_pair_ids[0] ?? 0, $hot_pair_ids[1] ?? 0), $editor_ids));
+$starter_ids    = wp_list_pluck($starter_query->posts, 'ID');
+$builder_query  = nerdywithme_get_featured_posts(3, array_merge(array($hero_id, $hot_pair_ids[0] ?? 0), $editor_ids, $starter_ids));
+$builder_ids    = wp_list_pluck($builder_query->posts, 'ID');
+$quick_query    = nerdywithme_get_featured_posts(3, array_merge(array($hero_id, $hot_pair_ids[0] ?? 0, $hot_pair_ids[1] ?? 0), $editor_ids, $starter_ids, $builder_ids));
 
 if (count($editor_ids) < 3) {
 	$fallback_editor_ids = array_slice(array_values(array_diff($ids, array($hero_id), $hero_side_ids, $hot_pair_ids, $hot_strip_ids)), 0, 3 - count($editor_ids));
@@ -40,7 +42,7 @@ if (count($editor_ids) < 3) {
 		<?php if ($hero_id) : ?>
 			<article class="compact-hero-card">
 				<a class="compact-hero-card__thumb" href="<?php echo esc_url(get_permalink($hero_id)); ?>">
-					<img src="<?php echo esc_url(nerdywithme_get_post_image($hero_id, 'large')); ?>" alt="<?php echo esc_attr(get_the_title($hero_id)); ?>">
+					<?php echo nerdywithme_get_post_image_tag($hero_id, 'large', array('alt' => get_the_title($hero_id), 'loading' => 'eager', 'fetchpriority' => 'high'), '100vw'); ?>
 				</a>
 				<div class="compact-hero-card__content">
 					<?php nerdywithme_post_meta($hero_id); ?>
@@ -125,7 +127,7 @@ if (count($editor_ids) < 3) {
 					<article class="list-post list-post--circle">
 						<a class="list-post__media" href="<?php the_permalink(); ?>">
 							<span class="compact-list__thumb compact-list__thumb--circle">
-								<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'thumbnail')); ?>" alt="<?php the_title_attribute(); ?>">
+								<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'thumbnail', array('alt' => get_the_title()), '(max-width: 1100px) 18vw, 104px'); ?>
 							</span>
 						</a>
 						<div class="list-post__body">
@@ -148,7 +150,7 @@ if (count($editor_ids) < 3) {
 					<article class="list-post list-post--circle">
 						<a class="list-post__media" href="<?php the_permalink(); ?>">
 							<span class="compact-list__thumb compact-list__thumb--circle">
-								<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'thumbnail')); ?>" alt="<?php the_title_attribute(); ?>">
+								<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'thumbnail', array('alt' => get_the_title()), '(max-width: 1100px) 18vw, 104px'); ?>
 							</span>
 						</a>
 						<div class="list-post__body">
@@ -168,7 +170,7 @@ if (count($editor_ids) < 3) {
 					<article class="list-post list-post--circle">
 						<a class="list-post__media" href="<?php the_permalink(); ?>">
 							<span class="compact-list__thumb compact-list__thumb--circle">
-								<img src="<?php echo esc_url(nerdywithme_get_post_image(get_the_ID(), 'thumbnail')); ?>" alt="<?php the_title_attribute(); ?>">
+								<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'thumbnail', array('alt' => get_the_title()), '(max-width: 1100px) 18vw, 104px'); ?>
 							</span>
 						</a>
 						<div class="list-post__body">

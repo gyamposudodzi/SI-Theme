@@ -49,6 +49,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  renderDrawerMenu();
+
   if (navToggle) {
     navToggle.addEventListener("click", function () {
       renderDrawerMenu();
@@ -97,29 +99,40 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  document.addEventListener("click", function (event) {
-    const target = event.target;
-    if (
-      body.classList.contains("nav-open") &&
-      navToggle &&
-      megaPanel &&
-      !megaPanel.contains(target) &&
-      !navToggle.contains(target)
-    ) {
-      closeNav();
-    }
+  if (navToggle || searchToggle) {
+    document.addEventListener("click", function (event) {
+      const target = event.target;
+      if (
+        body.classList.contains("nav-open") &&
+        navToggle &&
+        megaPanel &&
+        !megaPanel.contains(target) &&
+        !navToggle.contains(target)
+      ) {
+        closeNav();
+      }
 
-    if (
-      body.classList.contains("search-open") &&
-      searchToggle &&
-      searchPanel &&
-      searchDialog &&
-      !searchDialog.contains(target) &&
-      !searchToggle.contains(target)
-    ) {
-      closeSearch();
-    }
-  });
+      if (
+        body.classList.contains("search-open") &&
+        searchToggle &&
+        searchPanel &&
+        searchDialog &&
+        !searchDialog.contains(target) &&
+        !searchToggle.contains(target)
+      ) {
+        closeSearch();
+      }
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && body.classList.contains("nav-open")) {
+        closeNav();
+      }
+      if (event.key === "Escape" && body.classList.contains("search-open")) {
+        closeSearch();
+      }
+    });
+  }
 
   if (searchClose) {
     searchClose.addEventListener("click", function () {
@@ -127,78 +140,72 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  document.addEventListener("keydown", function (event) {
-    if (event.key === "Escape" && body.classList.contains("nav-open")) {
-      closeNav();
-    }
-    if (event.key === "Escape" && body.classList.contains("search-open")) {
-      closeSearch();
-    }
-  });
-
-  window.addEventListener("resize", function () {
-    renderDrawerMenu();
-    if (window.innerWidth > 820 && body.classList.contains("nav-open")) {
-      closeNav();
-    }
-
-    if (window.innerWidth <= 560 && body.classList.contains("search-open")) {
-      if (searchPanel) {
-        searchPanel.setAttribute("aria-hidden", "false");
+  if (menuSlot || navToggle || searchToggle) {
+    window.addEventListener("resize", function () {
+      renderDrawerMenu();
+      if (window.innerWidth > 820 && body.classList.contains("nav-open")) {
+        closeNav();
       }
-    }
-  });
 
-  document.querySelectorAll("[data-featured-slider]").forEach(function (slider) {
-    const slides = Array.from(slider.querySelectorAll("[data-featured-slide]"));
-    const dots = Array.from(slider.querySelectorAll("[data-featured-dot]"));
-    const prev = slider.querySelector("[data-featured-prev]");
-    const next = slider.querySelector("[data-featured-next]");
-
-    if (!slides.length) {
-      return;
-    }
-
-    let index = slides.findIndex(function (slide) {
-      return slide.classList.contains("is-active");
+      if (window.innerWidth <= 560 && body.classList.contains("search-open")) {
+        if (searchPanel) {
+          searchPanel.setAttribute("aria-hidden", "false");
+        }
+      }
     });
+  }
 
-    if (index < 0) {
-      index = 0;
-    }
+  const sliders = document.querySelectorAll("[data-featured-slider]");
+  if (sliders.length) {
+    sliders.forEach(function (slider) {
+      const slides = Array.from(slider.querySelectorAll("[data-featured-slide]"));
+      const dots = Array.from(slider.querySelectorAll("[data-featured-dot]"));
+      const prev = slider.querySelector("[data-featured-prev]");
+      const next = slider.querySelector("[data-featured-next]");
 
-    function renderFeaturedSlider(nextIndex) {
-      index = (nextIndex + slides.length) % slides.length;
+      if (!slides.length) {
+        return;
+      }
 
-      slides.forEach(function (slide, slideIndex) {
-        slide.classList.toggle("is-active", slideIndex === index);
+      let index = slides.findIndex(function (slide) {
+        return slide.classList.contains("is-active");
       });
+
+      if (index < 0) {
+        index = 0;
+      }
+
+      function renderFeaturedSlider(nextIndex) {
+        index = (nextIndex + slides.length) % slides.length;
+
+        slides.forEach(function (slide, slideIndex) {
+          slide.classList.toggle("is-active", slideIndex === index);
+        });
+
+        dots.forEach(function (dot, dotIndex) {
+          dot.classList.toggle("is-active", dotIndex === index);
+        });
+      }
+
+      if (prev) {
+        prev.addEventListener("click", function () {
+          renderFeaturedSlider(index - 1);
+        });
+      }
+
+      if (next) {
+        next.addEventListener("click", function () {
+          renderFeaturedSlider(index + 1);
+        });
+      }
 
       dots.forEach(function (dot, dotIndex) {
-        dot.classList.toggle("is-active", dotIndex === index);
+        dot.addEventListener("click", function () {
+          renderFeaturedSlider(dotIndex);
+        });
       });
-    }
-
-    if (prev) {
-      prev.addEventListener("click", function () {
-        renderFeaturedSlider(index - 1);
-      });
-    }
-
-    if (next) {
-      next.addEventListener("click", function () {
-        renderFeaturedSlider(index + 1);
-      });
-    }
-
-    dots.forEach(function (dot, dotIndex) {
-      dot.addEventListener("click", function () {
-        renderFeaturedSlider(dotIndex);
-  });
-
-  renderDrawerMenu();
-});
-  });
+    });
+  }
 
   const readingBar = document.querySelector("[data-reading-bar]");
   if (readingBar && body.classList.contains("single-post")) {
@@ -236,12 +243,16 @@ document.addEventListener("DOMContentLoaded", function () {
       ticking = false;
     }
 
-    window.addEventListener("scroll", function () {
-      if (!ticking) {
-        window.requestAnimationFrame(updateReadingBar);
-        ticking = true;
-      }
-    }, { passive: true });
+    window.addEventListener(
+      "scroll",
+      function () {
+        if (!ticking) {
+          window.requestAnimationFrame(updateReadingBar);
+          ticking = true;
+        }
+      },
+      { passive: true }
+    );
 
     updateReadingBar();
   }
@@ -280,7 +291,6 @@ document.addEventListener("DOMContentLoaded", function () {
         observer.observe(heading);
       });
     }
-
   }
 
   const stickySidebar = document.querySelector(".single-layout .sidebar");

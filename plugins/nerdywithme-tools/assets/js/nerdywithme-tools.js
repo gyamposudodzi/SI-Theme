@@ -6,6 +6,40 @@ function nwmFormatCurrencyWithSymbol(symbol, value) {
   return (symbol || "") + value.toFixed(2);
 }
 
+var nwmCalculatorTimers = new WeakMap();
+
+function nwmQueueCalculatorUpdate(calculator, key, fn, delay) {
+  if (!calculator || typeof fn !== "function") {
+    return;
+  }
+
+  var timers = nwmCalculatorTimers.get(calculator) || {};
+  var timeout = timers[key];
+
+  if (timeout) {
+    window.clearTimeout(timeout);
+  }
+
+  timers[key] = window.setTimeout(function () {
+    fn(calculator);
+  }, delay || 120);
+
+  nwmCalculatorTimers.set(calculator, timers);
+}
+
+function nwmHasTools() {
+  return !!document.querySelector(
+    "[data-nwm-tools-hub]," +
+    " [data-nwm-risk-calculator]," +
+    " [data-nwm-position-calculator]," +
+    " [data-nwm-pip-calculator]," +
+    " [data-nwm-profit-calculator]," +
+    " [data-nwm-compound-calculator]"
+  );
+}
+
+var nwmToolsPresent = nwmHasTools();
+
 function nwmGetCompoundPeriodLabel(frequency, period) {
   if (frequency === 12) {
     return "Month " + period;
@@ -639,65 +673,68 @@ function nwmGetToolFromLocation(hub) {
   return "";
 }
 
-document.addEventListener("input", function (event) {
-  var numericInput = event.target.closest("[data-nwm-numeric]");
-  if (numericInput) {
-    nwmSanitizeNumericInput(numericInput);
-  }
+if (nwmToolsPresent) {
+  document.addEventListener("input", function (event) {
+    var numericInput = event.target.closest("[data-nwm-numeric]");
+    if (numericInput) {
+      nwmSanitizeNumericInput(numericInput);
+    }
 
-  var calculator = event.target.closest("[data-nwm-risk-calculator]");
-  if (calculator) {
-    nwmUpdateRiskCalculator(calculator);
-  }
+    var calculator = event.target.closest("[data-nwm-risk-calculator]");
+    if (calculator) {
+      nwmQueueCalculatorUpdate(calculator, "risk", nwmUpdateRiskCalculator);
+    }
 
-  var positionCalculator = event.target.closest("[data-nwm-position-calculator]");
-  if (positionCalculator) {
-    nwmUpdatePositionCalculator(positionCalculator);
-  }
+    var positionCalculator = event.target.closest("[data-nwm-position-calculator]");
+    if (positionCalculator) {
+      nwmQueueCalculatorUpdate(positionCalculator, "position", nwmUpdatePositionCalculator);
+    }
 
-  var pipCalculator = event.target.closest("[data-nwm-pip-calculator]");
-  if (pipCalculator) {
-    nwmUpdatePipCalculator(pipCalculator);
-  }
+    var pipCalculator = event.target.closest("[data-nwm-pip-calculator]");
+    if (pipCalculator) {
+      nwmQueueCalculatorUpdate(pipCalculator, "pip", nwmUpdatePipCalculator);
+    }
 
-  var profitCalculator = event.target.closest("[data-nwm-profit-calculator]");
-  if (profitCalculator) {
-    nwmUpdateProfitCalculator(profitCalculator);
-  }
+    var profitCalculator = event.target.closest("[data-nwm-profit-calculator]");
+    if (profitCalculator) {
+      nwmQueueCalculatorUpdate(profitCalculator, "profit", nwmUpdateProfitCalculator);
+    }
 
-  var compoundCalculator = event.target.closest("[data-nwm-compound-calculator]");
-  if (compoundCalculator) {
-    nwmUpdateCompoundCalculator(compoundCalculator);
-  }
-});
+    var compoundCalculator = event.target.closest("[data-nwm-compound-calculator]");
+    if (compoundCalculator) {
+      nwmQueueCalculatorUpdate(compoundCalculator, "compound", nwmUpdateCompoundCalculator, 160);
+    }
+  });
 
-document.addEventListener("change", function (event) {
-  var riskCalculator = event.target.closest("[data-nwm-risk-calculator]");
-  if (riskCalculator) {
-    nwmUpdateRiskCalculator(riskCalculator);
-  }
+  document.addEventListener("change", function (event) {
+    var riskCalculator = event.target.closest("[data-nwm-risk-calculator]");
+    if (riskCalculator) {
+      nwmQueueCalculatorUpdate(riskCalculator, "risk", nwmUpdateRiskCalculator, 60);
+    }
 
-  var positionCalculator = event.target.closest("[data-nwm-position-calculator]");
-  if (positionCalculator) {
-    nwmUpdatePositionCalculator(positionCalculator);
-  }
+    var positionCalculator = event.target.closest("[data-nwm-position-calculator]");
+    if (positionCalculator) {
+      nwmQueueCalculatorUpdate(positionCalculator, "position", nwmUpdatePositionCalculator, 60);
+    }
 
-  var pipCalculator = event.target.closest("[data-nwm-pip-calculator]");
-  if (pipCalculator) {
-    nwmUpdatePipCalculator(pipCalculator);
-  }
+    var pipCalculator = event.target.closest("[data-nwm-pip-calculator]");
+    if (pipCalculator) {
+      nwmQueueCalculatorUpdate(pipCalculator, "pip", nwmUpdatePipCalculator, 60);
+    }
 
-  var profitCalculator = event.target.closest("[data-nwm-profit-calculator]");
-  if (profitCalculator) {
-    nwmUpdateProfitCalculator(profitCalculator);
-  }
+    var profitCalculator = event.target.closest("[data-nwm-profit-calculator]");
+    if (profitCalculator) {
+      nwmQueueCalculatorUpdate(profitCalculator, "profit", nwmUpdateProfitCalculator, 60);
+    }
 
-  var compoundCalculator = event.target.closest("[data-nwm-compound-calculator]");
-  if (compoundCalculator) {
-    nwmUpdateCompoundCalculator(compoundCalculator);
-  }
-});
+    var compoundCalculator = event.target.closest("[data-nwm-compound-calculator]");
+    if (compoundCalculator) {
+      nwmQueueCalculatorUpdate(compoundCalculator, "compound", nwmUpdateCompoundCalculator, 80);
+    }
+  });
+}
 
+if (nwmToolsPresent) {
 document.addEventListener("click", function (event) {
   var presetButton = event.target.closest("[data-nwm-compound-preset]");
   if (presetButton) {
@@ -793,7 +830,9 @@ document.addEventListener("click", function (event) {
     window.history.pushState({ toolId: toolId }, "", href);
   }
 });
+}
 
+if (nwmToolsPresent) {
 document.addEventListener("keydown", function (event) {
   var tab = event.target.closest("[data-nwm-tool-tab]");
   if (!tab) {
@@ -821,6 +860,7 @@ document.addEventListener("keydown", function (event) {
   tabs[nextIndex].focus();
   nwmActivateToolHubTab(hub, tabs[nextIndex].getAttribute("data-nwm-tool-tab"));
 });
+}
 
 function nwmShowCompoundChartTooltip(point, event) {
   var chart = point.closest("[data-nwm-compound-chart]");
@@ -870,6 +910,7 @@ function nwmHideCompoundChartTooltip(point) {
   }
 }
 
+if (nwmToolsPresent) {
 document.addEventListener("mousemove", function (event) {
   var point = event.target.closest("[data-nwm-compound-chart-point]");
 
@@ -877,7 +918,9 @@ document.addEventListener("mousemove", function (event) {
     nwmShowCompoundChartTooltip(point, event);
   }
 });
+}
 
+if (nwmToolsPresent) {
 document.addEventListener("mouseleave", function (event) {
   var point = event.target.closest ? event.target.closest("[data-nwm-compound-chart-point]") : null;
 
@@ -885,7 +928,9 @@ document.addEventListener("mouseleave", function (event) {
     nwmHideCompoundChartTooltip(point);
   }
 }, true);
+}
 
+if (nwmToolsPresent) {
 document.addEventListener("focusin", function (event) {
   var point = event.target.closest("[data-nwm-compound-chart-point]");
 
@@ -893,7 +938,9 @@ document.addEventListener("focusin", function (event) {
     nwmShowCompoundChartTooltip(point);
   }
 });
+}
 
+if (nwmHasTools()) {
 document.addEventListener("focusout", function (event) {
   var point = event.target.closest("[data-nwm-compound-chart-point]");
 
@@ -901,8 +948,13 @@ document.addEventListener("focusout", function (event) {
     nwmHideCompoundChartTooltip(point);
   }
 });
+}
 
 document.addEventListener("DOMContentLoaded", function () {
+  if (!nwmToolsPresent) {
+    return;
+  }
+
   document.querySelectorAll("[data-nwm-risk-calculator]").forEach(function (calculator) {
     nwmUpdateRiskCalculator(calculator);
   });
@@ -947,30 +999,21 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 
-window.addEventListener("popstate", function () {
-  document.querySelectorAll("[data-nwm-tools-hub]").forEach(function (hub) {
-    var locationTool = nwmGetToolFromLocation(hub);
-    var targetTab = locationTool ? hub.querySelector('[data-nwm-tool-tab="' + locationTool + '"]') : hub.querySelector("[data-nwm-tool-tab]");
+if (nwmToolsPresent) {
+  window.addEventListener("popstate", function () {
+    document.querySelectorAll("[data-nwm-tools-hub]").forEach(function (hub) {
+      var firstTab = hub.querySelector("[data-nwm-tool-tab]");
+      var locationTool = nwmGetToolFromLocation(hub);
+      var targetTab = locationTool ? hub.querySelector('[data-nwm-tool-tab="' + locationTool + '"]') : firstTab;
 
-    if (targetTab) {
-      nwmActivateToolHubTab(hub, targetTab.getAttribute("data-nwm-tool-tab"));
-    }
+      if (targetTab) {
+        nwmActivateToolHubTab(hub, targetTab.getAttribute("data-nwm-tool-tab"));
+      }
+    });
+
+    document.querySelectorAll("[data-nwm-compound-calculator]").forEach(function (calculator) {
+      nwmPopulateCompoundCalculatorFromUrl(calculator);
+      nwmUpdateCompoundCalculator(calculator);
+    });
   });
-
-  document.querySelectorAll("[data-nwm-compound-calculator]").forEach(function (calculator) {
-    nwmPopulateCompoundCalculatorFromUrl(calculator);
-    nwmUpdateCompoundCalculator(calculator);
-  });
-});
-
-window.addEventListener("popstate", function () {
-  document.querySelectorAll("[data-nwm-tools-hub]").forEach(function (hub) {
-    var firstTab = hub.querySelector("[data-nwm-tool-tab]");
-    var locationTool = nwmGetToolFromLocation(hub);
-    var targetTab = locationTool ? hub.querySelector('[data-nwm-tool-tab="' + locationTool + '"]') : firstTab;
-
-    if (targetTab) {
-      nwmActivateToolHubTab(hub, targetTab.getAttribute("data-nwm-tool-tab"));
-    }
-  });
-});
+}

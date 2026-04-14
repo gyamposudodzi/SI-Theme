@@ -1,0 +1,41 @@
+document.addEventListener("DOMContentLoaded", function () {
+  const toc = document.querySelector("[data-toc]");
+  if (!toc) {
+    return;
+  }
+
+  const tocLinks = Array.from(toc.querySelectorAll('a[href^="#"]'));
+  const tocMap = new Map();
+  tocLinks.forEach(function (link) {
+    const id = link.getAttribute("href").slice(1);
+    const target = document.getElementById(id);
+    if (target) {
+      tocMap.set(target, link);
+    }
+  });
+
+  if (!tocMap.size) {
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting && tocMap.has(entry.target)) {
+          tocLinks.forEach(function (link) {
+            link.classList.remove("is-active");
+          });
+          tocMap.get(entry.target).classList.add("is-active");
+        }
+      });
+    },
+    {
+      rootMargin: "-20% 0px -65% 0px",
+      threshold: 0.1,
+    }
+  );
+
+  tocMap.forEach(function (_link, heading) {
+    observer.observe(heading);
+  });
+});

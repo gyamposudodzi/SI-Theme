@@ -71,7 +71,7 @@ get_header();
 											?>
 											<article class="read-next__item">
 												<a class="read-next__thumb" href="<?php the_permalink(); ?>">
-													<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'large', array('alt' => get_the_title()), '(max-width: 1100px) 45vw, 320px'); ?>
+													<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-card', array('alt' => get_the_title()), '(max-width: 1100px) 45vw, 320px'); ?>
 												</a>
 												<?php nerdywithme_post_meta(); ?>
 												<h3 class="read-next__title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>

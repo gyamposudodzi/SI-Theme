@@ -24,11 +24,28 @@ $hero_side_ids  = array_slice($remaining_ids, 0, 4);
 $hot_pair_ids   = array_slice($remaining_ids, 4, 2);
 $hot_strip_ids  = array_slice($remaining_ids, 6, 4);
 $popular_ids    = array_slice($remaining_ids, 2, 7);
-$starter_query  = nerdywithme_get_featured_posts(3, array_merge(array($hero_id), $editor_ids));
-$starter_ids    = wp_list_pluck($starter_query->posts, 'ID');
-$builder_query  = nerdywithme_get_featured_posts(3, array_merge(array($hero_id, $hot_pair_ids[0] ?? 0), $editor_ids, $starter_ids));
-$builder_ids    = wp_list_pluck($builder_query->posts, 'ID');
-$quick_query    = nerdywithme_get_featured_posts(3, array_merge(array($hero_id, $hot_pair_ids[0] ?? 0, $hot_pair_ids[1] ?? 0), $editor_ids, $starter_ids, $builder_ids));
+$tail_ids       = array_values(array_diff($remaining_ids, $hero_side_ids, $hot_pair_ids, $hot_strip_ids, $popular_ids, $editor_ids));
+$starter_ids    = array_slice($tail_ids, 0, 3);
+$builder_ids    = array_slice($tail_ids, 3, 3);
+$quick_ids      = array_slice($tail_ids, 6, 3);
+$starter_query  = null;
+$builder_query  = null;
+$quick_query    = null;
+
+if (count($starter_ids) < 3) {
+	$starter_query = nerdywithme_get_featured_posts(3 - count($starter_ids), array_merge(array($hero_id), $editor_ids, $starter_ids));
+	$starter_ids   = array_values(array_unique(array_merge($starter_ids, wp_list_pluck($starter_query->posts, 'ID'))));
+}
+
+if (count($builder_ids) < 3) {
+	$builder_query = nerdywithme_get_featured_posts(3 - count($builder_ids), array_merge(array($hero_id), $editor_ids, $starter_ids, $builder_ids));
+	$builder_ids   = array_values(array_unique(array_merge($builder_ids, wp_list_pluck($builder_query->posts, 'ID'))));
+}
+
+if (count($quick_ids) < 3) {
+	$quick_query = nerdywithme_get_featured_posts(3 - count($quick_ids), array_merge(array($hero_id), $editor_ids, $starter_ids, $builder_ids, $quick_ids));
+	$quick_ids   = array_values(array_unique(array_merge($quick_ids, wp_list_pluck($quick_query->posts, 'ID'))));
+}
 
 if (count($editor_ids) < 3) {
 	$fallback_editor_ids = array_slice(array_values(array_diff($ids, array($hero_id), $hero_side_ids, $hot_pair_ids, $hot_strip_ids)), 0, 3 - count($editor_ids));
@@ -121,8 +138,12 @@ if (count($editor_ids) < 3) {
 			<?php nerdywithme_section_heading(__('Starter Reads', 'nerdywithme')); ?>
 			<div class="list-posts">
 				<?php
-				while ($starter_query->have_posts()) :
-					$starter_query->the_post();
+				foreach ($starter_ids as $starter_id) :
+					$post = get_post($starter_id);
+					if (! $post) {
+						continue;
+					}
+					setup_postdata($post);
 					?>
 					<article class="list-post list-post--circle">
 						<a class="list-post__media" href="<?php the_permalink(); ?>">
@@ -138,7 +159,7 @@ if (count($editor_ids) < 3) {
 						</div>
 					</article>
 					<?php
-				endwhile;
+				endforeach;
 				wp_reset_postdata();
 				?>
 			</div>
@@ -146,7 +167,14 @@ if (count($editor_ids) < 3) {
 		<div>
 			<?php nerdywithme_section_heading(__('Build Your Edge', 'nerdywithme')); ?>
 			<div class="list-posts">
-				<?php while ($builder_query->have_posts()) : $builder_query->the_post(); ?>
+				<?php
+				foreach ($builder_ids as $builder_id) :
+					$post = get_post($builder_id);
+					if (! $post) {
+						continue;
+					}
+					setup_postdata($post);
+					?>
 					<article class="list-post list-post--circle">
 						<a class="list-post__media" href="<?php the_permalink(); ?>">
 							<span class="compact-list__thumb compact-list__thumb--circle">
@@ -160,13 +188,20 @@ if (count($editor_ids) < 3) {
 							</div>
 						</div>
 					</article>
-				<?php endwhile; wp_reset_postdata(); ?>
+				<?php endforeach; wp_reset_postdata(); ?>
 			</div>
 		</div>
 		<div>
 			<?php nerdywithme_section_heading(__('Quick Lessons', 'nerdywithme')); ?>
 			<div class="list-posts">
-				<?php while ($quick_query->have_posts()) : $quick_query->the_post(); ?>
+				<?php
+				foreach ($quick_ids as $quick_id) :
+					$post = get_post($quick_id);
+					if (! $post) {
+						continue;
+					}
+					setup_postdata($post);
+					?>
 					<article class="list-post list-post--circle">
 						<a class="list-post__media" href="<?php the_permalink(); ?>">
 							<span class="compact-list__thumb compact-list__thumb--circle">
@@ -180,7 +215,7 @@ if (count($editor_ids) < 3) {
 							</div>
 						</div>
 					</article>
-				<?php endwhile; wp_reset_postdata(); ?>
+				<?php endforeach; wp_reset_postdata(); ?>
 			</div>
 		</div>
 	</div>

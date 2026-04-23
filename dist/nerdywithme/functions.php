@@ -6,7 +6,7 @@
  */
 
 if (! defined('NERDYWITHME_VERSION')) {
-	define('NERDYWITHME_VERSION', '1.0.4');
+	define('NERDYWITHME_VERSION', '1.0.5');
 }
 
 function nerdywithme_setup() {
@@ -799,26 +799,60 @@ function nerdywithme_sanitize_social_platform($value) {
 
 function nerdywithme_social_platform_meta($platform) {
 	$map = array(
-		'facebook'   => array('label' => 'Facebook', 'icon' => 'f'),
-		'x'          => array('label' => 'X', 'icon' => 'x'),
-		'instagram'  => array('label' => 'Instagram', 'icon' => 'ig'),
-		'youtube'    => array('label' => 'YouTube', 'icon' => 'yt'),
-		'tiktok'     => array('label' => 'TikTok', 'icon' => 'tt'),
-		'discord'    => array('label' => 'Discord', 'icon' => 'dc'),
-		'telegram'   => array('label' => 'Telegram', 'icon' => 'tg'),
-		'linkedin'   => array('label' => 'LinkedIn', 'icon' => 'in'),
-		'github'     => array('label' => 'GitHub', 'icon' => 'gh'),
-		'reddit'     => array('label' => 'Reddit', 'icon' => 'rd'),
+		'facebook'    => array('label' => 'Facebook', 'icon' => 'f'),
+		'x'           => array('label' => 'X', 'icon' => 'x'),
+		'instagram'   => array('label' => 'Instagram', 'icon' => 'ig'),
+		'youtube'     => array('label' => 'YouTube', 'icon' => 'yt'),
+		'tiktok'      => array('label' => 'TikTok', 'icon' => 'tt'),
+		'discord'     => array('label' => 'Discord', 'icon' => 'dc'),
+		'telegram'    => array('label' => 'Telegram', 'icon' => 'tg'),
+		'linkedin'    => array('label' => 'LinkedIn', 'icon' => 'in'),
+		'github'      => array('label' => 'GitHub', 'icon' => 'gh'),
+		'reddit'      => array('label' => 'Reddit', 'icon' => 'rd'),
 		'tradingview' => array('label' => 'TradingView', 'icon' => 'tv'),
-		'whatsapp'   => array('label' => 'WhatsApp', 'icon' => 'wa'),
-		'snapchat'   => array('label' => 'Snapchat', 'icon' => 'sc'),
-		'threads'    => array('label' => 'Threads', 'icon' => 'th'),
-		'twitch'     => array('label' => 'Twitch', 'icon' => 'tw'),
-		'newsletter' => array('label' => 'Newsletter', 'icon' => 'nl'),
-		'website'    => array('label' => 'Website', 'icon' => 'ww'),
+		'whatsapp'    => array('label' => 'WhatsApp', 'icon' => 'wa'),
+		'snapchat'    => array('label' => 'Snapchat', 'icon' => 'sc'),
+		'threads'     => array('label' => 'Threads', 'icon' => 'th'),
+		'twitch'      => array('label' => 'Twitch', 'icon' => 'tw'),
+		'newsletter'  => array('label' => 'Newsletter', 'icon' => 'nl'),
+		'website'     => array('label' => 'Website', 'icon' => 'ww'),
 	);
 
 	return $map[ $platform ] ?? array('label' => 'Custom', 'icon' => '');
+}
+
+function nerdywithme_social_icon_svg($platform, $fallback = '') {
+	$icons = array(
+		'facebook'    => '<path d="M14.5 8.3h2.1V5.1c-.4-.1-1.6-.2-3-.2-3 0-5 1.8-5 5.2v2.9H5.3v3.6h3.3v8.5h4v-8.5h3.3l.5-3.6h-3.8v-2.5c0-1 .3-1.7 1.9-1.7Z"/>',
+		'x'           => '<path d="M5.1 5h4.5l3.6 5.1L17.6 5h4.1l-6.5 7.4 7.1 10.1h-4.5l-4-5.7-5 5.7H4.7l7.1-8.1L5.1 5Zm2.4 1.8 11.2 14h1.1L8.6 6.8H7.5Z"/>',
+		'instagram'   => '<path d="M8.1 4.8h7.8c2.3 0 4.2 1.9 4.2 4.2v7.8c0 2.3-1.9 4.2-4.2 4.2H8.1c-2.3 0-4.2-1.9-4.2-4.2V9c0-2.3 1.9-4.2 4.2-4.2Zm0 1.8c-1.3 0-2.4 1.1-2.4 2.4v7.8c0 1.3 1.1 2.4 2.4 2.4h7.8c1.3 0 2.4-1.1 2.4-2.4V9c0-1.3-1.1-2.4-2.4-2.4H8.1Zm3.9 3a4.3 4.3 0 1 1 0 8.6 4.3 4.3 0 0 1 0-8.6Zm0 1.8a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Zm4.5-2.2a1.1 1.1 0 1 1-2.2 0 1.1 1.1 0 0 1 2.2 0Z"/>',
+		'youtube'     => '<path d="M21.5 8.1s-.2-1.6-.9-2.3c-.9-.9-1.9-.9-2.3-1C15 4.5 12 4.5 12 4.5s-3 0-6.3.3c-.5.1-1.5.1-2.3 1-.7.7-.9 2.3-.9 2.3s-.3 1.9-.3 3.9v1.8c0 1.9.3 3.9.3 3.9s.2 1.6.9 2.3c.8.9 2 .9 2.5 1 1.8.2 6.1.3 6.1.3s3 0 6.3-.3c.5-.1 1.5-.1 2.3-1 .7-.7.9-2.3.9-2.3s.3-1.9.3-3.9V12c0-2-.3-3.9-.3-3.9ZM9.8 15.7V8.9l6.4 3.4-6.4 3.4Z"/>',
+		'tiktok'      => '<path d="M14.5 4.5c.3 2.3 1.6 3.7 3.8 3.9v3.2c-1.3.1-2.6-.3-3.8-1v5.9c0 7.5-8.2 9.8-11.5 4.5-2.1-3.4-.8-9.4 5.9-9.6v3.4c-.4.1-.8.1-1.2.3-1.2.4-1.9 1.4-1.7 2.7.4 2.4 4.8 3.1 4.4-1.6V4.5h4.1Z"/>',
+		'discord'     => '<path d="M19.8 6.6a16.6 16.6 0 0 0-4.1-1.3l-.5 1.1a15.6 15.6 0 0 0-4.6 0l-.5-1.1c-1.5.2-2.8.7-4.1 1.3-2.6 3.9-3.3 7.7-2.9 11.5a16.8 16.8 0 0 0 5 2.5l.9-1.5c-.5-.2-1-.5-1.5-.8l.4-.3a11.9 11.9 0 0 0 10.2 0l.4.3c-.5.3-1 .6-1.5.8l.9 1.5a16.8 16.8 0 0 0 5-2.5c.5-4.4-.8-8.1-3.1-11.5ZM9.4 15.7c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Zm5.2 0c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Z"/>',
+		'telegram'    => '<path d="m21.7 4.6-3.2 15.1c-.2 1.1-.9 1.3-1.8.8l-4.9-3.6-2.4 2.3c-.3.3-.5.5-1 .5l.4-5 9.1-8.2c.4-.4-.1-.6-.6-.3L6 13.3l-4.8-1.5c-1-.3-1-1 .2-1.5L20.1 3c.9-.3 1.7.2 1.6 1.6Z"/>',
+		'linkedin'    => '<path d="M6.5 8.7H3.3v12h3.2v-12ZM4.9 7.1a1.9 1.9 0 1 0 0-3.8 1.9 1.9 0 0 0 0 3.8Zm15.8 6.7c0-3.2-1.7-5.3-4.5-5.3-2 0-2.9 1.1-3.4 1.9V8.7H9.6v12h3.2v-6.6c0-1.7.9-2.8 2.4-2.8s2.3 1 2.3 2.8v6.6h3.2v-6.9Z"/>',
+		'github'      => '<path d="M12 3.5a8.7 8.7 0 0 0-2.8 17c.4.1.6-.2.6-.4v-1.7c-2.5.5-3-1.1-3-1.1-.4-1-.9-1.3-.9-1.3-.8-.5.1-.5.1-.5.9.1 1.4.9 1.4.9.8 1.4 2.1 1 2.5.8.1-.6.3-1 .6-1.2-2-.2-4.1-1-4.1-4.3 0-1 .4-1.8.9-2.4-.1-.2-.4-1.1.1-2.4 0 0 .8-.2 2.5.9.7-.2 1.4-.3 2.2-.3.7 0 1.5.1 2.2.3 1.7-1.1 2.5-.9 2.5-.9.5 1.3.2 2.2.1 2.4.6.6.9 1.4.9 2.4 0 3.3-2.1 4.1-4.1 4.3.3.3.6.8.6 1.7v2.4c0 .2.2.5.6.4A8.7 8.7 0 0 0 12 3.5Z"/>',
+		'reddit'      => '<path d="M20.8 11.2c-.7 0-1.3.3-1.7.8-1.7-1.1-4-1.8-6.5-1.9l1.1-3.4 2.9.7a1.9 1.9 0 1 0 .3-1.2l-3.4-.8c-.3-.1-.6.1-.7.4l-1.3 4.2c-2.6 0-5 .7-6.8 1.9a2.2 2.2 0 1 0-2.4 3.6v.5c0 3.3 4.4 6 9.8 6s9.8-2.7 9.8-6v-.5a2.2 2.2 0 0 0-1.1-4.1ZM8.5 14.8a1.3 1.3 0 1 1 0 2.6 1.3 1.3 0 0 1 0-2.6Zm6.9 4.2c-1.4 1-5.4 1-6.8 0-.3-.2-.3-.6-.1-.8.2-.3.6-.3.8-.1 1 .7 4.3.7 5.3 0 .3-.2.6-.2.8.1.2.3.2.6-.1.8Zm.1-1.6a1.3 1.3 0 1 1 0-2.6 1.3 1.3 0 0 1 0 2.6Z"/>',
+		'tradingview' => '<path d="M4 7.4h5.1v2.1H7.6v7.1H5.5V9.5H4V7.4Zm6.1 0h2.2l2.1 5.7 2.1-5.7h2.2l-3.5 9.2h-1.6l-3.5-9.2Zm8.2 6.9h2v2.3h-2v-2.3Z"/>',
+		'whatsapp'    => '<path d="M12 3.7a8.1 8.1 0 0 0-7 12.2L4 20.5l4.7-1.2A8.1 8.1 0 1 0 12 3.7Zm0 1.7a6.4 6.4 0 0 1 5.5 9.7 6.4 6.4 0 0 1-7.9 2.4l-.3-.1-2.8.7.7-2.7-.2-.3A6.4 6.4 0 0 1 12 5.4Zm-2.6 3.2c-.1 0-.3 0-.5.2-.2.2-.7.7-.7 1.8s.8 2.1.9 2.3c.1.1 1.6 2.6 4 3.5 2 .8 2.4.6 2.9.6.4 0 1.3-.5 1.5-1 .2-.5.2-.9.1-1-.1-.1-.2-.2-.5-.3l-1.6-.8c-.2-.1-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1-.3-.1-1.1-.4-2-1.2-.7-.7-1.2-1.5-1.4-1.8-.1-.2 0-.4.1-.5l.4-.5c.1-.1.2-.3.3-.4.1-.2 0-.3 0-.5l-.7-1.6c-.2-.4-.3-.4-.5-.4h-.5Z"/>',
+		'snapchat'   => '<path d="M12 3.6c-2.5 0-4.5 1.8-4.5 4.2v2.8c0 .5-.2.9-.7 1.1l-1.5.7c-.5.2-.5.9 0 1.1.8.4 1.4.6 1.9.7.1.7.5 1.1 1.2 1.2.4.1.8.2 1 .6.6.8 1.4 1.4 2.6 1.4s2-.6 2.6-1.4c.3-.4.6-.5 1-.6.7-.1 1.1-.5 1.2-1.2.5-.1 1.1-.3 1.9-.7.5-.2.5-.9 0-1.1l-1.5-.7c-.5-.2-.7-.6-.7-1.1V7.8c0-2.4-2-4.2-4.5-4.2Z"/>',
+		'threads'    => '<path d="M12.2 3.8c4.4 0 7.3 2.8 7.3 7.8 0 4.9-2.8 8.6-7.5 8.6-4.1 0-7.4-2.7-7.4-7.4 0-4.7 3.2-7.4 7.2-7.4 3 0 5.1 1.6 5.8 4.5l-2 .5c-.5-2.1-1.8-3.1-3.9-3.1-2.8 0-5 1.9-5 5.4 0 3.4 2.3 5.4 5.3 5.4 3.2 0 5.3-2.5 5.3-6.6 0-3.8-2.1-6.1-5.3-6.1-1.9 0-3.3.7-4.4 2l-1.5-1.3c1.5-1.8 3.5-2.8 6.1-2.8Zm-.4 6.4c2.2 0 3.8 1.1 3.8 3.1 0 2.1-1.8 3.4-4 3.4-2.1 0-3.7-1.1-3.7-2.9 0-1.8 1.6-2.9 3.9-2.9.5 0 1.1.1 1.6.2-.3-.7-.9-1-1.8-1-1 0-1.7.3-2.4.9l-1.1-1.4c1-.9 2.2-1.4 3.7-1.4Zm-.1 2.3c-1.1 0-1.7.4-1.7 1.1 0 .8.7 1.2 1.7 1.2 1.1 0 1.8-.5 1.8-1.3 0-.6-.6-1-1.8-1Z"/>',
+		'twitch'     => '<path d="M5.5 4.5 4.2 8v11.8h4.1V22h2.3l2.2-2.2h3.4l4.6-4.6V4.5H5.5Zm13.2 9.7-2.7 2.7h-3.7l-2.2 2.2v-2.2H7.4V6.6h11.3v7.6Zm-2.2-5.3h-1.8v5.1h1.8V8.9Zm-4.9 0H9.8v5.1h1.8V8.9Z"/>',
+		'newsletter' => '<path d="M4 6.5h16c1.1 0 2 .9 2 2v9c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2v-9c0-1.1.9-2 2-2Zm0 2v.4l8 5 8-5v-.4H4Zm16 2.8-7.5 4.7a1 1 0 0 1-1 0L4 11.3v6.2h16v-6.2Z"/>',
+		'website'    => '<path d="M12 3.8a8.2 8.2 0 1 0 0 16.4 8.2 8.2 0 0 0 0-16.4Zm5.8 7.2h-3.1a13.3 13.3 0 0 0-1.1-4.7A6.4 6.4 0 0 1 17.8 11Zm-5.8-5c.5.7 1.1 2.2 1.3 5h-2.6c.2-2.8.8-4.3 1.3-5ZM5.9 13h3.2c.1 1.8.5 3.4 1.1 4.7A6.4 6.4 0 0 1 5.9 13Zm3.2-2H5.9a6.4 6.4 0 0 1 4.3-4.7A13.3 13.3 0 0 0 9.1 11Zm2.9 7c-.5-.7-1.1-2.2-1.3-5h2.6c-.2 2.8-.8 4.3-1.3 5Zm1.6-.3c.6-1.3 1-2.9 1.1-4.7h3.1a6.4 6.4 0 0 1-4.2 4.7Z"/>',
+	);
+
+	$path = $icons[ $platform ] ?? '';
+
+	if (! $path && $fallback) {
+		return '<span class="social-icon social-icon--text" aria-hidden="true">' . esc_html($fallback) . '</span>';
+	}
+
+	if (! $path) {
+		return '<span class="social-icon social-icon--text" aria-hidden="true">•</span>';
+	}
+
+	return '<svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' . $path . '</svg>';
 }
 
 function nerdywithme_card_tone_choices() {
@@ -937,7 +971,7 @@ function nerdywithme_render_card_icon($card, $icon_class) {
 		return '<span class="' . esc_attr($icon_class) . '"><img src="' . esc_url($card['icon_image']) . '" alt="" loading="lazy" decoding="async"></span>';
 	}
 
-	return '<span class="' . esc_attr($icon_class) . '">' . esc_html($card['icon_text']) . '</span>';
+	return '<span class="' . esc_attr($icon_class) . '">' . nerdywithme_social_icon_svg($card['platform'] ?? 'custom', $card['icon_text'] ?? '') . '</span>';
 }
 
 function nerdywithme_get_profile_card_settings() {
@@ -1153,37 +1187,59 @@ function nerdywithme_get_brand_logo_id() {
 
 function nerdywithme_social_links() {
 	$links = array();
+	$defaults = array(
+		1 => array(
+			'platform' => 'facebook',
+			'url'      => nerdywithme_get_option('facebook_url', '#'),
+		),
+		2 => array(
+			'platform' => 'x',
+			'url'      => nerdywithme_get_option('x_url', '#'),
+		),
+		3 => array(
+			'platform' => 'instagram',
+			'url'      => nerdywithme_get_option('instagram_url', '#'),
+		),
+	);
 
 	for ($i = 1; $i <= 3; $i++) {
-		$platform = nerdywithme_sanitize_social_platform(get_theme_mod('nerdywithme_social_link_' . $i . '_platform', 'custom'));
-		$url      = esc_url(get_theme_mod('nerdywithme_social_link_' . $i . '_url', '#'));
+		$default  = $defaults[ $i ];
+		$platform = nerdywithme_sanitize_social_platform(get_theme_mod('nerdywithme_social_link_' . $i . '_platform', $default['platform']));
+		$url      = esc_url(get_theme_mod('nerdywithme_social_link_' . $i . '_url', $default['url']));
+		if ('custom' === $platform && '#' === $url) {
+			$platform = $default['platform'];
+		}
 		if (! $url) {
 			continue;
 		}
 		$meta = nerdywithme_social_platform_meta($platform);
 		$links[] = array(
-			'label' => $meta['label'] ?: __('Social', 'nerdywithme'),
-			'text'  => $meta['icon'] ?: '•',
-			'url'   => $url,
+			'label'    => $meta['label'] ?: __('Social', 'nerdywithme'),
+			'platform' => $platform,
+			'text'     => $meta['icon'] ?: '•',
+			'url'      => $url,
 		);
 	}
 
 	if (! $links) {
 		return array(
 			array(
-				'label' => __('Facebook', 'nerdywithme'),
-				'text'  => 'f',
-				'url'   => nerdywithme_get_option('facebook_url', '#'),
+				'label'    => __('Facebook', 'nerdywithme'),
+				'platform' => 'facebook',
+				'text'     => 'f',
+				'url'      => nerdywithme_get_option('facebook_url', '#'),
 			),
 			array(
-				'label' => __('X', 'nerdywithme'),
-				'text'  => 'x',
-				'url'   => nerdywithme_get_option('x_url', '#'),
+				'label'    => __('X', 'nerdywithme'),
+				'platform' => 'x',
+				'text'     => 'x',
+				'url'      => nerdywithme_get_option('x_url', '#'),
 			),
 			array(
-				'label' => __('Instagram', 'nerdywithme'),
-				'text'  => 'ig',
-				'url'   => nerdywithme_get_option('instagram_url', '#'),
+				'label'    => __('Instagram', 'nerdywithme'),
+				'platform' => 'instagram',
+				'text'     => 'ig',
+				'url'      => nerdywithme_get_option('instagram_url', '#'),
 			),
 		);
 	}
@@ -1196,7 +1252,9 @@ function nerdywithme_render_social_links() {
 	?>
 	<div class="social-links" aria-label="<?php esc_attr_e('Social links', 'nerdywithme'); ?>">
 		<?php foreach ($links as $link) : ?>
-			<a href="<?php echo esc_url($link['url']); ?>" aria-label="<?php echo esc_attr($link['label']); ?>"><?php echo esc_html($link['text']); ?></a>
+			<a href="<?php echo esc_url($link['url']); ?>" aria-label="<?php echo esc_attr($link['label']); ?>">
+				<?php echo nerdywithme_social_icon_svg($link['platform'] ?? 'custom', $link['text'] ?? ''); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			</a>
 		<?php endforeach; ?>
 	</div>
 	<?php

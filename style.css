@@ -4,7 +4,7 @@ Theme URI: https://nerdywithme.com
 Author: Nerdywithme
 Author URI: https://nerdywithme.com
 Description: A playful editorial WordPress theme for the NerdyWithMe blog.
-Version: 1.0.4
+Version: 1.0.5
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
@@ -89,6 +89,20 @@ button, input, textarea, select { font: inherit; }
   box-shadow: none; font-weight: 700; color: var(--nwm-primary); font-size: 0.86rem;
 }
 .social-links a:hover { background: var(--nwm-secondary); color: #fff; }
+.social-icon {
+  width: 1.08em;
+  height: 1.08em;
+  display: block;
+  fill: currentColor;
+  flex: 0 0 auto;
+}
+.social-icon--text {
+  width: auto;
+  height: auto;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
+}
 
 .site-brand { justify-self: center; display: inline-flex; align-items: center; gap: 12px; }
 .site-brand__mark {
@@ -782,9 +796,9 @@ textarea { min-height: 160px; padding: 16px 18px; }
   align-items: stretch;
 }
 .compact-hero-card {
-  display: grid;
-  grid-template-rows: auto auto;
-  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
   padding: 0;
   border-radius: 0;
   background: transparent;
@@ -794,6 +808,9 @@ textarea { min-height: 160px; padding: 16px 18px; }
   min-height: 0;
 }
 .compact-hero-card__thumb {
+  display: block;
+  position: relative;
+  flex: 0 0 auto;
   overflow: hidden;
   border-radius: 0;
   background: #f5f6fa;
@@ -808,7 +825,15 @@ textarea { min-height: 160px; padding: 16px 18px; }
   object-fit: cover;
   border-radius: 0;
 }
-.compact-hero-card__content { display: grid; align-content: start; gap: 10px; padding: 0; }
+.compact-hero-card__content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 0;
+  clear: both;
+}
 .compact-hero-card .entry-title { font-size: clamp(2.05rem, 2.7vw, 3.2rem); max-width: none; width: 100%; }
 .compact-hero-card .entry-title a { display: block; max-width: 100%; }
 .compact-hero-card .entry-summary { margin: 0; max-width: 100%; font-size: 0.92rem; line-height: 1.6; }
@@ -945,6 +970,15 @@ textarea { min-height: 160px; padding: 16px 18px; }
   width: 18px;
   height: 18px;
   object-fit: contain;
+}
+.app-chip__icon .social-icon,
+.app-link__service .social-icon {
+  width: 17px;
+  height: 17px;
+}
+.app-chip__icon .social-icon--text,
+.app-link__service .social-icon--text {
+  font-size: 0.68rem;
 }
 .app-chip__body { display: grid; gap: 2px; }
 .app-chip--green { background: #d9f7e2; }
@@ -2386,7 +2420,6 @@ body.home .hot-grid__feature .card__title {
     height: auto;
   }
   body.home .compact-hero-card {
-    grid-template-rows: auto auto;
     gap: 14px;
     height: auto;
   }
@@ -2736,7 +2769,25 @@ body.home .hot-grid__feature .card__title {
   .site-tagline { display: none; }
   .site-brand__mark, .site-brand__fallback { width: 46px; height: 46px; border-radius: 14px; }
   .site-brand--lockup .site-brand__mark { width: 50px; height: 50px; margin: 0 -8px 0 -7px; }
-  .site-header__top { grid-template-columns: 1fr; }
+  .site-header__top { grid-template-columns: 1fr; padding-left: 56px; padding-right: 56px; }
+  .site-header__nav {
+    display: block;
+    height: 100%;
+    padding: 0;
+  }
+  .site-header__nav .header-tools,
+  .site-header__nav .nav-toggle {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+  }
+  .site-header__nav .header-tools {
+    right: 0;
+  }
+  .site-header__nav .nav-toggle {
+    left: 0;
+  }
   .site-brand { justify-self: center; }
   .search-form { grid-template-columns: 1fr; }
   .search-panel__dialog {

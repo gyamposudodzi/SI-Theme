@@ -10,14 +10,12 @@ get_header();
 $featured = nerdywithme_get_featured_posts(18);
 $ids      = wp_list_pluck($featured->posts, 'ID');
 $home_social_cards = nerdywithme_get_social_cards('home');
-$hero_source_slug   = nerdywithme_get_content_source_slug('hero_category', 'featured');
 $editor_source_slug = nerdywithme_get_content_source_slug('editors_pick_category', 'editors-pick');
-$hero_query = $hero_source_slug ? nerdywithme_get_posts_by_category_name($hero_source_slug, 1) : nerdywithme_get_featured_posts(1);
-$hero_ids   = wp_list_pluck($hero_query->posts, 'ID');
 $editor_query = $editor_source_slug ? nerdywithme_get_posts_by_category_name($editor_source_slug, 3) : nerdywithme_get_featured_posts(3);
 $editor_ids   = wp_list_pluck($editor_query->posts, 'ID');
 
-$hero_id        = $hero_ids[0] ?? ($ids[0] ?? 0);
+$hero_id        = nerdywithme_get_home_hero_post_id();
+$hero_id        = $hero_id ?: ($ids[0] ?? 0);
 $reserved_ids   = array_filter(array_merge(array($hero_id), $editor_ids));
 $remaining_ids  = array_values(array_diff($ids, $reserved_ids));
 $hero_side_ids  = array_slice($remaining_ids, 0, 4);
@@ -59,7 +57,7 @@ if (count($editor_ids) < 3) {
 		<?php if ($hero_id) : ?>
 			<article class="compact-hero-card">
 				<a class="compact-hero-card__thumb" href="<?php echo esc_url(get_permalink($hero_id)); ?>">
-					<?php echo nerdywithme_get_post_image_tag($hero_id, 'nwm-hero', array('alt' => get_the_title($hero_id), 'loading' => 'eager', 'fetchpriority' => 'high'), '100vw'); ?>
+					<?php echo nerdywithme_get_post_image_tag($hero_id, 'nwm-hero', array('alt' => get_the_title($hero_id), 'loading' => 'eager', 'fetchpriority' => 'high', 'decoding' => 'sync'), '(max-width: 700px) 100vw, (max-width: 1100px) 100vw, 62vw'); ?>
 				</a>
 				<div class="compact-hero-card__content">
 					<?php nerdywithme_post_meta($hero_id); ?>

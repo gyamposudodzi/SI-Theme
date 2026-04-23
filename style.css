@@ -1,10 +1,10 @@
 /*
 Theme Name: NerdyWithMe
-Theme URI: https://example.com/nerdywithme
+Theme URI: https://nerdywithme.com
 Author: Nerdywithme
-Author URI: nerdywithme.com
+Author URI: https://nerdywithme.com
 Description: A playful editorial WordPress theme for the NerdyWithMe blog.
-Version: 1.0.0
+Version: 1.0.4
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
@@ -30,6 +30,9 @@ Text Domain: nerdywithme
   --nwm-radius: 26px;
   --nwm-radius-lg: 40px;
   --nwm-max: 1240px;
+  --nwm-font-body: "Outfit", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --nwm-font-display: "Outfit", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --nwm-font-brand: "Fredoka", "Trebuchet MS", "Arial Rounded MT Bold", sans-serif;
 }
 
 *,
@@ -38,7 +41,7 @@ Text Domain: nerdywithme
 html { scroll-behavior: smooth; }
 body {
   margin: 0;
-  font-family: "Outfit", "Segoe UI", sans-serif;
+  font-family: var(--nwm-font-body);
   color: var(--nwm-text);
   background: #ffffff;
   line-height: 1.65;
@@ -48,6 +51,21 @@ a { color: inherit; text-decoration: none; }
 a:hover { color: var(--nwm-secondary); }
 button, input, textarea, select { font: inherit; }
 .screen-reader-text { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+.skip-link:focus {
+  left: 18px;
+  top: 18px;
+  z-index: 2000;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 12px 18px;
+  clip: auto;
+  border-radius: 999px;
+  background: var(--nwm-primary);
+  color: #fff;
+  font-weight: 800;
+  box-shadow: var(--nwm-shadow);
+}
 .nwm-shell { width: min(calc(100% - 32px), var(--nwm-max)); margin: 0 auto; }
 
 .site-header {
@@ -66,7 +84,7 @@ button, input, textarea, select { font: inherit; }
 .site-header__top { grid-template-columns: 1fr auto 1fr; padding: 12px 0 8px; }
 .social-links { display: inline-flex; align-items: center; gap: 10px; }
 .social-links a {
-  width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center;
   border-radius: 999px; background: transparent; border: 1px solid #eceef4;
   box-shadow: none; font-weight: 700; color: var(--nwm-primary); font-size: 0.86rem;
 }
@@ -80,12 +98,12 @@ button, input, textarea, select { font: inherit; }
 .site-brand__mark img { width: 100%; height: 100%; object-fit: contain; }
 .site-brand__fallback {
   width: 58px; height: 58px; border-radius: 18px; display: inline-flex; align-items: center; justify-content: center;
-  background: linear-gradient(135deg, var(--nwm-primary), #244ad0); color: #fff; font-family: "Fredoka", "Trebuchet MS", sans-serif;
+  background: linear-gradient(135deg, var(--nwm-primary), #244ad0); color: #fff; font-family: var(--nwm-font-brand);
   font-size: 1.7rem; font-weight: 700;
 }
 .site-brand__text { display: grid; gap: 2px; }
 .site-title {
-  margin: 0; font-family: "Fredoka", "Trebuchet MS", sans-serif; font-size: clamp(1.7rem, 4vw, 3.1rem);
+  margin: 0; font-family: var(--nwm-font-brand); font-size: clamp(1.7rem, 4vw, 3.1rem);
   line-height: 0.95; letter-spacing: 0.04em; text-transform: uppercase; color: var(--nwm-primary);
   text-shadow: 3px 3px 0 rgba(255, 95, 54, 0.16);
 }
@@ -318,7 +336,7 @@ button, input, textarea, select { font: inherit; }
 .mega-panel__posts h2,
 .mega-panel__social h2 {
   margin: 0 0 14px;
-  font-family: "Outfit", "Segoe UI", sans-serif;
+  font-family: var(--nwm-font-display);
   font-size: 1.28rem;
   font-weight: 800;
   line-height: 1;
@@ -387,7 +405,7 @@ button, input, textarea, select { font: inherit; }
   grid-area: meta;
 }
 .mega-panel__meta .post-meta,
-.mega-panel__meta .post-meta a { color: var(--nwm-muted); font-size: 0.72rem; gap: 8px; }
+.mega-panel__meta .post-meta a { color: #515a78; font-size: 0.72rem; gap: 8px; }
 .mega-panel__post-title {
   grid-area: title;
   margin: 0;
@@ -429,7 +447,7 @@ button, input, textarea, select { font: inherit; }
   margin: 7vh auto 0;
   padding: 30px 30px 28px;
   border-radius: 0;
-  background: rgba(255,255,255,0.96);
+  background: rgba(255, 255, 255, 0.96);
   border: 1px solid rgba(19, 42, 120, 0.08);
   box-shadow: 0 28px 80px rgba(10, 14, 35, 0.22);
   overflow: auto;
@@ -444,7 +462,7 @@ button, input, textarea, select { font: inherit; }
 .search-panel__header h2,
 .search-panel__intro h3 {
   margin: 0;
-  font-family: "Outfit", "Segoe UI", sans-serif;
+  font-family: var(--nwm-font-display);
   line-height: 1;
 }
 .search-panel__header h2 {
@@ -479,8 +497,8 @@ button, input, textarea, select { font: inherit; }
 .search-panel__filter {
   display: inline-flex;
   align-items: center;
-  min-height: 32px;
-  padding: 0 12px;
+  min-height: 38px;
+  padding: 0 14px;
   border-radius: 999px;
   border: 1px solid rgba(19, 42, 120, 0.08);
   color: var(--nwm-primary);
@@ -497,7 +515,7 @@ button, input, textarea, select { font: inherit; }
 }
 .search-panel__intro p {
   margin: 6px 0 0;
-  color: var(--nwm-muted);
+  color: #515a78;
   font-size: 0.88rem;
   line-height: 1.55;
 }
@@ -538,6 +556,23 @@ button, input, textarea, select { font: inherit; }
   display: grid;
   gap: 6px;
   align-content: start;
+}
+.search-panel__title {
+  margin: 0;
+  font-size: 0.96rem;
+  line-height: 1.08;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.search-panel__title a {
+  display: block;
+  color: inherit;
+}
+.search-panel__meta .post-meta,
+.search-panel__meta .post-meta a {
+  color: var(--nwm-muted);
+  font-size: 0.68rem;
+  gap: 6px;
 }
 .results-layout {
   align-items: start;
@@ -590,7 +625,7 @@ button, input, textarea, select { font: inherit; }
 }
 .results-empty h2 {
   margin: 0;
-  font-family: "Outfit", "Segoe UI", sans-serif;
+  font-family: var(--nwm-font-display);
   font-size: clamp(1.45rem, 2vw, 1.8rem);
   line-height: 1.05;
 }
@@ -652,7 +687,7 @@ button, input, textarea, select { font: inherit; }
   background: #f3f4f8;
   border: 1px solid #eceef4;
   color: var(--nwm-text);
-  font-family: "Outfit", "Segoe UI", sans-serif;
+  font-family: var(--nwm-font-display);
   font-size: 0.96rem;
   font-weight: 800;
   letter-spacing: -0.01em;
@@ -715,23 +750,6 @@ button, input, textarea, select { font: inherit; }
 .theme-ad-slot--archive-header:empty {
   display: none;
 }
-.search-panel__title {
-  margin: 0;
-  font-size: 0.96rem;
-  line-height: 1.08;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-}
-.search-panel__title a {
-  display: block;
-  color: inherit;
-}
-.search-panel__meta .post-meta,
-.search-panel__meta .post-meta a {
-  color: var(--nwm-muted);
-  font-size: 0.68rem;
-  gap: 6px;
-}
 .search-form { display: grid; grid-template-columns: 1fr auto; gap: 12px; }
 .search-form label, .search-form input[type="search"] { width: 100%; }
 input[type="search"], input[type="text"], input[type="email"], textarea {
@@ -743,17 +761,17 @@ textarea { min-height: 160px; padding: 16px 18px; }
 .site-main { padding: 22px 0 56px; }
 .page-section { margin: 0 0 137px; }
 .section-heading, .entry-title, .page-title, .error-404__title, .archive-headline {
-  margin: 0; font-family: "Outfit", "Segoe UI", sans-serif; font-weight: 800; letter-spacing: -0.045em; line-height: 1.02;
+  margin: 0; font-family: var(--nwm-font-display); font-weight: 800; letter-spacing: -0.045em; line-height: 1.02;
 }
 .section-heading { font-size: clamp(1.65rem, 2.2vw, 2.25rem); margin-bottom: 4px; }
 .archive-headline { font-size: clamp(2.8rem, 6vw, 5rem); }
 .section-intro, .archive-description, .entry-summary, .term-description, .hero-copy p, .error-404__message, .card__excerpt, .widget p { color: var(--nwm-muted); }
 .section-intro { max-width: 58ch; margin: 0; font-size: 0.92rem; line-height: 1.55; }
-.post-meta, .post-meta a { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 0.74rem; color: var(--nwm-muted); }
+.post-meta, .post-meta a { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 0.74rem; color: #515a78; }
 .post-categories { display: flex; gap: 8px; flex-wrap: wrap; }
 .post-categories a {
   display: inline-flex; align-items: center; min-height: 21px; padding: 0 9px; border-radius: 999px; font-size: 0.54rem;
-  font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; background: #ffe0eb; color: var(--nwm-sugar-pink);
+  font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; background: #ffe0eb; color: #9f1f4f;
 }
 
 .hero-grid { display: grid; grid-template-columns: minmax(0, 1.58fr) minmax(300px, 0.92fr); gap: 28px; align-items: start; }
@@ -874,7 +892,7 @@ textarea { min-height: 160px; padding: 16px 18px; }
 }
 .mini-post__thumb { height: 96px; }
 .mini-post__title, .read-next__title, .list-post__title {
-  margin: 0; font-family: "Outfit", "Segoe UI", sans-serif; font-size: clamp(1rem, 1.5vw, 1.22rem); line-height: 1.08;
+  margin: 0; font-family: var(--nwm-font-display); font-size: clamp(1rem, 1.5vw, 1.22rem); line-height: 1.08;
 }
 
 .section-header {
@@ -894,7 +912,7 @@ textarea { min-height: 160px; padding: 16px 18px; }
 .category-pill__thumb { aspect-ratio: 1.45 / 1; margin-bottom: 14px; }
 .category-pill__name {
   display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 0 18px; border-radius: 999px;
-  background: var(--nwm-lemon); font-family: "Outfit", "Segoe UI", sans-serif; font-size: 1.45rem; line-height: 1; margin-bottom: 10px;
+  background: var(--nwm-lemon); font-family: var(--nwm-font-display); font-size: 1.45rem; line-height: 1; margin-bottom: 10px;
 }
 .app-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
 .app-chip {
@@ -985,7 +1003,7 @@ textarea { min-height: 160px; padding: 16px 18px; }
 .card__thumb img {
   border-radius: 0;
 }
-.card__title { margin: 0; font-family: "Outfit", "Segoe UI", sans-serif; font-size: clamp(1.08rem, 1.25vw, 1.42rem); line-height: 1.14; font-weight: 800; }
+.card__title { margin: 0; font-family: var(--nwm-font-display); font-size: clamp(1.08rem, 1.25vw, 1.42rem); line-height: 1.14; font-weight: 800; }
 .card__content { display: grid; gap: 8px; }
 .card__excerpt { margin: 0; font-size: 0.86rem; line-height: 1.55; }
 .card--compact { gap: 8px; }
@@ -1100,7 +1118,7 @@ textarea { min-height: 160px; padding: 16px 18px; }
 }
 .row-post__title {
   margin: 0;
-  font-family: "Outfit", "Segoe UI", sans-serif;
+  font-family: var(--nwm-font-display);
   font-size: 1.48rem;
   line-height: 1.04;
   font-weight: 800;
@@ -1118,7 +1136,7 @@ textarea { min-height: 160px; padding: 16px 18px; }
 }
 .widget-title, .widget-card__title {
   margin: 0 0 18px;
-  font-family: "Outfit", "Segoe UI", sans-serif;
+  font-family: var(--nwm-font-display);
   font-size: 1.7rem;
   line-height: 1;
   font-weight: 800;
@@ -1987,13 +2005,13 @@ body.reader-bar--content .reading-bar__progress {
   color: var(--nwm-secondary);
   background: #fff0e8;
   border-radius: 999px;
-  font-family: "Outfit", "Segoe UI", sans-serif;
+  font-family: var(--nwm-font-display);
   font-size: 4.9rem;
   line-height: 1;
   font-weight: 800;
 }
-.entry-content h2, .entry-content h3, .entry-content h4, .footer-links h3 {
-  margin: 1.7em 0 0.48em; font-family: "Outfit", "Segoe UI", sans-serif; line-height: 0.98; color: var(--nwm-primary);
+.entry-content h2, .entry-content h3, .entry-content h4, .footer-links h2 {
+  margin: 1.7em 0 0.48em; font-family: var(--nwm-font-display); line-height: 0.98; color: var(--nwm-primary);
 }
 .entry-content h2 { font-size: clamp(2rem, 4vw, 3rem); }
 .entry-content h3 { font-size: clamp(1.6rem, 3vw, 2.2rem); }
@@ -2001,7 +2019,7 @@ body.reader-bar--content .reading-bar__progress {
 .entry-content blockquote {
   margin: 2em 0; padding: 28px 30px; border-radius: 0; border-left: 4px solid var(--nwm-secondary);
   background: linear-gradient(135deg, #fff0ea, #fff9f2);
-  font-family: "Outfit", "Segoe UI", sans-serif; font-size: clamp(1.4rem, 2.5vw, 2.1rem); line-height: 1.14; color: var(--nwm-primary);
+  font-family: var(--nwm-font-display); font-size: clamp(1.4rem, 2.5vw, 2.1rem); line-height: 1.14; color: var(--nwm-primary);
 }
 .entry-content blockquote p {
   margin: 0;
@@ -2182,7 +2200,7 @@ body.reader-bar--content .reading-bar__progress {
 }
 .error-404__code {
   display: inline-flex; align-items: center; justify-content: center; width: 396px; height: 396px; margin-bottom: 28px; border-radius: 999px;
-  background: linear-gradient(135deg, #fff0ea, #ffe0d1); color: var(--nwm-secondary); font-family: "Outfit", "Segoe UI", sans-serif;
+  background: linear-gradient(135deg, #fff0ea, #ffe0d1); color: var(--nwm-secondary); font-family: var(--nwm-font-display);
   font-size: 9rem; font-weight: 700;
   box-shadow: 0 28px 60px rgba(255, 95, 54, 0.12);
 }
@@ -2214,7 +2232,7 @@ body.reader-bar--content .reading-bar__progress {
 .footer-brand .site-brand { justify-content: center; }
 .footer-brand .section-intro { margin: 12px auto 0; max-width: 36ch; font-size: 0.84rem; }
 .footer-links { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) auto; gap: 24px; align-items: start; }
-.footer-links h3 { margin: 0 0 10px; font-size: 0.95rem; font-weight: 800; }
+.footer-links h2 { margin: 0 0 10px; font-size: 0.95rem; font-weight: 800; }
 .footer-links ul, .footer-links .footer-menu, .site-info ul, .site-info .site-info__menu { list-style: none; margin: 0; padding: 0; }
 .footer-links ul, .footer-links .footer-menu { display: grid; gap: 8px; }
 .footer-links li, .footer-links a { font-size: 0.8rem; color: #2a335d; }
@@ -2269,6 +2287,15 @@ body.home .hot-grid__feature .card__title {
 .card__content { min-width: 0; }
 
 @media (max-width: 1100px) {
+  .search-panel__dialog {
+    width: min(860px, calc(100vw - 24px));
+    margin-top: 5vh;
+    padding: 22px;
+  }
+  .search-panel__grid {
+    display: flex;
+    flex-wrap: nowrap;
+  }
   .hero-grid, .compact-hero-grid, .latest-grid, .archive-grid, .single-layout, .split-grid, .hot-grid, .footer-links { grid-template-columns: 1fr; }
   .hero-story__grid, .category-tiles, .subgrid, .post-grid, .triple-columns, .read-next__grid, .mega-panel__grid, .hot-grid__feature, .hot-grid__strip, .app-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .site-header__top { grid-template-columns: 1fr auto; }
@@ -2420,6 +2447,26 @@ body.home .hot-grid__feature .card__title {
 }
 
 @media (max-width: 820px) {
+  body:not(.home) .search-panel__dialog {
+    width: min(760px, calc(100vw - 20px));
+    margin-top: 4vh;
+    padding: 20px;
+  }
+  body:not(.home) .search-panel__thumb {
+    min-height: 140px;
+  }
+  body:not(.home) .search-panel__filters {
+    gap: 8px;
+    margin-bottom: 22px;
+  }
+  body:not(.home) .search-panel__filter {
+    min-height: 30px;
+    padding: 0 11px;
+    font-size: 0.72rem;
+  }
+  body:not(.home) .search-panel__post {
+    flex: 0 0 220px;
+  }
   .single-post--standard .single-hero,
   .single-post--feature .single-hero {
     max-width: 100%;
@@ -2505,7 +2552,7 @@ body.home .hot-grid__feature .card__title {
   }
   .mega-panel__post-grid { grid-template-columns: 1fr; }
   .mega-panel__meta .post-meta,
-  .mega-panel__meta .post-meta a { color: var(--nwm-muted); }
+  .mega-panel__meta .post-meta a { color: #515a78; }
   .mega-panel__post {
     grid-template-columns: 82px minmax(0, 1fr);
     column-gap: 12px;
@@ -2519,15 +2566,6 @@ body.home .hot-grid__feature .card__title {
   .mega-panel__social .social-links a {
     width: 44px;
     height: 44px;
-  }
-  .search-panel__dialog {
-    width: min(860px, calc(100vw - 24px));
-    margin-top: 5vh;
-    padding: 22px;
-  }
-  .search-panel__grid {
-    display: flex;
-    flex-wrap: nowrap;
   }
   .menu { display: grid; gap: 8px; }
   .menu .sub-menu {
@@ -2611,26 +2649,6 @@ body.home .hot-grid__feature .card__title {
   }
   body:not(.home) .card__title {
     font-size: 1.02rem;
-  }
-  body:not(.home) .search-panel__dialog {
-    width: min(760px, calc(100vw - 20px));
-    margin-top: 4vh;
-    padding: 20px;
-  }
-  body:not(.home) .search-panel__thumb {
-    min-height: 140px;
-  }
-  body:not(.home) .search-panel__filters {
-    gap: 8px;
-    margin-bottom: 22px;
-  }
-  body:not(.home) .search-panel__filter {
-    min-height: 30px;
-    padding: 0 11px;
-    font-size: 0.72rem;
-  }
-  body:not(.home) .search-panel__post {
-    flex: 0 0 220px;
   }
   body:not(.home) .single-post--feature .single-hero__image {
     aspect-ratio: 16 / 9.8;
@@ -2731,9 +2749,9 @@ body.home .hot-grid__feature .card__title {
     font-size: 1.55rem;
   }
   .search-panel__close {
-    width: 38px;
-    height: 38px;
-    min-height: 38px;
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
   }
   .search-panel__grid {
     display: flex;

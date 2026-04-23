@@ -20,7 +20,7 @@
 			</div>
 			<div class="footer-links">
 				<div>
-					<h3><?php esc_html_e('Core Pages', 'nerdywithme'); ?></h3>
+					<h2><?php esc_html_e('Core Pages', 'nerdywithme'); ?></h2>
 					<?php if (has_nav_menu('footer_col_1')) : ?>
 						<?php
 						wp_nav_menu(
@@ -41,7 +41,7 @@
 					<?php endif; ?>
 				</div>
 				<div>
-					<h3><?php esc_html_e('Categories', 'nerdywithme'); ?></h3>
+					<h2><?php esc_html_e('Categories', 'nerdywithme'); ?></h2>
 					<?php if (has_nav_menu('footer_col_2')) : ?>
 						<?php
 						wp_nav_menu(
@@ -62,7 +62,7 @@
 					<?php endif; ?>
 				</div>
 				<div>
-					<h3><?php esc_html_e('Build Stack', 'nerdywithme'); ?></h3>
+					<h2><?php esc_html_e('Build Stack', 'nerdywithme'); ?></h2>
 					<?php if (has_nav_menu('footer_col_3')) : ?>
 						<?php
 						wp_nav_menu(
@@ -83,7 +83,7 @@
 					<?php endif; ?>
 				</div>
 				<div>
-					<h3><?php esc_html_e('Start Here', 'nerdywithme'); ?></h3>
+					<h2><?php esc_html_e('Start Here', 'nerdywithme'); ?></h2>
 					<?php if (has_nav_menu('footer_col_4')) : ?>
 						<?php
 						wp_nav_menu(
@@ -104,7 +104,7 @@
 					<?php endif; ?>
 				</div>
 				<div>
-					<h3><?php esc_html_e('Follow Me', 'nerdywithme'); ?></h3>
+					<h2><?php esc_html_e('Follow Me', 'nerdywithme'); ?></h2>
 					<?php nerdywithme_render_social_links(); ?>
 				</div>
 			</div>

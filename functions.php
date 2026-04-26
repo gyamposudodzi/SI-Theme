@@ -6,7 +6,7 @@
  */
 
 if (! defined('NERDYWITHME_VERSION')) {
-	define('NERDYWITHME_VERSION', '1.0.5');
+	define('NERDYWITHME_VERSION', '1.0.6');
 }
 
 function nerdywithme_setup() {

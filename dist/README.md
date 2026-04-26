@@ -6,8 +6,8 @@ This directory contains packaged release artifacts, staging folders, and deploym
 
 Latest package files currently present in this folder:
 
-- Theme: `nerdywithme-theme-1.0.5.zip`
-- Theme flat package: `nerdywithme-theme-1.0.5-flat.zip`
+- Theme: `nerdywithme-theme-1.0.6.zip`
+- Theme flat package: `nerdywithme-theme-1.0.6-flat.zip`
 - Plugin: `nerdywithme-tools-0.1.1.zip`
 - Plugin alias: `nerdywithme-tools-latest.zip`
 
@@ -16,7 +16,7 @@ Legacy release files are also kept here for previous iterations.
 ## Install In WordPress
 
 1. In WordPress admin, go to `Appearance > Themes > Add New > Upload Theme`.
-2. Upload `nerdywithme-theme-1.0.5.zip` and activate it.
+2. Upload `nerdywithme-theme-1.0.6.zip` and activate it.
 3. Go to `Plugins > Add New > Upload Plugin`.
 4. Upload `nerdywithme-tools-0.1.1.zip` and activate it.
 5. Save permalinks once under `Settings > Permalinks` if the tools routes do not appear immediately.

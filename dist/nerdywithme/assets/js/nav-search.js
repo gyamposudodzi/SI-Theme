@@ -11,8 +11,8 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    const isMobile = window.matchMedia("(max-width: 820px)").matches;
-    const desiredIndex = isMobile ? 1 : 0;
+    const isCompactDrawer = window.matchMedia("(max-width: 1100px)").matches;
+    const desiredIndex = isCompactDrawer ? 1 : 0;
     const template = menuTemplates[desiredIndex] || menuTemplates[0];
 
     while (menuSlot.firstChild) {
@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (menuSlot || navToggle) {
     window.addEventListener("resize", function () {
       renderDrawerMenu();
-      if (window.innerWidth > 820 && body.classList.contains("nav-open")) {
+      if (window.innerWidth > 1100 && body.classList.contains("nav-open")) {
         closeNav();
       }
     });

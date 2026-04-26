@@ -1,48 +1,51 @@
 {
   "name": "nerdywithme-tools",
-  "version": "[TODO: 1.2.0]",
-  "description": "[TODO: A tool set for the nerdywithme theme]",
+  "version": "0.1.1",
+  "description": "Trading tools, calculator shortcodes, and ad slot controls for the NerdyWithMe theme.",
   "author": {
-    "name": "[TODO: Gyamposu Dodzi]",
-    "email": "[TODO: admin@nerdywithme.com]",
-    "url": "[TODO: https://github.com/gyamposudodzi]"
+    "name": "NerdyWithMe",
+    "email": "admin@nerdywithme.com",
+    "url": "https://nerdywithme.com"
   },
-  "homepage": "[TODO: https://nerdywithme.com/tools]",
-  "repository": "[TODO: https://github.com/gyamposudodzi/SI-THEME]",
-  "license": "[TODO: MIT]",
+  "homepage": "https://nerdywithme.com/tools",
+  "repository": "https://nerdywithme.com",
+  "license": "GPL-2.0-or-later",
   "keywords": [
-    "[TODO: keyword1]",
-    "[TODO: keyword2]"
+    "wordpress",
+    "forex",
+    "trading-tools",
+    "calculators",
+    "nerdywithme"
   ],
-  "skills": "[TODO: ./skills/]",
-  "hooks": "[TODO: ./hooks.json]",
-  "mcpServers": "[TODO: ./.mcp.json]",
-  "apps": "[TODO: ./.app.json]",
+  "skills": "./skills/",
+  "hooks": "./hooks.json",
+  "mcpServers": "./.mcp.json",
+  "apps": "./.app.json",
   "interface": {
-    "displayName": "[TODO: NWM Tools]",
-    "shortDescription": "[TODO: Short description for subtitle]",
-    "longDescription": "[TODO: Long description for details page]",
-    "developerName": "[TODO: Nerdywithme]",
-    "category": "[TODO: Productivity]",
+    "displayName": "NerdyWithMe Tools",
+    "shortDescription": "Forex calculators and ad-slot controls for NerdyWithMe.",
+    "longDescription": "A companion plugin for the NerdyWithMe WordPress theme that adds forex calculators, tool routing, shortcode-powered utilities, and managed ad-slot controls.",
+    "developerName": "NerdyWithMe",
+    "category": "Productivity",
     "capabilities": [
-      "[TODO: Interactive]",
-      "[TODO: Write]"
+      "Interactive",
+      "Write"
     ],
-    "websiteURL": "[TODO: https://nerdywithme.com/]",
-    "privacyPolicyURL": "[TODO: https://nerdywithme.com/privacy-policy/]",
-    "termsOfServiceURL": "[TODO: https://nerdywithme.com/terms-of-use/]",
+    "websiteURL": "https://nerdywithme.com/",
+    "privacyPolicyURL": "https://nerdywithme.com/privacy-policy/",
+    "termsOfServiceURL": "https://nerdywithme.com/terms-of-use/",
     "defaultPrompt": [
-      "[TODO: Summarize my inbox and draft replies for me.]",
-      "[TODO: Find open bugs and turn them into tickets.]",
-      "[TODO: Review today's meetings and flag gaps.]"
+      "Open the NerdyWithMe tools hub and explain which calculator fits this trading scenario.",
+      "Review the forex calculator setup and suggest improvements for pair-aware trade sizing.",
+      "Audit the theme and plugin package metadata before release."
     ],
-    "brandColor": "[TODO: #3B82F6]",
-    "composerIcon": "[TODO: ./assets/icon.png]",
-    "logo": "[TODO: ./assets/logo.png]",
+    "brandColor": "#132A78",
+    "composerIcon": "./assets/icon.png",
+    "logo": "./assets/logo.png",
     "screenshots": [
-      "[TODO: ./assets/screenshot1.png]",
-      "[TODO: ./assets/screenshot2.png]",
-      "[TODO: ./assets/screenshot3.png]"
+      "./assets/screenshot1.png",
+      "./assets/screenshot2.png",
+      "./assets/screenshot3.png"
     ]
   }
 }

@@ -358,47 +358,190 @@ function nwmSanitizeNumericInput(input) {
   input.value = cleaned;
 }
 
+function nwmNormalizePair(value) {
+  return String(value || "")
+    .toUpperCase()
+    .replace(/[^A-Z]/g, "")
+    .slice(0, 6);
+}
+
+function nwmSanitizePairInput(input) {
+  if (!input) {
+    return;
+  }
+
+  input.value = nwmNormalizePair(input.value);
+}
+
+function nwmGetForexContext(pairValue, accountCurrencyValue, referencePriceValue, conversionRateValue) {
+  var pair = nwmNormalizePair(pairValue);
+  var accountCurrency = String(accountCurrencyValue || "USD").toUpperCase().replace(/[^A-Z]/g, "").slice(0, 3) || "USD";
+  var referencePrice = parseFloat(referencePriceValue || "0");
+  var conversionRate = parseFloat(conversionRateValue || "0");
+  var isValidPair = pair.length === 6;
+  var baseCurrency = isValidPair ? pair.slice(0, 3) : "";
+  var quoteCurrency = isValidPair ? pair.slice(3, 6) : "";
+  var pipSize = quoteCurrency === "JPY" ? 0.01 : 0.0001;
+  var contractUnits = 100000;
+  var needsQuoteConversion = isValidPair && accountCurrency !== quoteCurrency && accountCurrency !== baseCurrency;
+
+  function convertQuoteToAccount(amount) {
+    if (amount <= 0 || !isValidPair) {
+      return 0;
+    }
+
+    if (accountCurrency === quoteCurrency) {
+      return amount;
+    }
+
+    if (accountCurrency === baseCurrency) {
+      return referencePrice > 0 ? amount / referencePrice : 0;
+    }
+
+    return conversionRate > 0 ? amount * conversionRate : 0;
+  }
+
+  function getPipDistance(priceA, priceB) {
+    var a = parseFloat(priceA || "0");
+    var b = parseFloat(priceB || "0");
+
+    if (a <= 0 || b <= 0 || !isValidPair || pipSize <= 0) {
+      return 0;
+    }
+
+    return Math.abs(a - b) / pipSize;
+  }
+
+  function getPipValueForLots(lots) {
+    var numericLots = parseFloat(lots || "0");
+
+    if (numericLots <= 0 || !isValidPair || pipSize <= 0) {
+      return 0;
+    }
+
+    var pipValueInQuote = pipSize * contractUnits * numericLots;
+    return convertQuoteToAccount(pipValueInQuote);
+  }
+
+  return {
+    pair: pair,
+    accountCurrency: accountCurrency,
+    baseCurrency: baseCurrency,
+    quoteCurrency: quoteCurrency,
+    referencePrice: referencePrice,
+    conversionRate: conversionRate,
+    pipSize: pipSize,
+    isValidPair: isValidPair,
+    needsQuoteConversion: needsQuoteConversion,
+    getPipDistance: getPipDistance,
+    getPipValueForLots: getPipValueForLots
+  };
+}
+
+function nwmFormatAccountValue(currencyCode, value) {
+  return (currencyCode || "USD") + " " + value.toFixed(2);
+}
+
+function nwmGetForexContextMessage(context) {
+  if (!context.isValidPair) {
+    return "Enter a six-letter forex pair like EURUSD or GBPJPY.";
+  }
+
+  if (context.accountCurrency === context.quoteCurrency) {
+    return "Pip value is quoted directly in " + context.accountCurrency + " because it is the quote currency for " + context.pair + ".";
+  }
+
+  if (context.accountCurrency === context.baseCurrency) {
+    return "Pip value is converted from " + context.quoteCurrency + " into " + context.accountCurrency + " using the reference price for " + context.pair + ".";
+  }
+
+  if (context.conversionRate > 0) {
+    return "Pip value is converted from " + context.quoteCurrency + " into " + context.accountCurrency + " using your quote-to-account rate.";
+  }
+
+  return "Enter the quote-to-account rate to convert " + context.quoteCurrency + " pip values into " + context.accountCurrency + " for " + context.pair + ".";
+}
+
+function nwmUpdateForexContextUi(calculator, context) {
+  if (!calculator) {
+    return;
+  }
+
+  var contextNode = calculator.querySelector("[data-nwm-forex-context]");
+  if (contextNode) {
+    contextNode.textContent = nwmGetForexContextMessage(context);
+  }
+
+  var conversionField = calculator.querySelector("[data-nwm-forex-conversion-field]");
+  var conversionInput = conversionField ? conversionField.querySelector("input") : null;
+
+  if (conversionField) {
+    conversionField.classList.toggle("is-hidden", !context.needsQuoteConversion);
+  }
+
+  if (conversionInput) {
+    conversionInput.disabled = !context.needsQuoteConversion;
+    if (!context.needsQuoteConversion) {
+      conversionInput.value = "1.00000";
+    }
+  }
+}
+
 function nwmUpdateRiskCalculator(calculator) {
   if (!calculator) {
     return;
   }
 
+  var context = nwmGetForexContext(
+    calculator.querySelector("[data-nwm-risk-pair]")?.value,
+    calculator.querySelector("[data-nwm-risk-account-currency]")?.value,
+    calculator.querySelector("[data-nwm-risk-reference]")?.value || calculator.querySelector("[data-nwm-entry]")?.value,
+    calculator.querySelector("[data-nwm-risk-conversion]")?.value
+  );
   var balance = parseFloat(calculator.querySelector("[data-nwm-balance]")?.value || "0");
   var riskPercent = parseFloat(calculator.querySelector("[data-nwm-risk]")?.value || "0");
   var entry = parseFloat(calculator.querySelector("[data-nwm-entry]")?.value || "0");
   var stop = parseFloat(calculator.querySelector("[data-nwm-stop]")?.value || "0");
   var target = parseFloat(calculator.querySelector("[data-nwm-target]")?.value || "0");
-  var pointValue = parseFloat(calculator.querySelector("[data-nwm-point-value]")?.value || "0");
 
   var riskAmount = balance > 0 && riskPercent > 0 ? (balance * riskPercent) / 100 : 0;
-  var stopDistance = entry > 0 && stop > 0 ? Math.abs(entry - stop) : 0;
-  var rewardDistance = entry > 0 && target > 0 ? Math.abs(target - entry) : 0;
-  var riskPerPoint = stopDistance > 0 ? riskAmount / stopDistance : 0;
-  var positionSize = stopDistance > 0 && pointValue > 0 ? riskAmount / (stopDistance * pointValue) : 0;
-  var rewardAmount = rewardDistance > 0 && pointValue > 0 && positionSize > 0 ? rewardDistance * pointValue * positionSize : 0;
+  var stopDistance = context.getPipDistance(entry, stop);
+  var rewardDistance = context.getPipDistance(entry, target);
+  var standardLotPipValue = context.getPipValueForLots(1);
+  var positionSize = stopDistance > 0 && standardLotPipValue > 0 ? riskAmount / (stopDistance * standardLotPipValue) : 0;
+  var pipValue = context.getPipValueForLots(positionSize);
+  var rewardAmount = rewardDistance > 0 && pipValue > 0 ? rewardDistance * pipValue : 0;
   var riskReward = stopDistance > 0 && rewardDistance > 0 ? rewardDistance / stopDistance : 0;
+  var riskPerPoint = stopDistance > 0 ? riskAmount / stopDistance : 0;
+
+  nwmUpdateForexContextUi(calculator, context);
 
   var riskAmountNode = calculator.querySelector("[data-nwm-risk-amount]");
   var stopDistanceNode = calculator.querySelector("[data-nwm-stop-distance]");
   var positionSizeNode = calculator.querySelector("[data-nwm-position-size]");
+  var pipValueNode = calculator.querySelector("[data-nwm-risk-pip-value]");
   var rewardAmountNode = calculator.querySelector("[data-nwm-reward-amount]");
   var riskRewardNode = calculator.querySelector("[data-nwm-rr]");
   var riskPerPointNode = calculator.querySelector("[data-nwm-risk-per-point]");
 
   if (riskAmountNode) {
-    riskAmountNode.textContent = nwmFormatCurrency(riskAmount);
+    riskAmountNode.textContent = nwmFormatAccountValue(context.accountCurrency, riskAmount);
   }
 
   if (stopDistanceNode) {
-    stopDistanceNode.textContent = stopDistance > 0 ? stopDistance.toFixed(5) : "0.00000";
+    stopDistanceNode.textContent = stopDistance > 0 ? stopDistance.toFixed(1) + " pips" : "0.0 pips";
   }
 
   if (positionSizeNode) {
     positionSizeNode.textContent = positionSize > 0 ? positionSize.toFixed(2) + " lots" : "0.00 lots";
   }
 
+  if (pipValueNode) {
+    pipValueNode.textContent = nwmFormatAccountValue(context.accountCurrency, pipValue);
+  }
+
   if (rewardAmountNode) {
-    rewardAmountNode.textContent = nwmFormatCurrency(rewardAmount);
+    rewardAmountNode.textContent = nwmFormatAccountValue(context.accountCurrency, rewardAmount);
   }
 
   if (riskRewardNode) {
@@ -406,7 +549,7 @@ function nwmUpdateRiskCalculator(calculator) {
   }
 
   if (riskPerPointNode) {
-    riskPerPointNode.textContent = nwmFormatCurrency(riskPerPoint);
+    riskPerPointNode.textContent = nwmFormatAccountValue(context.accountCurrency, riskPerPoint);
   }
 }
 
@@ -415,13 +558,20 @@ function nwmUpdatePositionCalculator(calculator) {
     return;
   }
 
+  var context = nwmGetForexContext(
+    calculator.querySelector("[data-nwm-position-pair]")?.value,
+    calculator.querySelector("[data-nwm-position-account-currency]")?.value,
+    calculator.querySelector("[data-nwm-position-reference]")?.value,
+    calculator.querySelector("[data-nwm-position-conversion]")?.value
+  );
   var riskAmount = parseFloat(calculator.querySelector("[data-nwm-position-risk]")?.value || "0");
   var stopDistance = parseFloat(calculator.querySelector("[data-nwm-position-stop]")?.value || "0");
-  var pointValue = parseFloat(calculator.querySelector("[data-nwm-position-point-value]")?.value || "0");
+  var standardLotPipValue = context.getPipValueForLots(1);
+  var positionSize = stopDistance > 0 && standardLotPipValue > 0 ? riskAmount / (stopDistance * standardLotPipValue) : 0;
+  var pipValue = context.getPipValueForLots(positionSize);
+  var positionStopValue = pipValue > 0 && stopDistance > 0 ? pipValue * stopDistance : 0;
 
-  var positionSize = stopDistance > 0 && pointValue > 0 ? riskAmount / (stopDistance * pointValue) : 0;
-  var riskPerPoint = stopDistance > 0 ? riskAmount / stopDistance : 0;
-  var positionStopValue = positionSize > 0 && pointValue > 0 && stopDistance > 0 ? positionSize * pointValue * stopDistance : 0;
+  nwmUpdateForexContextUi(calculator, context);
 
   var lotsNode = calculator.querySelector("[data-nwm-position-lots]");
   var perPointNode = calculator.querySelector("[data-nwm-position-per-point]");
@@ -432,11 +582,11 @@ function nwmUpdatePositionCalculator(calculator) {
   }
 
   if (perPointNode) {
-    perPointNode.textContent = nwmFormatCurrency(riskPerPoint);
+    perPointNode.textContent = nwmFormatAccountValue(context.accountCurrency, pipValue);
   }
 
   if (stopValueNode) {
-    stopValueNode.textContent = nwmFormatCurrency(positionStopValue);
+    stopValueNode.textContent = nwmFormatAccountValue(context.accountCurrency, positionStopValue);
   }
 }
 
@@ -445,24 +595,31 @@ function nwmUpdatePipCalculator(calculator) {
     return;
   }
 
+  var context = nwmGetForexContext(
+    calculator.querySelector("[data-nwm-pip-pair]")?.value,
+    calculator.querySelector("[data-nwm-pip-account-currency]")?.value,
+    calculator.querySelector("[data-nwm-pip-reference]")?.value,
+    calculator.querySelector("[data-nwm-pip-conversion]")?.value
+  );
   var lots = parseFloat(calculator.querySelector("[data-nwm-pip-lots]")?.value || "0");
-  var baseValue = parseFloat(calculator.querySelector("[data-nwm-pip-base-value]")?.value || "0");
   var distance = parseFloat(calculator.querySelector("[data-nwm-pip-distance]")?.value || "0");
 
-  var pipValue = lots > 0 && baseValue > 0 ? lots * baseValue : 0;
+  var pipValue = context.getPipValueForLots(lots);
   var totalMoveValue = pipValue > 0 && distance > 0 ? pipValue * distance : 0;
   var miniLots = lots > 0 ? lots * 100 : 0;
+
+  nwmUpdateForexContextUi(calculator, context);
 
   var pipValueNode = calculator.querySelector("[data-nwm-pip-value]");
   var pipTotalNode = calculator.querySelector("[data-nwm-pip-total]");
   var pipMiniNode = calculator.querySelector("[data-nwm-pip-mini]");
 
   if (pipValueNode) {
-    pipValueNode.textContent = nwmFormatCurrency(pipValue);
+    pipValueNode.textContent = nwmFormatAccountValue(context.accountCurrency, pipValue);
   }
 
   if (pipTotalNode) {
-    pipTotalNode.textContent = nwmFormatCurrency(totalMoveValue);
+    pipTotalNode.textContent = nwmFormatAccountValue(context.accountCurrency, totalMoveValue);
   }
 
   if (pipMiniNode) {
@@ -475,32 +632,40 @@ function nwmUpdateProfitCalculator(calculator) {
     return;
   }
 
+  var context = nwmGetForexContext(
+    calculator.querySelector("[data-nwm-profit-pair]")?.value,
+    calculator.querySelector("[data-nwm-profit-account-currency]")?.value,
+    calculator.querySelector("[data-nwm-profit-reference]")?.value || calculator.querySelector("[data-nwm-profit-entry]")?.value,
+    calculator.querySelector("[data-nwm-profit-conversion]")?.value
+  );
   var balance = parseFloat(calculator.querySelector("[data-nwm-profit-balance]")?.value || "0");
   var entry = parseFloat(calculator.querySelector("[data-nwm-profit-entry]")?.value || "0");
   var target = parseFloat(calculator.querySelector("[data-nwm-profit-target]")?.value || "0");
   var stop = parseFloat(calculator.querySelector("[data-nwm-profit-stop]")?.value || "0");
   var lots = parseFloat(calculator.querySelector("[data-nwm-profit-lots]")?.value || "0");
-  var pointValue = parseFloat(calculator.querySelector("[data-nwm-profit-point-value]")?.value || "0");
 
-  var targetDistance = entry > 0 && target > 0 ? Math.abs(target - entry) : 0;
-  var stopDistance = entry > 0 && stop > 0 ? Math.abs(entry - stop) : 0;
-  var pipValue = lots > 0 && pointValue > 0 ? lots * pointValue : 0;
+  var targetDistance = context.getPipDistance(entry, target);
+  var stopDistance = context.getPipDistance(entry, stop);
+  var pipValue = context.getPipValueForLots(lots);
   var profitAmount = targetDistance > 0 && pipValue > 0 ? targetDistance * pipValue : 0;
   var riskAmount = stopDistance > 0 && pipValue > 0 ? stopDistance * pipValue : 0;
   var rewardRisk = profitAmount > 0 && riskAmount > 0 ? profitAmount / riskAmount : 0;
   var growth = balance > 0 && profitAmount > 0 ? (profitAmount / balance) * 100 : 0;
 
+  nwmUpdateForexContextUi(calculator, context);
+
   var distanceNode = calculator.querySelector("[data-nwm-profit-distance]");
   var amountNode = calculator.querySelector("[data-nwm-profit-amount]");
   var rrNode = calculator.querySelector("[data-nwm-profit-rr]");
   var growthNode = calculator.querySelector("[data-nwm-profit-growth]");
+  var pipValueNode = calculator.querySelector("[data-nwm-profit-pip-value]");
 
   if (distanceNode) {
-    distanceNode.textContent = targetDistance > 0 ? targetDistance.toFixed(5) : "0.00000";
+    distanceNode.textContent = targetDistance > 0 ? targetDistance.toFixed(1) + " pips" : "0.0 pips";
   }
 
   if (amountNode) {
-    amountNode.textContent = nwmFormatCurrency(profitAmount);
+    amountNode.textContent = nwmFormatAccountValue(context.accountCurrency, profitAmount);
   }
 
   if (rrNode) {
@@ -509,6 +674,10 @@ function nwmUpdateProfitCalculator(calculator) {
 
   if (growthNode) {
     growthNode.textContent = growth > 0 ? growth.toFixed(2) + "%" : "0.00%";
+  }
+
+  if (pipValueNode) {
+    pipValueNode.textContent = nwmFormatAccountValue(context.accountCurrency, pipValue);
   }
 }
 
@@ -678,6 +847,12 @@ if (nwmToolsPresent) {
     var numericInput = event.target.closest("[data-nwm-numeric]");
     if (numericInput) {
       nwmSanitizeNumericInput(numericInput);
+    }
+
+    if (
+      event.target.matches("[data-nwm-risk-pair], [data-nwm-position-pair], [data-nwm-pip-pair], [data-nwm-profit-pair]")
+    ) {
+      nwmSanitizePairInput(event.target);
     }
 
     var calculator = event.target.closest("[data-nwm-risk-calculator]");

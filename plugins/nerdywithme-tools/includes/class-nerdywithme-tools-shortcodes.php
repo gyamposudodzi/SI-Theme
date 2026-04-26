@@ -475,6 +475,55 @@ class NerdyWithMe_Tools_Shortcodes {
 	}
 
 	/**
+	 * Render a shared forex pair datalist.
+	 *
+	 * @return string
+	 */
+	private function render_forex_pair_datalist() {
+		static $rendered = false;
+
+		if ($rendered) {
+			return '';
+		}
+
+		$rendered = true;
+
+		$pairs = array(
+			'EURUSD',
+			'GBPUSD',
+			'USDJPY',
+			'USDCHF',
+			'USDCAD',
+			'AUDUSD',
+			'NZDUSD',
+			'EURGBP',
+			'EURJPY',
+			'GBPJPY',
+			'EURAUD',
+			'EURNZD',
+			'GBPAUD',
+			'GBPCAD',
+			'GBPCHF',
+			'AUDJPY',
+			'CADJPY',
+			'CHFJPY',
+			'NZDJPY',
+			'XAUUSD',
+		);
+
+		ob_start();
+		?>
+		<datalist id="nwm-forex-pairs">
+			<?php foreach ($pairs as $pair) : ?>
+				<option value="<?php echo esc_attr($pair); ?>"></option>
+			<?php endforeach; ?>
+		</datalist>
+		<?php
+
+		return ob_get_clean();
+	}
+
+	/**
 	 * Inner risk calculator renderer.
 	 *
 	 * @return string
@@ -483,11 +532,35 @@ class NerdyWithMe_Tools_Shortcodes {
 		ob_start();
 		?>
 			<div class="nwm-tool-card nwm-tool-card--risk" data-nwm-risk-calculator>
+				<?php echo $this->render_forex_pair_datalist(); ?>
 				<div class="nwm-tool-card__header">
 					<h3><?php esc_html_e('Risk Calculator', 'nerdywithme-tools'); ?></h3>
 					<p><?php esc_html_e('Work out how much to risk, your stop distance, suggested position size, and the reward at your target.', 'nerdywithme-tools'); ?></p>
 				</div>
 			<div class="nwm-tool-grid">
+				<label>
+					<span><?php esc_html_e('Forex Pair', 'nerdywithme-tools'); ?></span>
+					<input type="text" inputmode="text" data-nwm-risk-pair list="nwm-forex-pairs" placeholder="EURUSD" value="EURUSD" maxlength="7" spellcheck="false">
+					<small class="nwm-tool-grid__hint"><?php esc_html_e('Choose a common pair from the list or type one manually.', 'nerdywithme-tools'); ?></small>
+				</label>
+				<label>
+					<span><?php esc_html_e('Account Currency', 'nerdywithme-tools'); ?></span>
+					<select data-nwm-risk-account-currency>
+						<option value="USD" selected>USD</option>
+						<option value="EUR">EUR</option>
+						<option value="GBP">GBP</option>
+						<option value="JPY">JPY</option>
+						<option value="AUD">AUD</option>
+						<option value="NZD">NZD</option>
+						<option value="CAD">CAD</option>
+						<option value="CHF">CHF</option>
+					</select>
+				</label>
+				<label class="nwm-tool-grid__conversion-field" data-nwm-forex-conversion-field>
+					<span><?php esc_html_e('Quote to Account Rate', 'nerdywithme-tools'); ?></span>
+					<input type="number" step="0.00001" min="0" inputmode="decimal" data-nwm-numeric data-nwm-risk-conversion placeholder="1.00000" value="1.00000">
+					<small class="nwm-tool-grid__hint"><?php esc_html_e('Only needed when your account currency differs from both the base and quote currency.', 'nerdywithme-tools'); ?></small>
+				</label>
 				<label>
 					<span><?php esc_html_e('Account Balance', 'nerdywithme-tools'); ?></span>
 					<input type="number" step="0.01" min="0" inputmode="decimal" data-nwm-numeric data-nwm-balance placeholder="1000" value="1000">
@@ -509,10 +582,12 @@ class NerdyWithMe_Tools_Shortcodes {
 					<input type="number" step="0.00001" min="0" inputmode="decimal" data-nwm-numeric data-nwm-target placeholder="1.26000" value="1.26000">
 				</label>
 				<label>
-					<span><?php esc_html_e('Value Per Point / Pip', 'nerdywithme-tools'); ?></span>
-					<input type="number" step="0.01" min="0.01" inputmode="decimal" data-nwm-numeric data-nwm-point-value placeholder="10" value="10">
+					<span><?php esc_html_e('Reference Price', 'nerdywithme-tools'); ?></span>
+					<input type="number" step="0.00001" min="0.00001" inputmode="decimal" data-nwm-numeric data-nwm-risk-reference placeholder="1.25000" value="1.25000">
+					<small class="nwm-tool-grid__hint"><?php esc_html_e('Usually your entry price. Used to convert pip value when needed.', 'nerdywithme-tools'); ?></small>
 				</label>
 			</div>
+			<p class="nwm-tool-card__note" data-nwm-forex-context><?php esc_html_e('Pip value is quoted directly in USD because it is the quote currency for EURUSD.', 'nerdywithme-tools'); ?></p>
 			<div class="nwm-tool-results">
 				<div>
 					<strong><?php esc_html_e('Risk Amount', 'nerdywithme-tools'); ?></strong>
@@ -520,15 +595,19 @@ class NerdyWithMe_Tools_Shortcodes {
 				</div>
 				<div>
 					<strong><?php esc_html_e('Stop Distance', 'nerdywithme-tools'); ?></strong>
-					<span data-nwm-stop-distance>0.00</span>
+					<span data-nwm-stop-distance>0.0 pips</span>
 				</div>
 				<div>
 					<strong><?php esc_html_e('Suggested Position Size', 'nerdywithme-tools'); ?></strong>
 					<span data-nwm-position-size>0.00 lots</span>
 				</div>
 				<div>
+					<strong><?php esc_html_e('Pip Value', 'nerdywithme-tools'); ?></strong>
+					<span data-nwm-risk-pip-value>USD 0.00</span>
+				</div>
+				<div>
 					<strong><?php esc_html_e('Reward At Target', 'nerdywithme-tools'); ?></strong>
-					<span data-nwm-reward-amount>$0.00</span>
+					<span data-nwm-reward-amount>USD 0.00</span>
 				</div>
 				<div>
 					<strong><?php esc_html_e('Risk / Reward', 'nerdywithme-tools'); ?></strong>
@@ -536,7 +615,7 @@ class NerdyWithMe_Tools_Shortcodes {
 				</div>
 				<div>
 					<strong><?php esc_html_e('Risk Budget Per Point', 'nerdywithme-tools'); ?></strong>
-					<span data-nwm-risk-per-point>$0.00</span>
+					<span data-nwm-risk-per-point>USD 0.00</span>
 				</div>
 			</div>
 		</div>
@@ -554,36 +633,60 @@ class NerdyWithMe_Tools_Shortcodes {
 		ob_start();
 		?>
 		<div class="nwm-tool-card nwm-tool-card--position" data-nwm-position-calculator>
+			<?php echo $this->render_forex_pair_datalist(); ?>
 			<div class="nwm-tool-card__header">
 				<h3><?php esc_html_e('Position Size Calculator', 'nerdywithme-tools'); ?></h3>
 				<p><?php esc_html_e('Start with the exact dollar amount you want to risk, then calculate a suggested lot size and value per point budget.', 'nerdywithme-tools'); ?></p>
 			</div>
 			<div class="nwm-tool-grid">
 				<label>
+					<span><?php esc_html_e('Forex Pair', 'nerdywithme-tools'); ?></span>
+					<input type="text" inputmode="text" data-nwm-position-pair list="nwm-forex-pairs" placeholder="EURUSD" value="EURUSD" maxlength="7" spellcheck="false">
+					<small class="nwm-tool-grid__hint"><?php esc_html_e('Choose a common pair from the list or type one manually.', 'nerdywithme-tools'); ?></small>
+				</label>
+				<label>
+					<span><?php esc_html_e('Account Currency', 'nerdywithme-tools'); ?></span>
+					<select data-nwm-position-account-currency>
+						<option value="USD" selected>USD</option>
+						<option value="EUR">EUR</option>
+						<option value="GBP">GBP</option>
+						<option value="JPY">JPY</option>
+						<option value="AUD">AUD</option>
+						<option value="NZD">NZD</option>
+						<option value="CAD">CAD</option>
+						<option value="CHF">CHF</option>
+					</select>
+				</label>
+				<label class="nwm-tool-grid__conversion-field" data-nwm-forex-conversion-field>
+					<span><?php esc_html_e('Quote to Account Rate', 'nerdywithme-tools'); ?></span>
+					<input type="number" step="0.00001" min="0" inputmode="decimal" data-nwm-numeric data-nwm-position-conversion placeholder="1.00000" value="1.00000">
+				</label>
+				<label>
 					<span><?php esc_html_e('Risk Amount', 'nerdywithme-tools'); ?></span>
 					<input type="number" step="0.01" min="0" inputmode="decimal" data-nwm-numeric data-nwm-position-risk placeholder="50" value="50">
 				</label>
 				<label>
-					<span><?php esc_html_e('Stop Distance', 'nerdywithme-tools'); ?></span>
-					<input type="number" step="0.00001" min="0.00001" inputmode="decimal" data-nwm-numeric data-nwm-position-stop placeholder="0.00500" value="0.00500">
+					<span><?php esc_html_e('Stop Distance (Pips)', 'nerdywithme-tools'); ?></span>
+					<input type="number" step="0.1" min="0.1" inputmode="decimal" data-nwm-numeric data-nwm-position-stop placeholder="50" value="50">
 				</label>
 				<label>
-					<span><?php esc_html_e('Value Per Point / Pip', 'nerdywithme-tools'); ?></span>
-					<input type="number" step="0.01" min="0.01" inputmode="decimal" data-nwm-numeric data-nwm-position-point-value placeholder="10" value="10">
+					<span><?php esc_html_e('Reference Price', 'nerdywithme-tools'); ?></span>
+					<input type="number" step="0.00001" min="0.00001" inputmode="decimal" data-nwm-numeric data-nwm-position-reference placeholder="1.25000" value="1.25000">
 				</label>
 			</div>
+			<p class="nwm-tool-card__note" data-nwm-forex-context><?php esc_html_e('Pip value is quoted directly in USD because it is the quote currency for EURUSD.', 'nerdywithme-tools'); ?></p>
 			<div class="nwm-tool-results">
 				<div>
 					<strong><?php esc_html_e('Suggested Position Size', 'nerdywithme-tools'); ?></strong>
 					<span data-nwm-position-lots>0.00 lots</span>
 				</div>
 				<div>
-					<strong><?php esc_html_e('Risk Budget Per Point', 'nerdywithme-tools'); ?></strong>
-					<span data-nwm-position-per-point>$0.00</span>
+					<strong><?php esc_html_e('Pip Value', 'nerdywithme-tools'); ?></strong>
+					<span data-nwm-position-per-point>USD 0.00</span>
 				</div>
 				<div>
 					<strong><?php esc_html_e('Position Value At Stop', 'nerdywithme-tools'); ?></strong>
-					<span data-nwm-position-stop-value>$0.00</span>
+					<span data-nwm-position-stop-value>USD 0.00</span>
 				</div>
 			</div>
 		</div>
@@ -601,32 +704,56 @@ class NerdyWithMe_Tools_Shortcodes {
 		ob_start();
 		?>
 		<div class="nwm-tool-card nwm-tool-card--pip" data-nwm-pip-calculator>
+			<?php echo $this->render_forex_pair_datalist(); ?>
 			<div class="nwm-tool-card__header">
 				<h3><?php esc_html_e('Pip / Point Value Calculator', 'nerdywithme-tools'); ?></h3>
 				<p><?php esc_html_e('Estimate the value of each pip or point for your current lot size, then project the total move value over a distance.', 'nerdywithme-tools'); ?></p>
 			</div>
 			<div class="nwm-tool-grid">
 				<label>
+					<span><?php esc_html_e('Forex Pair', 'nerdywithme-tools'); ?></span>
+					<input type="text" inputmode="text" data-nwm-pip-pair list="nwm-forex-pairs" placeholder="EURUSD" value="EURUSD" maxlength="7" spellcheck="false">
+					<small class="nwm-tool-grid__hint"><?php esc_html_e('Choose a common pair from the list or type one manually.', 'nerdywithme-tools'); ?></small>
+				</label>
+				<label>
+					<span><?php esc_html_e('Account Currency', 'nerdywithme-tools'); ?></span>
+					<select data-nwm-pip-account-currency>
+						<option value="USD" selected>USD</option>
+						<option value="EUR">EUR</option>
+						<option value="GBP">GBP</option>
+						<option value="JPY">JPY</option>
+						<option value="AUD">AUD</option>
+						<option value="NZD">NZD</option>
+						<option value="CAD">CAD</option>
+						<option value="CHF">CHF</option>
+					</select>
+				</label>
+				<label class="nwm-tool-grid__conversion-field" data-nwm-forex-conversion-field>
+					<span><?php esc_html_e('Quote to Account Rate', 'nerdywithme-tools'); ?></span>
+					<input type="number" step="0.00001" min="0" inputmode="decimal" data-nwm-numeric data-nwm-pip-conversion placeholder="1.00000" value="1.00000">
+				</label>
+				<label>
 					<span><?php esc_html_e('Lot Size', 'nerdywithme-tools'); ?></span>
 					<input type="number" step="0.01" min="0.01" inputmode="decimal" data-nwm-numeric data-nwm-pip-lots placeholder="1.00" value="1.00">
 				</label>
 				<label>
-					<span><?php esc_html_e('Value Per Pip / Point (1 Lot)', 'nerdywithme-tools'); ?></span>
-					<input type="number" step="0.01" min="0.01" inputmode="decimal" data-nwm-numeric data-nwm-pip-base-value placeholder="10" value="10">
+					<span><?php esc_html_e('Reference Price', 'nerdywithme-tools'); ?></span>
+					<input type="number" step="0.00001" min="0.00001" inputmode="decimal" data-nwm-numeric data-nwm-pip-reference placeholder="1.25000" value="1.25000">
 				</label>
 				<label>
-					<span><?php esc_html_e('Move Distance', 'nerdywithme-tools'); ?></span>
-					<input type="number" step="0.01" min="0" inputmode="decimal" data-nwm-numeric data-nwm-pip-distance placeholder="25" value="25">
+					<span><?php esc_html_e('Move Distance (Pips)', 'nerdywithme-tools'); ?></span>
+					<input type="number" step="0.1" min="0" inputmode="decimal" data-nwm-numeric data-nwm-pip-distance placeholder="25" value="25">
 				</label>
 			</div>
+			<p class="nwm-tool-card__note" data-nwm-forex-context><?php esc_html_e('Pip value is quoted directly in USD because it is the quote currency for EURUSD.', 'nerdywithme-tools'); ?></p>
 			<div class="nwm-tool-results">
 				<div>
 					<strong><?php esc_html_e('Value Per Pip / Point', 'nerdywithme-tools'); ?></strong>
-					<span data-nwm-pip-value>$0.00</span>
+					<span data-nwm-pip-value>USD 0.00</span>
 				</div>
 				<div>
 					<strong><?php esc_html_e('Total Move Value', 'nerdywithme-tools'); ?></strong>
-					<span data-nwm-pip-total>$0.00</span>
+					<span data-nwm-pip-total>USD 0.00</span>
 				</div>
 				<div>
 					<strong><?php esc_html_e('Mini Lot Equivalent', 'nerdywithme-tools'); ?></strong>
@@ -648,11 +775,34 @@ class NerdyWithMe_Tools_Shortcodes {
 		ob_start();
 		?>
 		<div class="nwm-tool-card nwm-tool-card--profit" data-nwm-profit-calculator>
+			<?php echo $this->render_forex_pair_datalist(); ?>
 			<div class="nwm-tool-card__header">
 				<h3><?php esc_html_e('Profit Target Calculator', 'nerdywithme-tools'); ?></h3>
 				<p><?php esc_html_e('Plan the payout at a target price, the reward multiple, and the percentage growth on your account.', 'nerdywithme-tools'); ?></p>
 			</div>
 			<div class="nwm-tool-grid">
+				<label>
+					<span><?php esc_html_e('Forex Pair', 'nerdywithme-tools'); ?></span>
+					<input type="text" inputmode="text" data-nwm-profit-pair list="nwm-forex-pairs" placeholder="EURUSD" value="EURUSD" maxlength="7" spellcheck="false">
+					<small class="nwm-tool-grid__hint"><?php esc_html_e('Choose a common pair from the list or type one manually.', 'nerdywithme-tools'); ?></small>
+				</label>
+				<label>
+					<span><?php esc_html_e('Account Currency', 'nerdywithme-tools'); ?></span>
+					<select data-nwm-profit-account-currency>
+						<option value="USD" selected>USD</option>
+						<option value="EUR">EUR</option>
+						<option value="GBP">GBP</option>
+						<option value="JPY">JPY</option>
+						<option value="AUD">AUD</option>
+						<option value="NZD">NZD</option>
+						<option value="CAD">CAD</option>
+						<option value="CHF">CHF</option>
+					</select>
+				</label>
+				<label class="nwm-tool-grid__conversion-field" data-nwm-forex-conversion-field>
+					<span><?php esc_html_e('Quote to Account Rate', 'nerdywithme-tools'); ?></span>
+					<input type="number" step="0.00001" min="0" inputmode="decimal" data-nwm-numeric data-nwm-profit-conversion placeholder="1.00000" value="1.00000">
+				</label>
 				<label>
 					<span><?php esc_html_e('Account Balance', 'nerdywithme-tools'); ?></span>
 					<input type="number" step="0.01" min="0" inputmode="decimal" data-nwm-numeric data-nwm-profit-balance placeholder="1000" value="1000">
@@ -674,18 +824,19 @@ class NerdyWithMe_Tools_Shortcodes {
 					<input type="number" step="0.01" min="0.01" inputmode="decimal" data-nwm-numeric data-nwm-profit-lots placeholder="1.00" value="1.00">
 				</label>
 				<label>
-					<span><?php esc_html_e('Value Per Pip / Point (1 Lot)', 'nerdywithme-tools'); ?></span>
-					<input type="number" step="0.01" min="0.01" inputmode="decimal" data-nwm-numeric data-nwm-profit-point-value placeholder="10" value="10">
+					<span><?php esc_html_e('Reference Price', 'nerdywithme-tools'); ?></span>
+					<input type="number" step="0.00001" min="0.00001" inputmode="decimal" data-nwm-numeric data-nwm-profit-reference placeholder="1.25000" value="1.25000">
 				</label>
 			</div>
+			<p class="nwm-tool-card__note" data-nwm-forex-context><?php esc_html_e('Pip value is quoted directly in USD because it is the quote currency for EURUSD.', 'nerdywithme-tools'); ?></p>
 			<div class="nwm-tool-results">
 				<div>
 					<strong><?php esc_html_e('Target Distance', 'nerdywithme-tools'); ?></strong>
-					<span data-nwm-profit-distance>0.00000</span>
+					<span data-nwm-profit-distance>0.0 pips</span>
 				</div>
 				<div>
 					<strong><?php esc_html_e('Profit At Target', 'nerdywithme-tools'); ?></strong>
-					<span data-nwm-profit-amount>$0.00</span>
+					<span data-nwm-profit-amount>USD 0.00</span>
 				</div>
 				<div>
 					<strong><?php esc_html_e('Reward / Risk', 'nerdywithme-tools'); ?></strong>
@@ -694,6 +845,10 @@ class NerdyWithMe_Tools_Shortcodes {
 				<div>
 					<strong><?php esc_html_e('Account Growth', 'nerdywithme-tools'); ?></strong>
 					<span data-nwm-profit-growth>0.00%</span>
+				</div>
+				<div>
+					<strong><?php esc_html_e('Pip Value', 'nerdywithme-tools'); ?></strong>
+					<span data-nwm-profit-pip-value>USD 0.00</span>
 				</div>
 			</div>
 		</div>

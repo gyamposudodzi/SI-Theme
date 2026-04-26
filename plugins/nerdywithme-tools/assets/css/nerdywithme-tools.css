@@ -202,6 +202,34 @@
   color: #9aa0bb;
 }
 
+.nwm-tool-grid input[type="text"] {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.nwm-tool-grid__hint {
+  display: block;
+  margin-top: -3px;
+  color: #69708f;
+  font-size: 0.74rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.nwm-tool-grid__conversion-field.is-hidden {
+  display: none;
+}
+
+.nwm-tool-card__note {
+  margin: -6px 0 0;
+  padding: 14px 16px;
+  border: 1px solid #ece7f5;
+  background: #fffaf5;
+  color: #4f587a;
+  font-size: 0.84rem;
+  line-height: 1.6;
+}
+
 .nwm-tool-results {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

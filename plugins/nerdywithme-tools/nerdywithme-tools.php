@@ -1,10 +1,15 @@
 <?php
 /**
  * Plugin Name: NerdyWithMe Tools
- * Plugin URI: https://example.com/nerdywithme-tools
+ * Plugin URI: https://nerdywithme.com/tools
  * Description: Trading tools, calculator shortcodes, and ad slot controls for the NerdyWithMe theme.
  * Version: 0.1.1
- * Author: Nerdywithme
+ * Author: NerdyWithMe
+ * Author URI: https://nerdywithme.com
+ * Requires at least: 6.0
+ * Tested up to: 6.7
+ * Requires PHP: 7.4
+ * License: GPL-2.0-or-later
  * Text Domain: nerdywithme-tools
  *
  * @package NerdyWithMeTools

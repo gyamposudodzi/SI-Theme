@@ -100,7 +100,7 @@
 							<?php while ($mega_posts->have_posts()) : $mega_posts->the_post(); ?>
 								<article class="mega-panel__post">
 									<a class="mega-panel__thumb" href="<?php the_permalink(); ?>">
-										<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-thumb', array('alt' => get_the_title()), '(max-width: 820px) 20vw, 120px'); ?>
+										<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-thumb', array('alt' => get_the_title()), nerdywithme_get_image_sizes_hint('mega-thumb')); ?>
 									</a>
 									<div class="mega-panel__meta"><?php nerdywithme_post_meta(get_the_ID()); ?></div>
 									<h3 class="mega-panel__post-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
@@ -139,7 +139,7 @@
 								<?php while ($search_posts && $search_posts->have_posts()) : $search_posts->the_post(); ?>
 									<article class="search-panel__post">
 										<a class="search-panel__thumb" href="<?php the_permalink(); ?>">
-											<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-mini', array('alt' => get_the_title()), '(max-width: 820px) 40vw, 180px'); ?>
+											<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-mini', array('alt' => get_the_title()), nerdywithme_get_image_sizes_hint('search-panel')); ?>
 										</a>
 										<div class="search-panel__content">
 											<div class="search-panel__meta"><?php nerdywithme_post_meta(get_the_ID()); ?></div>

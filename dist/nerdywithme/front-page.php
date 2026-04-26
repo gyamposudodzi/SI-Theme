@@ -57,7 +57,7 @@ if (count($editor_ids) < 3) {
 		<?php if ($hero_id) : ?>
 			<article class="compact-hero-card">
 				<a class="compact-hero-card__thumb" href="<?php echo esc_url(get_permalink($hero_id)); ?>">
-					<?php echo nerdywithme_get_post_image_tag($hero_id, 'nwm-hero', array('alt' => get_the_title($hero_id), 'loading' => 'eager', 'fetchpriority' => 'high', 'decoding' => 'sync'), '(max-width: 700px) 100vw, (max-width: 1100px) 100vw, 62vw'); ?>
+					<?php echo nerdywithme_get_post_image_tag($hero_id, 'nwm-hero', array('alt' => get_the_title($hero_id), 'loading' => 'eager', 'fetchpriority' => 'high', 'decoding' => 'sync'), nerdywithme_get_image_sizes_hint('home-hero')); ?>
 				</a>
 				<div class="compact-hero-card__content">
 					<?php nerdywithme_post_meta($hero_id); ?>
@@ -146,7 +146,7 @@ if (count($editor_ids) < 3) {
 					<article class="list-post list-post--circle">
 						<a class="list-post__media" href="<?php the_permalink(); ?>">
 							<span class="compact-list__thumb compact-list__thumb--circle">
-								<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-thumb', array('alt' => get_the_title()), '(max-width: 1100px) 18vw, 104px'); ?>
+								<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-thumb', array('alt' => get_the_title()), nerdywithme_get_image_sizes_hint('list-thumb')); ?>
 							</span>
 						</a>
 						<div class="list-post__body">
@@ -176,7 +176,7 @@ if (count($editor_ids) < 3) {
 					<article class="list-post list-post--circle">
 						<a class="list-post__media" href="<?php the_permalink(); ?>">
 							<span class="compact-list__thumb compact-list__thumb--circle">
-								<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-thumb', array('alt' => get_the_title()), '(max-width: 1100px) 18vw, 104px'); ?>
+								<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-thumb', array('alt' => get_the_title()), nerdywithme_get_image_sizes_hint('list-thumb')); ?>
 							</span>
 						</a>
 						<div class="list-post__body">
@@ -203,7 +203,7 @@ if (count($editor_ids) < 3) {
 					<article class="list-post list-post--circle">
 						<a class="list-post__media" href="<?php the_permalink(); ?>">
 							<span class="compact-list__thumb compact-list__thumb--circle">
-								<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-thumb', array('alt' => get_the_title()), '(max-width: 1100px) 18vw, 104px'); ?>
+								<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-thumb', array('alt' => get_the_title()), nerdywithme_get_image_sizes_hint('list-thumb')); ?>
 							</span>
 						</a>
 						<div class="list-post__body">

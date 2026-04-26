@@ -1,0 +1,7 @@
+{
+  "name": "nerdywithme-theme",
+  "private": true,
+  "scripts": {
+    "build:css": "node scripts/minify-css.js"
+  }
+}

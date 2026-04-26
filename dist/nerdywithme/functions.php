@@ -42,6 +42,7 @@ function nerdywithme_setup() {
 	add_image_size('nwm-hero', 1600, 900, true);
 	add_image_size('nwm-hero-mobile', 820, 620, true);
 	add_image_size('nwm-card', 900, 650, true);
+	add_image_size('nwm-card-compact', 640, 460, true);
 	add_image_size('nwm-mini', 600, 420, true);
 	add_image_size('nwm-thumb', 320, 320, true);
 	add_image_size('nwm-square', 220, 220, true);
@@ -63,8 +64,8 @@ add_action('after_setup_theme', 'nerdywithme_setup');
 
 function nerdywithme_enqueue_assets() {
 	$fonts_url = 'https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Outfit:wght@400;500;600;700;800&display=swap';
-	$style_file = file_exists(get_template_directory() . '/assets/css/theme.min.css') ? '/assets/css/theme.min.css' : '/style.css';
-	$tools_style_file = file_exists(get_template_directory() . '/assets/css/tools-page.min.css') ? '/assets/css/tools-page.min.css' : '/assets/css/tools-page.css';
+	$style_file = nerdywithme_get_preferred_asset('/style.css', '/assets/css/theme.min.css');
+	$tools_style_file = nerdywithme_get_preferred_asset('/assets/css/tools-page.css', '/assets/css/tools-page.min.css');
 	$nav_file    = file_exists(get_template_directory() . '/assets/js/nav-search.min.js') ? '/assets/js/nav-search.min.js' : '/assets/js/nav-search.js';
 	$search_file = file_exists(get_template_directory() . '/assets/js/search-modal.min.js') ? '/assets/js/search-modal.min.js' : '/assets/js/search-modal.js';
 	$slider_file = file_exists(get_template_directory() . '/assets/js/featured-slider.min.js') ? '/assets/js/featured-slider.min.js' : '/assets/js/featured-slider.js';
@@ -152,6 +153,21 @@ function nerdywithme_enqueue_assets() {
 	}
 }
 add_action('wp_enqueue_scripts', 'nerdywithme_enqueue_assets');
+
+function nerdywithme_get_preferred_asset($source_file, $minified_file) {
+	$source_path   = get_template_directory() . $source_file;
+	$minified_path = get_template_directory() . $minified_file;
+
+	if (! file_exists($minified_path)) {
+		return $source_file;
+	}
+
+	if (! file_exists($source_path)) {
+		return $minified_file;
+	}
+
+	return filemtime($minified_path) >= filemtime($source_path) ? $minified_file : $source_file;
+}
 
 function nerdywithme_trim_frontend_assets() {
 	if (is_admin()) {
@@ -265,7 +281,7 @@ function nerdywithme_preload_home_hero_image() {
 	}
 
 	$srcset = wp_get_attachment_image_srcset($thumbnail_id, 'nwm-hero');
-	$sizes  = '(max-width: 700px) 100vw, (max-width: 1100px) 100vw, 62vw';
+	$sizes  = nerdywithme_get_image_sizes_hint('home-hero');
 	?>
 	<?php if ($mobile_image && ! empty($mobile_image[0])) : ?>
 		<link rel="preload" as="image" href="<?php echo esc_url($mobile_image[0]); ?>"<?php echo $srcset ? ' imagesrcset="' . esc_attr($srcset) . '"' : ''; ?> imagesizes="<?php echo esc_attr($sizes); ?>" media="(max-width: 700px)" fetchpriority="high">
@@ -1029,12 +1045,35 @@ function nerdywithme_get_post_image($post_id, $size = 'large') {
 	return nerdywithme_fallback_image();
 }
 
+function nerdywithme_get_image_sizes_hint($context) {
+	$map = array(
+		'home-hero'       => '(max-width: 700px) 100vw, (max-width: 1100px) 100vw, 62vw',
+		'single-hero'     => '(max-width: 820px) 100vw, (max-width: 1200px) 92vw, 760px',
+		'standard-card'   => '(max-width: 560px) 100vw, (max-width: 1100px) 50vw, 560px',
+		'compact-card'    => '(max-width: 560px) 100vw, (max-width: 1100px) 50vw, 272px',
+		'row-card'        => '(max-width: 680px) 100vw, (max-width: 1100px) 45vw, 320px',
+		'related-card'    => '(max-width: 680px) 100vw, (max-width: 1100px) 50vw, 320px',
+		'category-card'   => '(max-width: 680px) 100vw, (max-width: 1100px) 50vw, 260px',
+		'featured-slider' => '(max-width: 680px) 100vw, 240px',
+		'mini-card'       => '(max-width: 680px) 100vw, (max-width: 1100px) 50vw, 260px',
+		'search-panel'    => '(max-width: 680px) 84vw, (max-width: 1100px) 40vw, 260px',
+		'mega-thumb'      => '84px',
+		'list-thumb'      => '(max-width: 680px) 104px, 18vw',
+		'ranked-thumb'    => '104px',
+		'compact-thumb'   => '90px',
+		'reading-thumb'   => '44px',
+	);
+
+	return $map[ $context ] ?? '';
+}
+
 function nerdywithme_get_post_image_tag($post_id, $size = 'large', $attrs = array(), $sizes = '') {
 	$classes = array('nwm-img');
 	$size_map = array(
 		'nwm-hero'   => array(1600, 900),
 		'nwm-hero-mobile' => array(820, 620),
 		'nwm-card'   => array(900, 650),
+		'nwm-card-compact' => array(640, 460),
 		'nwm-mini'   => array(600, 420),
 		'nwm-thumb'  => array(320, 320),
 		'nwm-square' => array(220, 220),
@@ -1330,15 +1369,27 @@ function nerdywithme_brand_style_label($variant) {
 }
 
 function nerdywithme_get_category_preview_post($category_id) {
+	static $preview_cache = array();
+	$category_id = (int) $category_id;
+
+	if (isset($preview_cache[ $category_id ])) {
+		return $preview_cache[ $category_id ];
+	}
+
 	$posts = get_posts(
 		array(
 			'posts_per_page'      => 1,
 			'cat'                 => $category_id,
 			'ignore_sticky_posts' => true,
+			'no_found_rows'       => true,
+			'post_status'         => 'publish',
+			'fields'              => 'ids',
 		)
 	);
 
-	return $posts[0]->ID ?? 0;
+	$preview_cache[ $category_id ] = (int) ($posts[0] ?? 0);
+
+	return $preview_cache[ $category_id ];
 }
 
 function nerdywithme_category_card($category) {
@@ -1347,7 +1398,7 @@ function nerdywithme_category_card($category) {
 	?>
 	<article class="category-pill">
 		<a class="category-pill__thumb" href="<?php echo esc_url(get_category_link($category)); ?>">
-			<?php echo nerdywithme_get_post_image_tag($image_id, 'nwm-card', array('alt' => $category->name), '(max-width: 1100px) 45vw, 260px'); ?>
+			<?php echo nerdywithme_get_post_image_tag($image_id, 'nwm-card-compact', array('alt' => $category->name), nerdywithme_get_image_sizes_hint('category-card')); ?>
 		</a>
 		<div class="category-pill__name"><?php echo esc_html($category->name); ?></div>
 		<p class="section-intro">
@@ -1420,10 +1471,13 @@ function nerdywithme_card($post_id, $variant = 'standard') {
 	if (! $post_id) {
 		return;
 	}
+
+	$image_size  = 'compact' === $variant ? 'nwm-card-compact' : 'nwm-card';
+	$image_sizes = 'compact' === $variant ? nerdywithme_get_image_sizes_hint('compact-card') : nerdywithme_get_image_sizes_hint('standard-card');
 	?>
 	<article <?php post_class('card card--' . $variant, $post_id); ?>>
 		<a class="card__thumb" href="<?php echo esc_url(get_permalink($post_id)); ?>">
-			<?php echo nerdywithme_get_post_image_tag($post_id, 'nwm-card', array('alt' => get_the_title($post_id)), '(max-width: 1100px) 100vw, 560px'); ?>
+			<?php echo nerdywithme_get_post_image_tag($post_id, $image_size, array('alt' => get_the_title($post_id)), $image_sizes); ?>
 		</a>
 		<div class="card__content">
 			<?php nerdywithme_post_meta($post_id); ?>
@@ -1443,7 +1497,7 @@ function nerdywithme_mini_post($post_id) {
 	?>
 	<article class="mini-post">
 		<a class="mini-post__thumb" href="<?php echo esc_url(get_permalink($post_id)); ?>">
-			<?php echo nerdywithme_get_post_image_tag($post_id, 'nwm-mini', array('alt' => get_the_title($post_id)), '(max-width: 1100px) 45vw, 260px'); ?>
+			<?php echo nerdywithme_get_post_image_tag($post_id, 'nwm-mini', array('alt' => get_the_title($post_id)), nerdywithme_get_image_sizes_hint('mini-card')); ?>
 		</a>
 		<div>
 			<?php nerdywithme_post_meta($post_id); ?>
@@ -1460,7 +1514,7 @@ function nerdywithme_row_post($post_id) {
 	?>
 	<article class="row-post">
 		<a class="row-post__thumb" href="<?php echo esc_url(get_permalink($post_id)); ?>">
-			<?php echo nerdywithme_get_post_image_tag($post_id, 'nwm-card', array('alt' => get_the_title($post_id)), '(max-width: 1100px) 45vw, 320px'); ?>
+			<?php echo nerdywithme_get_post_image_tag($post_id, 'nwm-card-compact', array('alt' => get_the_title($post_id)), nerdywithme_get_image_sizes_hint('row-card')); ?>
 		</a>
 		<div class="row-post__content">
 			<?php nerdywithme_post_meta($post_id); ?>
@@ -1484,12 +1538,64 @@ function nerdywithme_load_more_bar() {
 	<?php
 }
 
-function nerdywithme_ranked_posts($query_args, $limit = 3) {
-	$args                   = wp_parse_args($query_args, array());
-	$args['post_type']      = 'post';
-	$args['posts_per_page'] = 3;
+function nerdywithme_build_post_query_args($query_args = array(), $limit = 0) {
+	$args = wp_parse_args($query_args, array());
+
+	$args['post_type']           = 'post';
+	$args['post_status']         = 'publish';
 	$args['ignore_sticky_posts'] = true;
-	$query                  = new WP_Query($args);
+	$args['no_found_rows']       = true;
+
+	if ($limit > 0) {
+		$args['posts_per_page'] = $limit;
+	}
+
+	return $args;
+}
+
+function nerdywithme_get_cached_query($query_args = array(), $limit = 0) {
+	static $query_cache = array();
+
+	$args      = nerdywithme_build_post_query_args($query_args, $limit);
+	$cache_key = md5(wp_json_encode($args));
+
+	if (isset($query_cache[ $cache_key ])) {
+		return clone $query_cache[ $cache_key ];
+	}
+
+	$query                    = new WP_Query($args);
+	$query_cache[ $cache_key ] = clone $query;
+
+	return $query;
+}
+
+function nerdywithme_resolve_category_term($category_name) {
+	static $category_cache = array();
+
+	$raw_name  = is_string($category_name) ? trim($category_name) : '';
+	$cache_key = $raw_name ? strtolower($raw_name) : '__empty__';
+
+	if (array_key_exists($cache_key, $category_cache)) {
+		return $category_cache[ $cache_key ];
+	}
+
+	$category = null;
+
+	if ($raw_name) {
+		$category = get_category_by_slug(sanitize_title($raw_name));
+
+		if (! $category) {
+			$category = get_term_by('name', $raw_name, 'category');
+		}
+	}
+
+	$category_cache[ $cache_key ] = (! $category || is_wp_error($category)) ? null : $category;
+
+	return $category_cache[ $cache_key ];
+}
+
+function nerdywithme_ranked_posts($query_args, $limit = 3) {
+	$query = nerdywithme_get_cached_query($query_args, $limit);
 
 	if (! $query->have_posts()) {
 		return;
@@ -1505,7 +1611,7 @@ function nerdywithme_ranked_posts($query_args, $limit = 3) {
 				<a class="rank-list__media" href="<?php the_permalink(); ?>">
 						<span class="rank-list__thumb">
 							<span class="rank-list__count"><?php echo esc_html((string) $rank); ?></span>
-							<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-thumb', array('alt' => get_the_title()), '104px'); ?>
+							<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-thumb', array('alt' => get_the_title()), nerdywithme_get_image_sizes_hint('ranked-thumb')); ?>
 						</span>
 				</a>
 				<div class="rank-list__body">
@@ -1525,7 +1631,7 @@ function nerdywithme_ranked_posts($query_args, $limit = 3) {
 }
 
 function nerdywithme_compact_posts($query_args, $limit = 3) {
-	$query = new WP_Query(wp_parse_args($query_args, array('posts_per_page' => $limit)));
+	$query = nerdywithme_get_cached_query($query_args, $limit);
 
 	if (! $query->have_posts()) {
 		return;
@@ -1535,7 +1641,7 @@ function nerdywithme_compact_posts($query_args, $limit = 3) {
 		<?php while ($query->have_posts()) : $query->the_post(); ?>
 			<a class="compact-list__item compact-list__item--featured" href="<?php the_permalink(); ?>">
 				<div class="compact-list__thumb">
-					<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-thumb', array('alt' => get_the_title()), '90px'); ?>
+					<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-thumb', array('alt' => get_the_title()), nerdywithme_get_image_sizes_hint('compact-thumb')); ?>
 				</div>
 				<div class="compact-list__content">
 					<?php nerdywithme_post_meta(get_the_ID()); ?>
@@ -1549,11 +1655,7 @@ function nerdywithme_compact_posts($query_args, $limit = 3) {
 }
 
 function nerdywithme_featured_slider_posts($query_args, $limit = 3) {
-	$args                   = wp_parse_args($query_args, array());
-	$args['post_type']      = 'post';
-	$args['posts_per_page'] = $limit;
-	$args['ignore_sticky_posts'] = true;
-	$query                  = new WP_Query($args);
+	$query = nerdywithme_get_cached_query($query_args, $limit);
 
 	if (! $query->have_posts()) {
 		return;
@@ -1570,7 +1672,7 @@ function nerdywithme_featured_slider_posts($query_args, $limit = 3) {
 					<div class="compact-list__item compact-list__item--featured">
 						<a class="compact-list__thumb-link" href="<?php the_permalink(); ?>">
 							<div class="compact-list__thumb">
-								<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-card', array('alt' => get_the_title()), '(max-width: 1100px) 60vw, 240px'); ?>
+								<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-card-compact', array('alt' => get_the_title()), nerdywithme_get_image_sizes_hint('featured-slider')); ?>
 							</div>
 						</a>
 						<div class="compact-list__content">
@@ -1599,42 +1701,32 @@ function nerdywithme_featured_slider_posts($query_args, $limit = 3) {
 }
 
 function nerdywithme_get_featured_posts($count = 6, $exclude = array()) {
-	return new WP_Query(
+	return nerdywithme_get_cached_query(
 		array(
-			'post_type'           => 'post',
-			'posts_per_page'      => $count,
-			'post__not_in'        => $exclude,
-			'ignore_sticky_posts' => true,
-		)
+			'post__not_in' => $exclude,
+		),
+		$count
 	);
 }
 
 function nerdywithme_get_posts_by_category_name($category_name, $count = 3, $exclude = array()) {
-	$category = get_category_by_slug(sanitize_title($category_name));
-
-	if (! $category) {
-		$category = get_term_by('name', $category_name, 'category');
-	}
+	$category = nerdywithme_resolve_category_term($category_name);
 
 	if (! $category || is_wp_error($category)) {
-		return new WP_Query(
+		return nerdywithme_get_cached_query(
 			array(
-				'post_type'           => 'post',
-				'posts_per_page'      => $count,
-				'post__not_in'        => $exclude,
-				'ignore_sticky_posts' => true,
-			)
+				'post__not_in' => $exclude,
+			),
+			$count
 		);
 	}
 
-	return new WP_Query(
+	return nerdywithme_get_cached_query(
 		array(
-			'post_type'           => 'post',
-			'posts_per_page'      => $count,
-			'post__not_in'        => $exclude,
-			'ignore_sticky_posts' => true,
-			'cat'                 => (int) $category->term_id,
-		)
+			'post__not_in' => $exclude,
+			'cat'          => (int) $category->term_id,
+		),
+		$count
 	);
 }
 
@@ -1650,14 +1742,12 @@ function nerdywithme_get_related_posts($post_id = null, $count = 3) {
 	$display_category = nerdywithme_get_display_category($post_id);
 
 	if ($display_category && ! is_wp_error($display_category)) {
-		return new WP_Query(
+		return nerdywithme_get_cached_query(
 			array(
-				'post_type'           => 'post',
-				'posts_per_page'      => $count,
-				'post__not_in'        => $exclude,
-				'ignore_sticky_posts' => true,
-				'cat'                 => (int) $display_category->term_id,
-			)
+				'post__not_in' => $exclude,
+				'cat'          => (int) $display_category->term_id,
+			),
+			$count
 		);
 	}
 
@@ -1780,7 +1870,14 @@ function nerdywithme_get_404_suggestion_posts($count = 3) {
 }
 
 function nerdywithme_get_primary_categories($count = 6) {
-	return get_categories(
+	static $primary_categories_cache = array();
+	$count = max(1, (int) $count);
+
+	if (isset($primary_categories_cache[ $count ])) {
+		return $primary_categories_cache[ $count ];
+	}
+
+	$primary_categories_cache[ $count ] = get_categories(
 		array(
 			'hide_empty' => false,
 			'number'     => $count,
@@ -1788,4 +1885,6 @@ function nerdywithme_get_primary_categories($count = 6) {
 			'order'      => 'DESC',
 		)
 	);
+
+	return $primary_categories_cache[ $count ];
 }

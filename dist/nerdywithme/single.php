@@ -25,7 +25,7 @@ get_header();
 							<span class="reading-bar__arrow" aria-hidden="true">&lsaquo;</span>
 							<span class="reading-bar__tooltip" role="tooltip"><?php echo esc_html__('Previous article:', 'nerdywithme'); ?> <?php echo esc_html(get_the_title($previous_post)); ?></span>
 							<span class="reading-bar__thumb">
-								<?php echo nerdywithme_get_post_image_tag($previous_post->ID, 'thumbnail', array('alt' => get_the_title($previous_post)), '44px'); ?>
+								<?php echo nerdywithme_get_post_image_tag($previous_post->ID, 'nwm-thumb', array('alt' => get_the_title($previous_post)), nerdywithme_get_image_sizes_hint('reading-thumb')); ?>
 							</span>
 							<span class="reading-bar__text">
 								<strong><?php echo esc_html(get_the_title($previous_post)); ?></strong>
@@ -43,7 +43,7 @@ get_header();
 								<strong><?php echo esc_html(get_the_title($next_post)); ?></strong>
 							</span>
 							<span class="reading-bar__thumb">
-								<?php echo nerdywithme_get_post_image_tag($next_post->ID, 'thumbnail', array('alt' => get_the_title($next_post)), '44px'); ?>
+								<?php echo nerdywithme_get_post_image_tag($next_post->ID, 'nwm-thumb', array('alt' => get_the_title($next_post)), nerdywithme_get_image_sizes_hint('reading-thumb')); ?>
 							</span>
 							<span class="reading-bar__arrow" aria-hidden="true">&rsaquo;</span>
 							<span class="reading-bar__tooltip" role="tooltip"><?php echo esc_html__('Next article:', 'nerdywithme'); ?> <?php echo esc_html(get_the_title($next_post)); ?></span>
@@ -68,7 +68,7 @@ get_header();
 						</div>
 					</div>
 					<div class="single-hero__image">
-						<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'full', array('alt' => get_the_title(), 'loading' => 'eager', 'fetchpriority' => 'high'), '100vw'); ?>
+						<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-hero', array('alt' => get_the_title(), 'loading' => 'eager', 'fetchpriority' => 'high'), nerdywithme_get_image_sizes_hint('single-hero')); ?>
 					</div>
 				</header>
 				<div class="single-layout">
@@ -95,7 +95,7 @@ get_header();
 									?>
 									<article class="read-next__item">
 										<a class="read-next__thumb" href="<?php the_permalink(); ?>">
-											<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'medium_large', array('alt' => get_the_title()), '(max-width: 1100px) 45vw, 320px'); ?>
+											<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-card-compact', array('alt' => get_the_title()), nerdywithme_get_image_sizes_hint('related-card')); ?>
 										</a>
 										<?php nerdywithme_post_meta(get_the_ID()); ?>
 										<h3 class="read-next__title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
@@ -127,7 +127,7 @@ get_header();
 								</div>
 							</div>
 							<div class="single-hero__image single-hero__image--standard">
-								<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'full', array('alt' => get_the_title(), 'loading' => 'eager', 'fetchpriority' => 'high'), '100vw'); ?>
+								<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-hero', array('alt' => get_the_title(), 'loading' => 'eager', 'fetchpriority' => 'high'), nerdywithme_get_image_sizes_hint('single-hero')); ?>
 							</div>
 						</header>
 						<div class="entry-content">
@@ -152,7 +152,7 @@ get_header();
 									?>
 									<article class="read-next__item">
 										<a class="read-next__thumb" href="<?php the_permalink(); ?>">
-											<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'medium_large', array('alt' => get_the_title()), '(max-width: 1100px) 45vw, 320px'); ?>
+											<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-card-compact', array('alt' => get_the_title()), nerdywithme_get_image_sizes_hint('related-card')); ?>
 										</a>
 										<?php nerdywithme_post_meta(get_the_ID()); ?>
 										<h3 class="read-next__title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>

@@ -59,58 +59,60 @@
 			<div class="mega-panel" aria-hidden="true">
 				<div class="mega-panel__drawer">
 					<div class="mega-panel__topbar">
-						<div class="mega-panel__brand">
-							<?php nerdywithme_branding(false, 'lockup'); ?>
-						</div>
 						<button class="mega-panel__close" type="button" aria-label="<?php esc_attr_e('Close menu', 'nerdywithme'); ?>">
 							<span aria-hidden="true">&times;</span>
 						</button>
 					</div>
-					<div class="mega-panel__group">
-						<h2><?php esc_html_e('Explore', 'nerdywithme'); ?></h2>
-						<div class="mega-panel__links-slot" data-mega-menu-slot></div>
+					<div class="mega-panel__brand">
+						<?php nerdywithme_branding(false, 'lockup'); ?>
 					</div>
-					<div class="mega-panel__menu-templates" aria-hidden="true">
-						<?php
-						wp_nav_menu(
-							array(
-								'theme_location' => 'drawer_menu',
-								'container'      => false,
-								'menu_class'     => 'mega-panel__links',
-								'depth'          => 1,
-								'fallback_cb'    => 'nerdywithme_drawer_menu_fallback',
-							)
-						);
-						?>
-						<?php
-						wp_nav_menu(
-							array(
-								'theme_location' => 'primary',
-								'container'      => false,
-								'menu_class'     => 'mega-panel__links',
-								'depth'          => 1,
-								'fallback_cb'    => 'nerdywithme_primary_menu_fallback',
-							)
-						);
-						?>
-					</div>
-					<div class="mega-panel__posts">
-						<h2><?php esc_html_e('Latest Posts', 'nerdywithme'); ?></h2>
-						<div class="mega-panel__post-grid">
-							<?php while ($mega_posts->have_posts()) : $mega_posts->the_post(); ?>
-								<article class="mega-panel__post">
-									<a class="mega-panel__thumb" href="<?php the_permalink(); ?>">
-										<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-thumb', array('alt' => get_the_title()), nerdywithme_get_image_sizes_hint('mega-thumb')); ?>
-									</a>
-									<div class="mega-panel__meta"><?php nerdywithme_post_meta(get_the_ID()); ?></div>
-									<h3 class="mega-panel__post-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
-								</article>
-							<?php endwhile; wp_reset_postdata(); ?>
+					<div class="mega-panel__scroll">
+						<div class="mega-panel__group">
+							<h2><?php esc_html_e('Explore', 'nerdywithme'); ?></h2>
+							<div class="mega-panel__links-slot" data-mega-menu-slot></div>
 						</div>
-					</div>
-					<div class="mega-panel__social">
-						<h2><?php esc_html_e('Follow', 'nerdywithme'); ?></h2>
-						<?php nerdywithme_render_social_links(); ?>
+						<div class="mega-panel__menu-templates" aria-hidden="true">
+							<?php
+							wp_nav_menu(
+								array(
+									'theme_location' => 'drawer_menu',
+									'container'      => false,
+									'menu_class'     => 'mega-panel__links',
+									'depth'          => 1,
+									'fallback_cb'    => 'nerdywithme_drawer_menu_fallback',
+								)
+							);
+							?>
+							<?php
+							wp_nav_menu(
+								array(
+									'theme_location' => 'primary',
+									'container'      => false,
+									'menu_class'     => 'mega-panel__links',
+									'depth'          => 1,
+									'fallback_cb'    => 'nerdywithme_primary_menu_fallback',
+								)
+							);
+							?>
+						</div>
+						<div class="mega-panel__posts">
+							<h2><?php esc_html_e('Latest Posts', 'nerdywithme'); ?></h2>
+							<div class="mega-panel__post-grid">
+								<?php while ($mega_posts->have_posts()) : $mega_posts->the_post(); ?>
+									<article class="mega-panel__post">
+										<a class="mega-panel__thumb" href="<?php the_permalink(); ?>">
+											<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-thumb', array('alt' => get_the_title()), nerdywithme_get_image_sizes_hint('mega-thumb')); ?>
+										</a>
+										<div class="mega-panel__meta"><?php nerdywithme_post_meta(get_the_ID()); ?></div>
+										<h3 class="mega-panel__post-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
+									</article>
+								<?php endwhile; wp_reset_postdata(); ?>
+							</div>
+						</div>
+						<div class="mega-panel__social">
+							<h2><?php esc_html_e('Follow', 'nerdywithme'); ?></h2>
+							<?php nerdywithme_render_social_links(); ?>
+						</div>
 					</div>
 				</div>
 			</div>

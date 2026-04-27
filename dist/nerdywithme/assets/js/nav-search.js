@@ -1,10 +1,44 @@
 document.addEventListener("DOMContentLoaded", function () {
   const body = document.body;
+  const root = document.documentElement;
   const navToggle = document.querySelector(".nav-toggle");
   const megaPanel = document.querySelector(".mega-panel");
   const megaClose = megaPanel ? megaPanel.querySelector(".mega-panel__close") : null;
   const menuSlot = document.querySelector("[data-mega-menu-slot]");
   const menuTemplates = document.querySelectorAll(".mega-panel__menu-templates .mega-panel__links");
+  let lockedScrollY = 0;
+
+  function lockPageScroll() {
+    if (window.matchMedia("(max-width: 1100px)").matches || body.classList.contains("nav-scroll-locked")) {
+      return;
+    }
+
+    lockedScrollY = window.scrollY || window.pageYOffset || 0;
+    body.classList.add("nav-scroll-locked");
+    body.style.position = "fixed";
+    body.style.top = "-" + lockedScrollY + "px";
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
+    body.style.overflow = "hidden";
+    root.style.scrollBehavior = "auto";
+  }
+
+  function unlockPageScroll() {
+    if (!body.classList.contains("nav-scroll-locked")) {
+      return;
+    }
+
+    body.classList.remove("nav-scroll-locked");
+    body.style.position = "";
+    body.style.top = "";
+    body.style.left = "";
+    body.style.right = "";
+    body.style.width = "";
+    body.style.overflow = "";
+    root.style.scrollBehavior = "";
+    window.scrollTo(0, lockedScrollY);
+  }
 
   function renderDrawerMenu() {
     if (!menuSlot || !menuTemplates.length) {
@@ -29,6 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
       navToggle.setAttribute("aria-expanded", "false");
     }
     body.classList.remove("nav-open");
+    unlockPageScroll();
     if (megaPanel) {
       megaPanel.setAttribute("aria-hidden", "true");
     }
@@ -42,6 +77,11 @@ document.addEventListener("DOMContentLoaded", function () {
       const expanded = navToggle.getAttribute("aria-expanded") === "true";
       navToggle.setAttribute("aria-expanded", String(!expanded));
       body.classList.toggle("nav-open", !expanded);
+      if (!expanded) {
+        lockPageScroll();
+      } else {
+        unlockPageScroll();
+      }
       if (megaPanel) {
         megaPanel.setAttribute("aria-hidden", String(expanded));
       }
@@ -79,7 +119,9 @@ document.addEventListener("DOMContentLoaded", function () {
     window.addEventListener("resize", function () {
       renderDrawerMenu();
       if (window.innerWidth > 1100 && body.classList.contains("nav-open")) {
-        closeNav();
+        lockPageScroll();
+      } else if (window.innerWidth <= 1100) {
+        unlockPageScroll();
       }
     });
   }

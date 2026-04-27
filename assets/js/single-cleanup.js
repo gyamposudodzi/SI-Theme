@@ -13,16 +13,45 @@ document.addEventListener("DOMContentLoaded", function () {
   let activeTrigger = null;
 
   function fallbackCopy(text) {
-    const input = document.createElement("input");
-    input.type = "text";
+    const input = document.createElement("textarea");
     input.value = text;
     input.setAttribute("readonly", "readonly");
-    input.style.position = "absolute";
+    input.style.position = "fixed";
+    input.style.top = "0";
     input.style.left = "-9999px";
+    input.style.opacity = "0";
     document.body.appendChild(input);
+    input.focus();
     input.select();
-    document.execCommand("copy");
+    input.setSelectionRange(0, input.value.length);
+
+    let copied = false;
+
+    try {
+      copied = document.execCommand("copy");
+    } catch (error) {
+      copied = false;
+    }
+
     document.body.removeChild(input);
+    return copied;
+  }
+
+  function markCopied(link) {
+    const originalLabel = link.getAttribute("aria-label") || "Copy link";
+    const originalText = link.textContent;
+
+    link.setAttribute("aria-label", "Link copied");
+    if (link.tagName === "BUTTON") {
+      link.textContent = "Copied";
+    }
+
+    window.setTimeout(function () {
+      link.setAttribute("aria-label", originalLabel);
+      if (link.tagName === "BUTTON") {
+        link.textContent = originalText;
+      }
+    }, 1600);
   }
 
   function closeShareModal(modal) {
@@ -68,30 +97,33 @@ document.addEventListener("DOMContentLoaded", function () {
     link.addEventListener("click", function (event) {
       event.preventDefault();
 
-      const url = link.getAttribute("data-copy-url");
+      const modal = link.closest("[data-share-modal]");
+      const input = modal ? modal.querySelector("[data-copy-input]") : null;
+      const url = link.getAttribute("data-copy-url") || (input ? input.value : "");
       if (!url) {
         return;
       }
 
-      const originalLabel = link.getAttribute("aria-label") || "Copy link";
-
-      const markCopied = function () {
-        link.setAttribute("aria-label", "Link copied");
-        window.setTimeout(function () {
-          link.setAttribute("aria-label", originalLabel);
-        }, 1600);
-      };
+      if (input) {
+        input.focus();
+        input.select();
+        input.setSelectionRange(0, input.value.length);
+      }
 
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(url).then(markCopied).catch(function () {
-          fallbackCopy(url);
-          markCopied();
+        navigator.clipboard.writeText(url).then(function () {
+          markCopied(link);
+        }).catch(function () {
+          if (fallbackCopy(url)) {
+            markCopied(link);
+          }
         });
         return;
       }
 
-      fallbackCopy(url);
-      markCopied();
+      if (fallbackCopy(url)) {
+        markCopied(link);
+      }
     });
   });
 

@@ -497,18 +497,6 @@ class NerdyWithMe_Tools_Shortcodes {
 			'AUDUSD',
 			'NZDUSD',
 			'EURGBP',
-			'EURJPY',
-			'GBPJPY',
-			'EURAUD',
-			'EURNZD',
-			'GBPAUD',
-			'GBPCAD',
-			'GBPCHF',
-			'AUDJPY',
-			'CADJPY',
-			'CHFJPY',
-			'NZDJPY',
-			'XAUUSD',
 		);
 
 		ob_start();

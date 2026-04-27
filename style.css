@@ -83,12 +83,33 @@ button, input, textarea, select { font: inherit; }
 .site-header__nav { display: grid; align-items: center; gap: 14px; }
 .site-header__top { grid-template-columns: 1fr auto 1fr; padding: 12px 0 8px; }
 .social-links { display: inline-flex; align-items: center; gap: 10px; }
-.social-links a {
+.social-links a,
+.social-links button {
   width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center;
   border-radius: 999px; background: transparent; border: 1px solid #eceef4;
   box-shadow: none; font-weight: 700; color: var(--nwm-primary); font-size: 0.86rem;
 }
-.social-links a:hover { background: var(--nwm-secondary); color: #fff; }
+.social-links button {
+  min-height: 44px;
+  padding: 0;
+  cursor: pointer;
+}
+.social-links a:hover,
+.social-links button:hover,
+.social-links a:focus-visible,
+.social-links button:focus-visible { background: var(--nwm-secondary); color: #fff; }
+.social-links a:hover .social-icon,
+.social-links button:hover .social-icon,
+.social-links a:focus-visible .social-icon,
+.social-links button:focus-visible .social-icon {
+  fill: #fff;
+}
+.social-links a:hover img,
+.social-links button:hover img,
+.social-links a:focus-visible img,
+.social-links button:focus-visible img {
+  filter: brightness(0) invert(1);
+}
 .social-icon {
   width: 1.08em;
   height: 1.08em;
@@ -297,7 +318,7 @@ button, input, textarea, select { font: inherit; }
   width: min(392px, calc(100vw - 24px));
   height: 100vh;
   max-height: 100vh;
-  padding: 30px 34px 24px 26px;
+  padding: 30px 56px 24px 26px;
   background: #fff;
   color: var(--nwm-text);
   border-right: 1px solid #eceef4;
@@ -317,7 +338,7 @@ button, input, textarea, select { font: inherit; }
   justify-content: space-between;
   gap: 16px;
   position: relative;
-  padding-right: 64px;
+  padding-right: 8px;
 }
 .mega-panel__brand {
   min-width: 0;
@@ -342,9 +363,10 @@ button, input, textarea, select { font: inherit; }
   justify-content: center;
   box-shadow: none;
   flex: 0 0 auto;
-  position: absolute;
-  top: 0;
-  right: 10px;
+  position: relative;
+  top: auto;
+  right: auto;
+  margin-left: auto;
 }
 .mega-panel__group h2,
 .mega-panel__posts h2,
@@ -532,6 +554,110 @@ button, input, textarea, select { font: inherit; }
   color: #515a78;
   font-size: 0.88rem;
   line-height: 1.55;
+}
+.share-modal-open {
+  overflow: hidden;
+}
+.single-share-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1450;
+}
+.single-share-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 14, 35, 0.3);
+  backdrop-filter: blur(8px);
+}
+.single-share-modal__dialog {
+  position: relative;
+  width: min(560px, calc(100vw - 24px));
+  margin: 10vh auto 0;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(19, 42, 120, 0.08);
+  box-shadow: 0 24px 64px rgba(10, 14, 35, 0.22);
+}
+.single-share-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.single-share-modal__header h2 {
+  margin: 0;
+  font-family: var(--nwm-font-display);
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  line-height: 1;
+}
+.single-share-modal__close {
+  width: 42px;
+  height: 42px;
+  min-height: 42px;
+  padding: 0;
+  border-radius: 0;
+  border: 1px solid #eceef4;
+  background: #fff;
+  color: var(--nwm-primary);
+  box-shadow: none;
+}
+.single-share-modal__close span {
+  font-size: 1.9rem;
+  line-height: 1;
+}
+.single-share-modal__intro {
+  margin: 12px 0 0;
+  color: #515a78;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+.single-share-modal__copy {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  margin-top: 20px;
+}
+.single-share-modal__copy input {
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid #dfe4ef;
+  background: #fafbff;
+  color: var(--nwm-text);
+}
+.single-share-modal__copy-button,
+.single-share-modal__native {
+  min-height: 48px;
+  padding: 0 18px;
+  border-radius: 0;
+}
+.single-share-modal__native {
+  margin-top: 14px;
+  background: #101437;
+  color: #fff;
+  box-shadow: none;
+}
+.single-share-modal__links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+}
+.single-share-modal__links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid #e7eaf3;
+  background: #fff;
+  color: var(--nwm-primary);
+  font-weight: 700;
+}
+.single-share-modal__links a:hover,
+.single-share-modal__links a:focus-visible {
+  background: #fff8f3;
+  color: var(--nwm-secondary);
 }
 .search-panel__grid {
   display: flex;
@@ -1393,6 +1519,19 @@ textarea { min-height: 160px; padding: 16px 18px; }
   font-size: 0.72rem;
   font-weight: 800;
 }
+.app-link:hover .app-link__service,
+.app-link:focus-visible .app-link__service {
+  background: var(--nwm-secondary);
+  color: #fff;
+}
+.app-link:hover .app-link__service .social-icon,
+.app-link:focus-visible .app-link__service .social-icon {
+  fill: #fff;
+}
+.app-link:hover .app-link__service img,
+.app-link:focus-visible .app-link__service img {
+  filter: brightness(0) invert(1);
+}
 .app-link__body { display: grid; gap: 2px; }
 .app-link__body strong { font-size: 0.98rem; line-height: 1; }
 .app-link__body span { color: #4d5677; font-size: 0.74rem; line-height: 1.35; }
@@ -1524,6 +1663,11 @@ textarea { min-height: 160px; padding: 16px 18px; }
   box-shadow: none;
   gap: 6px;
   white-space: nowrap;
+}
+.profile-card__button:hover,
+.profile-card__button:focus-visible {
+  background: #e5532d;
+  color: #fff;
 }
 .widget-card--plain {
   padding-top: 2px;
@@ -2938,6 +3082,15 @@ body.home .hot-grid__feature .card__title {
   .search-panel__title {
     font-size: 0.92rem;
     line-height: 1.08;
+  }
+  .single-share-modal__dialog {
+    width: min(calc(100vw - 20px), 100%);
+    margin-top: 5vh;
+    padding: 18px;
+  }
+  .single-share-modal__copy,
+  .single-share-modal__links {
+    grid-template-columns: 1fr;
   }
   body.home .compact-hero-card__thumb {
     min-height: 0;

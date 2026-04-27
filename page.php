@@ -12,6 +12,14 @@ get_header();
 	<?php while (have_posts()) : the_post(); ?>
 		<?php $is_tools_page = is_page('tools'); ?>
 		<?php $active_tool = ($is_tools_page && function_exists('nerdywithme_tools_get_active_tool_data')) ? nerdywithme_tools_get_active_tool_data() : null; ?>
+		<?php
+		$tools_page_content = '';
+		$tools_page_has_hub = false;
+		if ($is_tools_page) {
+			$tools_page_content = get_the_content();
+			$tools_page_has_hub = false !== strpos($tools_page_content, '[nwm_tools_hub]');
+		}
+		?>
 		<article <?php post_class(); ?>>
 			<header class="archive-hero">
 				<div class="archive-hero__layout">
@@ -58,6 +66,9 @@ get_header();
 						<div class="single-content">
 							<div class="entry-content entry-content--tools">
 								<?php the_content(); ?>
+								<?php if (! $tools_page_has_hub && shortcode_exists('nwm_tools_hub')) : ?>
+									<?php echo do_shortcode('[nwm_tools_hub]'); ?>
+								<?php endif; ?>
 							</div>
 							<section class="read-next read-next--tools">
 								<?php nerdywithme_section_heading(__('Read Next', 'nerdywithme'), __('Keep learning with practical trade setups, platform breakdowns, and system ideas.', 'nerdywithme')); ?>

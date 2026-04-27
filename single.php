@@ -59,14 +59,7 @@ get_header();
 					<?php nerdywithme_post_meta(get_the_ID()); ?>
 					<h1 class="entry-title"><?php the_title(); ?></h1>
 					<p class="entry-summary"><?php echo esc_html($summary); ?></p>
-					<div class="single-share">
-						<span><?php esc_html_e('Share:', 'nerdywithme'); ?></span>
-						<div class="social-links">
-							<a href="#" aria-label="<?php esc_attr_e('Facebook', 'nerdywithme'); ?>">f</a>
-							<a href="#" aria-label="<?php esc_attr_e('X', 'nerdywithme'); ?>">x</a>
-							<a href="#" aria-label="<?php esc_attr_e('Copy link', 'nerdywithme'); ?>">&#8599;</a>
-						</div>
-					</div>
+					<?php nerdywithme_render_share_links(get_the_ID()); ?>
 					<div class="single-hero__image">
 						<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-hero', array('alt' => get_the_title(), 'loading' => 'eager', 'fetchpriority' => 'high'), nerdywithme_get_image_sizes_hint('single-hero')); ?>
 					</div>
@@ -117,14 +110,7 @@ get_header();
 								<?php nerdywithme_post_meta(get_the_ID()); ?>
 								<h1 class="entry-title"><?php the_title(); ?></h1>
 								<p class="entry-summary"><?php echo esc_html($summary); ?></p>
-								<div class="single-share">
-									<span><?php esc_html_e('Share:', 'nerdywithme'); ?></span>
-									<div class="social-links">
-										<a href="#" aria-label="<?php esc_attr_e('Facebook', 'nerdywithme'); ?>">f</a>
-										<a href="#" aria-label="<?php esc_attr_e('X', 'nerdywithme'); ?>">x</a>
-										<a href="#" aria-label="<?php esc_attr_e('Copy link', 'nerdywithme'); ?>">&#8599;</a>
-									</div>
-								</div>
+								<?php nerdywithme_render_share_links(get_the_ID()); ?>
 							</div>
 							<div class="single-hero__image single-hero__image--standard">
 								<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-hero', array('alt' => get_the_title(), 'loading' => 'eager', 'fetchpriority' => 'high'), nerdywithme_get_image_sizes_hint('single-hero')); ?>

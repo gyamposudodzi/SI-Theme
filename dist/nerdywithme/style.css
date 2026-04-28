@@ -4,7 +4,7 @@ Theme URI: https://nerdywithme.com
 Author: NerdyWithMe
 Author URI: https://nerdywithme.com
 Description: A playful editorial WordPress theme for the NerdyWithMe blog.
-Version: 1.0.6
+Version: 1.0.9
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
@@ -2762,8 +2762,23 @@ body.home .hot-grid__feature .card__title {
     padding: 0 11px;
     font-size: 0.72rem;
   }
+  .search-panel__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+    overflow: visible;
+    padding-bottom: 0;
+  }
+  .search-panel__post,
   body:not(.home) .search-panel__post {
-    flex: 0 0 220px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    flex: 0 0 auto;
+  }
+  .search-panel__thumb {
+    aspect-ratio: 1.28 / 0.84;
+    min-height: 164px;
   }
   .single-post--standard .single-hero,
   .single-post--feature .single-hero {
@@ -3071,13 +3086,13 @@ body.home .hot-grid__feature .card__title {
   }
   .search-panel__post {
     display: grid;
-    grid-template-columns: 120px minmax(0, 1fr);
-    gap: 12px;
+    grid-template-columns: 1fr;
+    gap: 10px;
     align-items: start;
   }
   .search-panel__thumb {
-    aspect-ratio: 1 / 1;
-    min-height: 120px;
+    aspect-ratio: 1.28 / 0.84;
+    min-height: 164px;
   }
   .search-panel__content {
     gap: 8px;

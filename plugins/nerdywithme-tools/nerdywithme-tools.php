@@ -3,7 +3,7 @@
  * Plugin Name: NerdyWithMe Tools
  * Plugin URI: https://nerdywithme.com/tools
  * Description: Trading tools, calculator shortcodes, and ad slot controls for the NerdyWithMe theme.
- * Version: 0.1.1
+ * Version: 0.1.2
  * Author: NerdyWithMe
  * Author URI: https://nerdywithme.com
  * Requires at least: 6.0
@@ -19,7 +19,7 @@ if (! defined('ABSPATH')) {
 	exit;
 }
 
-define('NERDYWITHME_TOOLS_VERSION', '0.1.1');
+define('NERDYWITHME_TOOLS_VERSION', '0.1.2');
 define('NERDYWITHME_TOOLS_FILE', __FILE__);
 define('NERDYWITHME_TOOLS_PATH', plugin_dir_path(__FILE__));
 define('NERDYWITHME_TOOLS_URL', plugin_dir_url(__FILE__));

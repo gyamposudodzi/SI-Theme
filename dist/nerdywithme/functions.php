@@ -6,7 +6,7 @@
  */
 
 if (! defined('NERDYWITHME_VERSION')) {
-	define('NERDYWITHME_VERSION', '1.0.6');
+	define('NERDYWITHME_VERSION', '1.0.9');
 }
 
 function nerdywithme_setup() {
@@ -66,12 +66,12 @@ function nerdywithme_enqueue_assets() {
 	$fonts_url = 'https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Outfit:wght@400;500;600;700;800&display=swap';
 	$style_file = nerdywithme_get_preferred_asset('/style.css', '/assets/css/theme.min.css');
 	$tools_style_file = nerdywithme_get_preferred_asset('/assets/css/tools-page.css', '/assets/css/tools-page.min.css');
-	$nav_file    = file_exists(get_template_directory() . '/assets/js/nav-search.min.js') ? '/assets/js/nav-search.min.js' : '/assets/js/nav-search.js';
-	$search_file = file_exists(get_template_directory() . '/assets/js/search-modal.min.js') ? '/assets/js/search-modal.min.js' : '/assets/js/search-modal.js';
-	$slider_file = file_exists(get_template_directory() . '/assets/js/featured-slider.min.js') ? '/assets/js/featured-slider.min.js' : '/assets/js/featured-slider.js';
-	$reading_file = file_exists(get_template_directory() . '/assets/js/reading-bar.min.js') ? '/assets/js/reading-bar.min.js' : '/assets/js/reading-bar.js';
-	$toc_file    = file_exists(get_template_directory() . '/assets/js/toc.min.js') ? '/assets/js/toc.min.js' : '/assets/js/toc.js';
-	$single_file = file_exists(get_template_directory() . '/assets/js/single-cleanup.min.js') ? '/assets/js/single-cleanup.min.js' : '/assets/js/single-cleanup.js';
+	$nav_file    = nerdywithme_get_preferred_asset('/assets/js/nav-search.js', '/assets/js/nav-search.min.js');
+	$search_file = nerdywithme_get_preferred_asset('/assets/js/search-modal.js', '/assets/js/search-modal.min.js');
+	$slider_file = nerdywithme_get_preferred_asset('/assets/js/featured-slider.js', '/assets/js/featured-slider.min.js');
+	$reading_file = nerdywithme_get_preferred_asset('/assets/js/reading-bar.js', '/assets/js/reading-bar.min.js');
+	$toc_file    = nerdywithme_get_preferred_asset('/assets/js/toc.js', '/assets/js/toc.min.js');
+	$single_file = nerdywithme_get_preferred_asset('/assets/js/single-cleanup.js', '/assets/js/single-cleanup.min.js');
 	$style_version = file_exists(get_template_directory() . $style_file) ? (string) filemtime(get_template_directory() . $style_file) : NERDYWITHME_VERSION;
 	$tools_style_version = file_exists(get_template_directory() . $tools_style_file) ? (string) filemtime(get_template_directory() . $tools_style_file) : NERDYWITHME_VERSION;
 	$nav_version    = file_exists(get_template_directory() . $nav_file) ? (string) filemtime(get_template_directory() . $nav_file) : NERDYWITHME_VERSION;
@@ -226,6 +226,62 @@ add_filter('style_loader_tag', 'nerdywithme_async_font_stylesheet', 10, 4);
 
 function nerdywithme_has_search_modal() {
 	return apply_filters('nerdywithme_enable_search_modal', true);
+}
+
+function nerdywithme_render_share_links($post_id = 0) {
+	$post_id = $post_id ? (int) $post_id : get_the_ID();
+
+	if (! $post_id) {
+		return;
+	}
+
+	$permalink = get_permalink($post_id);
+	$title     = get_the_title($post_id);
+
+	if (! $permalink || ! $title) {
+		return;
+	}
+
+	$facebook_url = 'https://www.facebook.com/sharer/sharer.php?u=' . rawurlencode($permalink);
+	$x_url        = 'https://x.com/intent/tweet?url=' . rawurlencode($permalink) . '&text=' . rawurlencode($title);
+	$linkedin_url = 'https://www.linkedin.com/sharing/share-offsite/?url=' . rawurlencode($permalink);
+	$whatsapp_url = 'https://wa.me/?text=' . rawurlencode($title . ' ' . $permalink);
+	$email_url    = 'mailto:?subject=' . rawurlencode($title) . '&body=' . rawurlencode($permalink);
+	$modal_id     = 'nwm-share-modal-' . $post_id;
+	?>
+	<div class="single-share">
+		<span><?php esc_html_e('Share:', 'nerdywithme'); ?></span>
+		<div class="social-links">
+			<a href="<?php echo esc_url($facebook_url); ?>" target="_blank" rel="noopener noreferrer" aria-label="<?php esc_attr_e('Share on Facebook', 'nerdywithme'); ?>">f</a>
+			<a href="<?php echo esc_url($x_url); ?>" target="_blank" rel="noopener noreferrer" aria-label="<?php esc_attr_e('Share on X', 'nerdywithme'); ?>">x</a>
+			<button type="button" class="single-share__trigger" data-share-open aria-label="<?php esc_attr_e('More share options', 'nerdywithme'); ?>" aria-haspopup="dialog" aria-controls="<?php echo esc_attr($modal_id); ?>">&#8599;</button>
+		</div>
+	</div>
+	<div id="<?php echo esc_attr($modal_id); ?>" class="single-share-modal" data-share-modal aria-hidden="true" hidden>
+		<div class="single-share-modal__backdrop" data-share-close></div>
+		<div class="single-share-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="<?php echo esc_attr($modal_id); ?>-title">
+			<div class="single-share-modal__header">
+				<h2 id="<?php echo esc_attr($modal_id); ?>-title"><?php esc_html_e('Share this article', 'nerdywithme'); ?></h2>
+				<button type="button" class="single-share-modal__close" data-share-close aria-label="<?php esc_attr_e('Close share options', 'nerdywithme'); ?>">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<p class="single-share-modal__intro"><?php esc_html_e('Copy the link or keep sharing through your preferred platform.', 'nerdywithme'); ?></p>
+			<div class="single-share-modal__copy">
+				<input type="text" readonly value="<?php echo esc_url($permalink); ?>" data-copy-input aria-label="<?php esc_attr_e('Article link', 'nerdywithme'); ?>">
+				<button type="button" class="single-share-modal__copy-button" data-copy-link data-copy-url="<?php echo esc_url($permalink); ?>"><?php esc_html_e('Copy link', 'nerdywithme'); ?></button>
+			</div>
+			<button type="button" class="single-share-modal__native" data-native-share data-share-url="<?php echo esc_url($permalink); ?>" data-share-title="<?php echo esc_attr($title); ?>" hidden><?php esc_html_e('Share using device apps', 'nerdywithme'); ?></button>
+			<div class="single-share-modal__links">
+				<a href="<?php echo esc_url($linkedin_url); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e('LinkedIn', 'nerdywithme'); ?></a>
+				<a href="<?php echo esc_url($whatsapp_url); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e('WhatsApp', 'nerdywithme'); ?></a>
+				<a href="<?php echo esc_url($email_url); ?>"><?php esc_html_e('Email', 'nerdywithme'); ?></a>
+				<a href="<?php echo esc_url($facebook_url); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Facebook', 'nerdywithme'); ?></a>
+				<a href="<?php echo esc_url($x_url); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e('X', 'nerdywithme'); ?></a>
+			</div>
+		</div>
+	</div>
+	<?php
 }
 
 function nerdywithme_resource_hints($urls, $relation_type) {

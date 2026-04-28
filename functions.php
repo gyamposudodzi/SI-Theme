@@ -6,7 +6,7 @@
  */
 
 if (! defined('NERDYWITHME_VERSION')) {
-	define('NERDYWITHME_VERSION', '1.0.6');
+	define('NERDYWITHME_VERSION', '1.0.9');
 }
 
 function nerdywithme_setup() {
@@ -66,12 +66,12 @@ function nerdywithme_enqueue_assets() {
 	$fonts_url = 'https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Outfit:wght@400;500;600;700;800&display=swap';
 	$style_file = nerdywithme_get_preferred_asset('/style.css', '/assets/css/theme.min.css');
 	$tools_style_file = nerdywithme_get_preferred_asset('/assets/css/tools-page.css', '/assets/css/tools-page.min.css');
-	$nav_file    = file_exists(get_template_directory() . '/assets/js/nav-search.min.js') ? '/assets/js/nav-search.min.js' : '/assets/js/nav-search.js';
-	$search_file = file_exists(get_template_directory() . '/assets/js/search-modal.min.js') ? '/assets/js/search-modal.min.js' : '/assets/js/search-modal.js';
-	$slider_file = file_exists(get_template_directory() . '/assets/js/featured-slider.min.js') ? '/assets/js/featured-slider.min.js' : '/assets/js/featured-slider.js';
-	$reading_file = file_exists(get_template_directory() . '/assets/js/reading-bar.min.js') ? '/assets/js/reading-bar.min.js' : '/assets/js/reading-bar.js';
-	$toc_file    = file_exists(get_template_directory() . '/assets/js/toc.min.js') ? '/assets/js/toc.min.js' : '/assets/js/toc.js';
-	$single_file = file_exists(get_template_directory() . '/assets/js/single-cleanup.min.js') ? '/assets/js/single-cleanup.min.js' : '/assets/js/single-cleanup.js';
+	$nav_file    = nerdywithme_get_preferred_asset('/assets/js/nav-search.js', '/assets/js/nav-search.min.js');
+	$search_file = nerdywithme_get_preferred_asset('/assets/js/search-modal.js', '/assets/js/search-modal.min.js');
+	$slider_file = nerdywithme_get_preferred_asset('/assets/js/featured-slider.js', '/assets/js/featured-slider.min.js');
+	$reading_file = nerdywithme_get_preferred_asset('/assets/js/reading-bar.js', '/assets/js/reading-bar.min.js');
+	$toc_file    = nerdywithme_get_preferred_asset('/assets/js/toc.js', '/assets/js/toc.min.js');
+	$single_file = nerdywithme_get_preferred_asset('/assets/js/single-cleanup.js', '/assets/js/single-cleanup.min.js');
 	$style_version = file_exists(get_template_directory() . $style_file) ? (string) filemtime(get_template_directory() . $style_file) : NERDYWITHME_VERSION;
 	$tools_style_version = file_exists(get_template_directory() . $tools_style_file) ? (string) filemtime(get_template_directory() . $tools_style_file) : NERDYWITHME_VERSION;
 	$nav_version    = file_exists(get_template_directory() . $nav_file) ? (string) filemtime(get_template_directory() . $nav_file) : NERDYWITHME_VERSION;

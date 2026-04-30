@@ -356,7 +356,7 @@ class NerdyWithMe_Tools_Shortcodes {
 				'slug'        => $this->sanitize_tool_slug($slug_overrides['compound-growth'] ?? $slug_defaults['compound-growth'], 'compound-growth'),
 				'description' => $descriptions['compound-growth'] ?? __('Project compounded account growth over time.', 'nerdywithme-tools'),
 				'summary'     => $summaries['compound-growth'] ?? __('Project how your account could grow over time with compounded returns, recurring contributions, and a period you choose.', 'nerdywithme-tools'),
-				'meta_title'  => $meta_titles['compound-growth'] ?? __('Compound Growth Calculator | NerdyWithMe Tools', 'nerdywithme-tools'),
+				'meta_title'  => $meta_titles['compound-growth'] ?? __('Forex Compound Calculator | NerdyWithMe Tools', 'nerdywithme-tools'),
 				'enabled'     => ! isset($settings['enable_compound_growth_calculator']) || ! empty($settings['enable_compound_growth_calculator']),
 				'render'      => array($this, 'render_compound_growth_calculator_inner'),
 			),
@@ -443,7 +443,7 @@ class NerdyWithMe_Tools_Shortcodes {
 			'position-size'   => __('Position Size', 'nerdywithme-tools'),
 			'pip-value'       => __('Pip / Point Value', 'nerdywithme-tools'),
 			'profit-target'   => __('Profit Target', 'nerdywithme-tools'),
-			'compound-growth' => __('Compound Growth', 'nerdywithme-tools'),
+			'compound-growth' => __('Forex Compound Calculator', 'nerdywithme-tools'),
 		);
 	}
 

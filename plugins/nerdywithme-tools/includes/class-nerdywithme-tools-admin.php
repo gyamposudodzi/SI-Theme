@@ -162,7 +162,7 @@ class NerdyWithMe_Tools_Admin {
 
 		add_settings_field(
 			'enable_compound_growth_calculator',
-			__('Enable Compound Growth', 'nerdywithme-tools'),
+			__('Enable Forex Compound Calculator', 'nerdywithme-tools'),
 			array($this, 'render_checkbox_field'),
 			'nerdywithme-tools',
 			'nerdywithme_tools_calculators',
@@ -899,7 +899,7 @@ class NerdyWithMe_Tools_Admin {
 			'position-size'   => __('Position Size', 'nerdywithme-tools'),
 			'pip-value'       => __('Pip / Point Value', 'nerdywithme-tools'),
 			'profit-target'   => __('Profit Target', 'nerdywithme-tools'),
-			'compound-growth' => __('Compound Growth', 'nerdywithme-tools'),
+			'compound-growth' => __('Forex Compound Calculator', 'nerdywithme-tools'),
 		);
 	}
 
@@ -978,7 +978,7 @@ class NerdyWithMe_Tools_Admin {
 			'position-size'   => __('Position Size Calculator | NerdyWithMe Tools', 'nerdywithme-tools'),
 			'pip-value'       => __('Pip and Point Value Calculator | NerdyWithMe Tools', 'nerdywithme-tools'),
 			'profit-target'   => __('Profit Target Calculator | NerdyWithMe Tools', 'nerdywithme-tools'),
-			'compound-growth' => __('Compound Growth Calculator | NerdyWithMe Tools', 'nerdywithme-tools'),
+			'compound-growth' => __('Forex Compound Calculator | NerdyWithMe Tools', 'nerdywithme-tools'),
 		);
 	}
 }

@@ -114,6 +114,21 @@ function nerdywithme_enqueue_assets() {
 			true
 		);
 		wp_script_add_data('nerdywithme-search-modal', 'defer', true);
+		wp_localize_script(
+			'nerdywithme-search-modal',
+			'nwmSearchModalConfig',
+			array(
+				'ajaxUrl'      => admin_url('admin-ajax.php'),
+				'nonce'        => wp_create_nonce('nwm_live_search'),
+				'minChars'     => 2,
+				'emptyLabel'   => __('Start typing to search posts, categories, and tools.', 'nerdywithme'),
+				'loadingLabel' => __('Searching...', 'nerdywithme'),
+				'postsLabel'   => __('Posts', 'nerdywithme'),
+				'categoriesLabel' => __('Categories', 'nerdywithme'),
+				'toolsLabel'   => __('Tools', 'nerdywithme'),
+				'noResultsLabel' => __('No matching results yet. Try a broader keyword.', 'nerdywithme'),
+			)
+		);
 	}
 
 	if (! is_page('tools') && ! is_404() && (is_front_page() || is_home() || is_archive() || is_search() || is_single())) {
@@ -177,6 +192,8 @@ function nerdywithme_enqueue_assets() {
 	wp_script_add_data('nerdywithme-back-to-top', 'defer', true);
 }
 add_action('wp_enqueue_scripts', 'nerdywithme_enqueue_assets');
+add_action('wp_ajax_nerdywithme_live_search', 'nerdywithme_handle_live_search');
+add_action('wp_ajax_nopriv_nerdywithme_live_search', 'nerdywithme_handle_live_search');
 
 function nerdywithme_get_preferred_asset($source_file, $minified_file) {
 	$source_path   = get_template_directory() . $source_file;
@@ -250,6 +267,188 @@ add_filter('style_loader_tag', 'nerdywithme_async_font_stylesheet', 10, 4);
 
 function nerdywithme_has_search_modal() {
 	return apply_filters('nerdywithme_enable_search_modal', true);
+}
+
+function nerdywithme_score_search_match($query, $primary_text, $secondary_text = '') {
+	$query_tokens = preg_split('/\s+/', strtolower(trim((string) $query)));
+	$query_tokens = array_filter($query_tokens);
+	$primary      = strtolower((string) $primary_text);
+	$secondary    = strtolower((string) $secondary_text);
+	$score        = 0;
+
+	if (! $query_tokens) {
+		return $score;
+	}
+
+	if ($primary === strtolower(trim((string) $query))) {
+		$score += 200;
+	}
+
+	if (0 === strpos($primary, strtolower(trim((string) $query)))) {
+		$score += 120;
+	}
+
+	if (false !== strpos($primary, strtolower(trim((string) $query)))) {
+		$score += 80;
+	}
+
+	foreach ($query_tokens as $token) {
+		if ('' === $token) {
+			continue;
+		}
+
+		if (0 === strpos($primary, $token)) {
+			$score += 28;
+		} elseif (false !== strpos($primary, $token)) {
+			$score += 18;
+		}
+
+		if (false !== strpos($secondary, $token)) {
+			$score += 8;
+		}
+	}
+
+	return $score;
+}
+
+function nerdywithme_sort_scored_results($a, $b) {
+	$a_score = (int) ($a['_score'] ?? 0);
+	$b_score = (int) ($b['_score'] ?? 0);
+
+	if ($a_score === $b_score) {
+		return strcmp((string) ($a['title'] ?? ''), (string) ($b['title'] ?? ''));
+	}
+
+	return $b_score <=> $a_score;
+}
+
+function nerdywithme_handle_live_search() {
+	check_ajax_referer('nwm_live_search', 'nonce');
+
+	$query = isset($_GET['q']) ? sanitize_text_field(wp_unslash($_GET['q'])) : '';
+	$query = trim($query);
+
+	if (mb_strlen($query) < 2) {
+		wp_send_json_success(
+			array(
+				'posts'      => array(),
+				'categories' => array(),
+				'tools'      => array(),
+			)
+		);
+	}
+
+	$posts_query = new WP_Query(
+		array(
+			'post_type'              => 'post',
+			'post_status'            => 'publish',
+			's'                      => $query,
+			'posts_per_page'         => 5,
+			'no_found_rows'          => true,
+			'ignore_sticky_posts'    => true,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+		)
+	);
+
+	$posts = array();
+	while ($posts_query->have_posts()) {
+		$posts_query->the_post();
+		$title = get_the_title();
+		$excerpt = has_excerpt() ? get_the_excerpt() : wp_trim_words(wp_strip_all_tags(get_the_content()), 18, '');
+		$posts[] = array(
+			'title' => $title,
+			'url'   => get_permalink(),
+			'meta'  => get_the_date(),
+			'_score' => nerdywithme_score_search_match($query, $title, $excerpt),
+		);
+	}
+	wp_reset_postdata();
+	usort($posts, 'nerdywithme_sort_scored_results');
+	$posts = array_slice($posts, 0, 5);
+
+	$categories = array();
+	$terms = get_terms(
+		array(
+			'taxonomy'   => 'category',
+			'hide_empty' => true,
+			'search'     => $query,
+			'number'     => 4,
+		)
+	);
+
+	if (! is_wp_error($terms)) {
+		foreach ($terms as $term) {
+			$categories[] = array(
+				'title' => $term->name,
+				'url'   => get_term_link($term),
+				'meta'  => sprintf(
+					/* translators: %d: post count. */
+					_n('%d post', '%d posts', (int) $term->count, 'nerdywithme'),
+					(int) $term->count
+				),
+				'_score' => nerdywithme_score_search_match($query, $term->name, $term->description),
+			);
+		}
+	}
+	usort($categories, 'nerdywithme_sort_scored_results');
+	$categories = array_slice($categories, 0, 4);
+
+	$tools = array();
+	if (function_exists('nerdywithme_tools')) {
+		$plugin = nerdywithme_tools();
+		if ($plugin && method_exists($plugin, 'get_tools_registry')) {
+			foreach ($plugin->get_tools_registry() as $tool) {
+				$haystack = strtolower(trim(($tool['label'] ?? '') . ' ' . ($tool['description'] ?? '') . ' ' . ($tool['summary'] ?? '')));
+				if (false === strpos($haystack, strtolower($query))) {
+					continue;
+				}
+
+				$tools[] = array(
+					'title' => $tool['label'] ?? '',
+					'url'   => $tool['url'] ?? '',
+					'meta'  => $tool['description'] ?? '',
+					'_score' => nerdywithme_score_search_match(
+						$query,
+						$tool['label'] ?? '',
+						trim(($tool['description'] ?? '') . ' ' . ($tool['summary'] ?? ''))
+					),
+				);
+			}
+		}
+	}
+	usort($tools, 'nerdywithme_sort_scored_results');
+	$tools = array_slice($tools, 0, 4);
+
+	$posts = array_map(
+		static function ($item) {
+			unset($item['_score']);
+			return $item;
+		},
+		$posts
+	);
+	$categories = array_map(
+		static function ($item) {
+			unset($item['_score']);
+			return $item;
+		},
+		$categories
+	);
+	$tools = array_map(
+		static function ($item) {
+			unset($item['_score']);
+			return $item;
+		},
+		$tools
+	);
+
+	wp_send_json_success(
+		array(
+			'posts'      => $posts,
+			'categories' => $categories,
+			'tools'      => $tools,
+		)
+	);
 }
 
 function nerdywithme_cookie_banner_enabled() {

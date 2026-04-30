@@ -144,6 +144,23 @@ class NerdyWithMe_Tools_Plugin {
 	}
 
 	/**
+	 * Public access to the tool registry.
+	 *
+	 * @return array
+	 */
+	public function get_tools_registry() {
+		$tools = $this->shortcodes->get_tool_registry();
+
+		foreach ($tools as $tool_id => &$tool) {
+			$tool['id']  = $tool_id;
+			$tool['url'] = $this->shortcodes->get_tool_url($tool_id);
+		}
+		unset($tool);
+
+		return $tools;
+	}
+
+	/**
 	 * Filter browser title for active tool views.
 	 *
 	 * @param array $parts Title parts.

@@ -127,6 +127,12 @@
 							</button>
 						</div>
 						<?php get_search_form(); ?>
+						<div class="search-panel__live" data-search-live>
+							<div class="search-panel__status" data-search-status>
+								<?php esc_html_e('Start typing to search posts, categories, and tools.', 'nerdywithme'); ?>
+							</div>
+							<div class="search-panel__results" data-search-results hidden></div>
+						</div>
 						<div class="search-panel__filters" aria-label="<?php esc_attr_e('Suggested categories', 'nerdywithme'); ?>">
 							<?php foreach ($search_categories as $search_category) : ?>
 								<a class="search-panel__filter" href="<?php echo esc_url(get_category_link($search_category)); ?>"><?php echo esc_html($search_category->name); ?></a>

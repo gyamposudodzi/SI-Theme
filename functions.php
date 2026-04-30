@@ -72,6 +72,8 @@ function nerdywithme_enqueue_assets() {
 	$reading_file = nerdywithme_get_preferred_asset('/assets/js/reading-bar.js', '/assets/js/reading-bar.min.js');
 	$toc_file    = nerdywithme_get_preferred_asset('/assets/js/toc.js', '/assets/js/toc.min.js');
 	$single_file = nerdywithme_get_preferred_asset('/assets/js/single-cleanup.js', '/assets/js/single-cleanup.min.js');
+	$cookie_file = nerdywithme_get_preferred_asset('/assets/js/cookie-consent.js', '/assets/js/cookie-consent.min.js');
+	$back_to_top_file = nerdywithme_get_preferred_asset('/assets/js/back-to-top.js', '/assets/js/back-to-top.min.js');
 	$style_version = file_exists(get_template_directory() . $style_file) ? (string) filemtime(get_template_directory() . $style_file) : NERDYWITHME_VERSION;
 	$tools_style_version = file_exists(get_template_directory() . $tools_style_file) ? (string) filemtime(get_template_directory() . $tools_style_file) : NERDYWITHME_VERSION;
 	$nav_version    = file_exists(get_template_directory() . $nav_file) ? (string) filemtime(get_template_directory() . $nav_file) : NERDYWITHME_VERSION;
@@ -80,6 +82,8 @@ function nerdywithme_enqueue_assets() {
 	$reading_version = file_exists(get_template_directory() . $reading_file) ? (string) filemtime(get_template_directory() . $reading_file) : NERDYWITHME_VERSION;
 	$toc_version    = file_exists(get_template_directory() . $toc_file) ? (string) filemtime(get_template_directory() . $toc_file) : NERDYWITHME_VERSION;
 	$single_version = file_exists(get_template_directory() . $single_file) ? (string) filemtime(get_template_directory() . $single_file) : NERDYWITHME_VERSION;
+	$cookie_version = file_exists(get_template_directory() . $cookie_file) ? (string) filemtime(get_template_directory() . $cookie_file) : NERDYWITHME_VERSION;
+	$back_to_top_version = file_exists(get_template_directory() . $back_to_top_file) ? (string) filemtime(get_template_directory() . $back_to_top_file) : NERDYWITHME_VERSION;
 
 	wp_enqueue_style('nerdywithme-fonts', esc_url($fonts_url), array(), null);
 	wp_enqueue_style('nerdywithme-style', get_template_directory_uri() . $style_file, array('nerdywithme-fonts'), $style_version);
@@ -151,6 +155,26 @@ function nerdywithme_enqueue_assets() {
 		);
 		wp_script_add_data('nerdywithme-single-cleanup', 'defer', true);
 	}
+
+	if (nerdywithme_cookie_banner_enabled()) {
+		wp_enqueue_script(
+			'nerdywithme-cookie-consent',
+			get_template_directory_uri() . $cookie_file,
+			array(),
+			$cookie_version,
+			true
+		);
+		wp_script_add_data('nerdywithme-cookie-consent', 'defer', true);
+	}
+
+	wp_enqueue_script(
+		'nerdywithme-back-to-top',
+		get_template_directory_uri() . $back_to_top_file,
+		array(),
+		$back_to_top_version,
+		true
+	);
+	wp_script_add_data('nerdywithme-back-to-top', 'defer', true);
 }
 add_action('wp_enqueue_scripts', 'nerdywithme_enqueue_assets');
 
@@ -226,6 +250,10 @@ add_filter('style_loader_tag', 'nerdywithme_async_font_stylesheet', 10, 4);
 
 function nerdywithme_has_search_modal() {
 	return apply_filters('nerdywithme_enable_search_modal', true);
+}
+
+function nerdywithme_cookie_banner_enabled() {
+	return apply_filters('nerdywithme_enable_cookie_banner', true);
 }
 
 function nerdywithme_render_share_links($post_id = 0) {

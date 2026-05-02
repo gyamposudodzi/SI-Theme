@@ -587,6 +587,47 @@ button, input, textarea, select { font: inherit; }
   font-size: 0.8rem;
   line-height: 1.5;
 }
+.search-panel__empty-state {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid #e7eaf3;
+  background: #fff;
+}
+.search-panel__empty-copy {
+  margin: 0;
+  color: #515a78;
+  font-size: 0.92rem;
+  line-height: 1.65;
+}
+.search-panel__empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.search-panel__empty-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgba(255, 95, 54, 0.18);
+  background: #fff8f3;
+  color: var(--nwm-secondary);
+  font-weight: 800;
+}
+.search-panel__empty-button:hover,
+.search-panel__empty-button:focus-visible {
+  background: #fff1e9;
+  color: var(--nwm-secondary);
+}
+.search-panel__empty-filters {
+  display: grid;
+  gap: 10px;
+}
+.search-panel__filters--recovery {
+  margin-bottom: 0;
+}
 .search-panel__filters {
   display: flex;
   flex-wrap: wrap;

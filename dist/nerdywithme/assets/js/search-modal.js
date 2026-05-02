@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const searchDialog = searchPanel ? searchPanel.querySelector(".search-panel__dialog") : null;
   const searchClose = searchPanel ? searchPanel.querySelector(".search-panel__close") : null;
   const searchInput = searchPanel ? searchPanel.querySelector(".search-field") : null;
+  const searchForm = searchPanel ? searchPanel.querySelector(".search-form") : null;
   const searchFilters = searchPanel ? searchPanel.querySelector(".search-panel__filters") : null;
   const searchSuggested = searchPanel ? searchPanel.querySelector(".search-panel__suggested") : null;
   const searchStatus = searchPanel ? searchPanel.querySelector("[data-search-status]") : null;
@@ -20,6 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let activeController = null;
   let debounceId = 0;
   let activeResultIndex = -1;
+  const fallbackFiltersMarkup = searchFilters ? searchFilters.innerHTML : "";
 
   function closeSearch() {
     searchToggle.setAttribute("aria-expanded", "false");
@@ -96,7 +98,36 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
-  function renderResults(payload) {
+  function buildEmptyState(query) {
+    const formAction = searchForm ? searchForm.getAttribute("action") || "/" : "/";
+    const searchUrl = new URL(formAction, window.location.origin);
+    searchUrl.searchParams.set("s", query);
+
+    return (
+      '<section class="search-panel__empty-state">' +
+      '<p class="search-panel__empty-copy">' +
+      (config.noResultsLabel || "No matching results yet. Try a broader keyword.") +
+      "</p>" +
+      '<div class="search-panel__empty-actions">' +
+      '<a class="search-panel__empty-button" href="' +
+      searchUrl.toString() +
+      '">' +
+      (config.viewAllLabel || "See full search results") +
+      "</a>" +
+      "</div>" +
+      (fallbackFiltersMarkup
+        ? '<div class="search-panel__empty-filters"><h3 class="search-panel__group-title">' +
+          (config.exploreLabel || "Explore categories") +
+          "</h3>" +
+          '<div class="search-panel__filters search-panel__filters--recovery">' +
+          fallbackFiltersMarkup +
+          "</div></div>"
+        : "") +
+      "</section>"
+    );
+  }
+
+  function renderResults(payload, query) {
     const posts = payload.posts || [];
     const categories = payload.categories || [];
     const tools = payload.tools || [];
@@ -116,7 +147,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (!hasResults) {
-      searchResults.innerHTML = "";
+      searchResults.hidden = false;
+      searchResults.innerHTML = buildEmptyState(query);
       activeResultIndex = -1;
       return;
     }
@@ -188,7 +220,7 @@ document.addEventListener("DOMContentLoaded", function () {
           throw new Error("Search failed");
         }
 
-        renderResults(data.data || {});
+        renderResults(data.data || {}, query);
       })
       .catch(function (error) {
         if (error.name === "AbortError") {

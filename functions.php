@@ -127,6 +127,8 @@ function nerdywithme_enqueue_assets() {
 				'categoriesLabel' => __('Categories', 'nerdywithme'),
 				'toolsLabel'   => __('Tools', 'nerdywithme'),
 				'noResultsLabel' => __('No matching results yet. Try a broader keyword.', 'nerdywithme'),
+				'viewAllLabel' => __('See full search results', 'nerdywithme'),
+				'exploreLabel' => __('Explore categories', 'nerdywithme'),
 			)
 		);
 	}
@@ -625,6 +627,10 @@ function nerdywithme_customize_register($wp_customize) {
 			'label'   => __('Instagram URL', 'nerdywithme'),
 			'default' => '#',
 		),
+		'pinterest_url'    => array(
+			'label'   => __('Pinterest URL', 'nerdywithme'),
+			'default' => '#',
+		),
 		'footer_blurb'     => array(
 			'label'   => __('Footer Blurb', 'nerdywithme'),
 			'default' => __('Where trading meets technology: practical market education, automation, AI, and tools for modern traders.', 'nerdywithme'),
@@ -654,9 +660,10 @@ function nerdywithme_customize_register($wp_customize) {
 		array('platform' => 'facebook', 'url' => '#'),
 		array('platform' => 'x', 'url' => '#'),
 		array('platform' => 'instagram', 'url' => '#'),
+		array('platform' => 'pinterest', 'url' => '#'),
 	);
 
-	for ($i = 1; $i <= 3; $i++) {
+	for ($i = 1; $i <= 4; $i++) {
 		$default = $social_link_defaults[ $i - 1 ];
 
 		$wp_customize->add_setting(
@@ -1074,6 +1081,7 @@ function nerdywithme_social_platform_choices() {
 		'facebook'   => __('Facebook', 'nerdywithme'),
 		'x'          => __('X (Twitter)', 'nerdywithme'),
 		'instagram'  => __('Instagram', 'nerdywithme'),
+		'pinterest'  => __('Pinterest', 'nerdywithme'),
 		'youtube'    => __('YouTube', 'nerdywithme'),
 		'tiktok'     => __('TikTok', 'nerdywithme'),
 		'discord'    => __('Discord', 'nerdywithme'),
@@ -1101,6 +1109,7 @@ function nerdywithme_social_platform_meta($platform) {
 		'facebook'    => array('label' => 'Facebook', 'icon' => 'f'),
 		'x'           => array('label' => 'X', 'icon' => 'x'),
 		'instagram'   => array('label' => 'Instagram', 'icon' => 'ig'),
+		'pinterest'   => array('label' => 'Pinterest', 'icon' => 'pt'),
 		'youtube'     => array('label' => 'YouTube', 'icon' => 'yt'),
 		'tiktok'      => array('label' => 'TikTok', 'icon' => 'tt'),
 		'discord'     => array('label' => 'Discord', 'icon' => 'dc'),
@@ -1125,6 +1134,7 @@ function nerdywithme_social_icon_svg($platform, $fallback = '') {
 		'facebook'    => '<path d="M14.5 8.3h2.1V5.1c-.4-.1-1.6-.2-3-.2-3 0-5 1.8-5 5.2v2.9H5.3v3.6h3.3v8.5h4v-8.5h3.3l.5-3.6h-3.8v-2.5c0-1 .3-1.7 1.9-1.7Z"/>',
 		'x'           => '<path d="M5.1 5h4.5l3.6 5.1L17.6 5h4.1l-6.5 7.4 7.1 10.1h-4.5l-4-5.7-5 5.7H4.7l7.1-8.1L5.1 5Zm2.4 1.8 11.2 14h1.1L8.6 6.8H7.5Z"/>',
 		'instagram'   => '<path d="M8.1 4.8h7.8c2.3 0 4.2 1.9 4.2 4.2v7.8c0 2.3-1.9 4.2-4.2 4.2H8.1c-2.3 0-4.2-1.9-4.2-4.2V9c0-2.3 1.9-4.2 4.2-4.2Zm0 1.8c-1.3 0-2.4 1.1-2.4 2.4v7.8c0 1.3 1.1 2.4 2.4 2.4h7.8c1.3 0 2.4-1.1 2.4-2.4V9c0-1.3-1.1-2.4-2.4-2.4H8.1Zm3.9 3a4.3 4.3 0 1 1 0 8.6 4.3 4.3 0 0 1 0-8.6Zm0 1.8a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Zm4.5-2.2a1.1 1.1 0 1 1-2.2 0 1.1 1.1 0 0 1 2.2 0Z"/>',
+		'pinterest'   => '<path d="M12.2 3.4c-4.8 0-7.2 3.4-7.2 6.3 0 1.7.7 3.3 2.2 3.9.2.1.3 0 .4-.2l.4-1.5c.1-.2 0-.3-.1-.5-.4-.5-.7-1.2-.7-2.2 0-2.8 2.1-5.3 5.5-5.3 3 0 4.6 1.8 4.6 4.3 0 3.2-1.4 5.9-3.5 5.9-1.2 0-2.1-1-1.8-2.2.4-1.5 1.1-3.1 1.1-4.2 0-1-.5-1.8-1.6-1.8-1.3 0-2.3 1.3-2.3 3.1 0 1.1.4 1.9.4 1.9l-1.5 6.2c-.4 1.6-.1 3.6 0 3.8 0 .1.1.1.2 0 .1-.1 1.1-1.4 1.4-2.8l.6-2.4c.3.6 1.2 1.2 2.2 1.2 2.9 0 4.9-2.7 4.9-6.4 0-2.8-2.4-5.4-6-5.4Z"/>',
 		'youtube'     => '<path d="M21.5 8.1s-.2-1.6-.9-2.3c-.9-.9-1.9-.9-2.3-1C15 4.5 12 4.5 12 4.5s-3 0-6.3.3c-.5.1-1.5.1-2.3 1-.7.7-.9 2.3-.9 2.3s-.3 1.9-.3 3.9v1.8c0 1.9.3 3.9.3 3.9s.2 1.6.9 2.3c.8.9 2 .9 2.5 1 1.8.2 6.1.3 6.1.3s3 0 6.3-.3c.5-.1 1.5-.1 2.3-1 .7-.7.9-2.3.9-2.3s.3-1.9.3-3.9V12c0-2-.3-3.9-.3-3.9ZM9.8 15.7V8.9l6.4 3.4-6.4 3.4Z"/>',
 		'tiktok'      => '<path d="M14.5 4.5c.3 2.3 1.6 3.7 3.8 3.9v3.2c-1.3.1-2.6-.3-3.8-1v5.9c0 7.5-8.2 9.8-11.5 4.5-2.1-3.4-.8-9.4 5.9-9.6v3.4c-.4.1-.8.1-1.2.3-1.2.4-1.9 1.4-1.7 2.7.4 2.4 4.8 3.1 4.4-1.6V4.5h4.1Z"/>',
 		'discord'     => '<path d="M19.8 6.6a16.6 16.6 0 0 0-4.1-1.3l-.5 1.1a15.6 15.6 0 0 0-4.6 0l-.5-1.1c-1.5.2-2.8.7-4.1 1.3-2.6 3.9-3.3 7.7-2.9 11.5a16.8 16.8 0 0 0 5 2.5l.9-1.5c-.5-.2-1-.5-1.5-.8l.4-.3a11.9 11.9 0 0 0 10.2 0l.4.3c-.5.3-1 .6-1.5.8l.9 1.5a16.8 16.8 0 0 0 5-2.5c.5-4.4-.8-8.1-3.1-11.5ZM9.4 15.7c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Zm5.2 0c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Z"/>',
@@ -1522,9 +1532,13 @@ function nerdywithme_social_links() {
 			'platform' => 'instagram',
 			'url'      => nerdywithme_get_option('instagram_url', '#'),
 		),
+		4 => array(
+			'platform' => 'pinterest',
+			'url'      => nerdywithme_get_option('pinterest_url', '#'),
+		),
 	);
 
-	for ($i = 1; $i <= 3; $i++) {
+	for ($i = 1; $i <= 4; $i++) {
 		$default  = $defaults[ $i ];
 		$platform = nerdywithme_sanitize_social_platform(get_theme_mod('nerdywithme_social_link_' . $i . '_platform', $default['platform']));
 		$url      = esc_url(get_theme_mod('nerdywithme_social_link_' . $i . '_url', $default['url']));
@@ -1562,6 +1576,12 @@ function nerdywithme_social_links() {
 				'platform' => 'instagram',
 				'text'     => 'ig',
 				'url'      => nerdywithme_get_option('instagram_url', '#'),
+			),
+			array(
+				'label'    => __('Pinterest', 'nerdywithme'),
+				'platform' => 'pinterest',
+				'text'     => 'pt',
+				'url'      => nerdywithme_get_option('pinterest_url', '#'),
 			),
 		);
 	}

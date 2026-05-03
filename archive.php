@@ -14,7 +14,7 @@ get_header();
 	<div class="archive-description"><?php the_archive_description(); ?></div>
 </section>
 
-<section class="page-section">
+<section class="page-section nwm-deferred-render">
 	<div class="archive-grid">
 		<div class="post-grid">
 			<?php if (have_posts()) : ?>

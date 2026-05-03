@@ -9,6 +9,28 @@ if (! defined('NERDYWITHME_VERSION')) {
 	define('NERDYWITHME_VERSION', '1.0.9');
 }
 
+function nerdywithme_get_versioned_asset_url($file, $version) {
+	$url = get_template_directory_uri() . $file;
+
+	if (! $version) {
+		return $url;
+	}
+
+	return add_query_arg('ver', rawurlencode((string) $version), $url);
+}
+
+function nerdywithme_queue_delayed_script($handle, $src, $version = '') {
+	static $queued = array();
+
+	if (! $src || isset($queued[ $handle ])) {
+		return;
+	}
+
+	$queued[ $handle ] = nerdywithme_get_versioned_asset_url($src, $version);
+
+	$GLOBALS['nerdywithme_delayed_scripts'] = $queued;
+}
+
 function nerdywithme_setup() {
 	add_theme_support('title-tag');
 	add_theme_support('post-thumbnails');
@@ -74,6 +96,7 @@ function nerdywithme_enqueue_assets() {
 	$single_file = nerdywithme_get_preferred_asset('/assets/js/single-cleanup.js', '/assets/js/single-cleanup.min.js');
 	$cookie_file = nerdywithme_get_preferred_asset('/assets/js/cookie-consent.js', '/assets/js/cookie-consent.min.js');
 	$back_to_top_file = nerdywithme_get_preferred_asset('/assets/js/back-to-top.js', '/assets/js/back-to-top.min.js');
+	$mobile_title_trim_file = nerdywithme_get_preferred_asset('/assets/js/mobile-title-trim.js', '/assets/js/mobile-title-trim.min.js');
 	$style_version = file_exists(get_template_directory() . $style_file) ? (string) filemtime(get_template_directory() . $style_file) : NERDYWITHME_VERSION;
 	$tools_style_version = file_exists(get_template_directory() . $tools_style_file) ? (string) filemtime(get_template_directory() . $tools_style_file) : NERDYWITHME_VERSION;
 	$nav_version    = file_exists(get_template_directory() . $nav_file) ? (string) filemtime(get_template_directory() . $nav_file) : NERDYWITHME_VERSION;
@@ -84,6 +107,7 @@ function nerdywithme_enqueue_assets() {
 	$single_version = file_exists(get_template_directory() . $single_file) ? (string) filemtime(get_template_directory() . $single_file) : NERDYWITHME_VERSION;
 	$cookie_version = file_exists(get_template_directory() . $cookie_file) ? (string) filemtime(get_template_directory() . $cookie_file) : NERDYWITHME_VERSION;
 	$back_to_top_version = file_exists(get_template_directory() . $back_to_top_file) ? (string) filemtime(get_template_directory() . $back_to_top_file) : NERDYWITHME_VERSION;
+	$mobile_title_trim_version = file_exists(get_template_directory() . $mobile_title_trim_file) ? (string) filemtime(get_template_directory() . $mobile_title_trim_file) : NERDYWITHME_VERSION;
 
 	wp_enqueue_style('nerdywithme-fonts', esc_url($fonts_url), array(), null);
 	wp_enqueue_style('nerdywithme-style', get_template_directory_uri() . $style_file, array('nerdywithme-fonts'), $style_version);
@@ -106,62 +130,31 @@ function nerdywithme_enqueue_assets() {
 	wp_script_add_data('nerdywithme-nav-search', 'defer', true);
 
 	if (nerdywithme_has_search_modal()) {
-		wp_enqueue_script(
-			'nerdywithme-search-modal',
-			get_template_directory_uri() . $search_file,
-			array(),
-			$search_version,
-			true
-		);
-		wp_script_add_data('nerdywithme-search-modal', 'defer', true);
-		wp_localize_script(
-			'nerdywithme-search-modal',
-			'nwmSearchModalConfig',
-			array(
-				'ajaxUrl'      => admin_url('admin-ajax.php'),
-				'nonce'        => wp_create_nonce('nwm_live_search'),
-				'minChars'     => 2,
-				'emptyLabel'   => __('Start typing to search posts, categories, and tools.', 'nerdywithme'),
-				'loadingLabel' => __('Searching...', 'nerdywithme'),
-				'postsLabel'   => __('Posts', 'nerdywithme'),
-				'categoriesLabel' => __('Categories', 'nerdywithme'),
-				'toolsLabel'   => __('Tools', 'nerdywithme'),
-				'noResultsLabel' => __('No matching results yet. Try a broader keyword.', 'nerdywithme'),
-				'viewAllLabel' => __('See full search results', 'nerdywithme'),
-				'exploreLabel' => __('Explore categories', 'nerdywithme'),
-			)
-		);
+		$GLOBALS['nerdywithme_search_modal_src'] = $search_file;
+		$GLOBALS['nerdywithme_search_modal_version'] = $search_version;
 	}
 
 	if (! is_page('tools') && ! is_404() && (is_front_page() || is_home() || is_archive() || is_search() || is_single())) {
+		nerdywithme_queue_delayed_script('nerdywithme-featured-slider', $slider_file, $slider_version);
+	}
+
+	if (is_front_page()) {
 		wp_enqueue_script(
-			'nerdywithme-featured-slider',
-			get_template_directory_uri() . $slider_file,
+			'nerdywithme-mobile-title-trim',
+			get_template_directory_uri() . $mobile_title_trim_file,
 			array(),
-			$slider_version,
+			$mobile_title_trim_version,
 			true
 		);
-		wp_script_add_data('nerdywithme-featured-slider', 'defer', true);
+		wp_script_add_data('nerdywithme-mobile-title-trim', 'defer', true);
 	}
 
 	if (is_single()) {
-		wp_enqueue_script(
-			'nerdywithme-reading-bar',
-			get_template_directory_uri() . $reading_file,
-			array(),
-			$reading_version,
-			true
-		);
-		wp_script_add_data('nerdywithme-reading-bar', 'defer', true);
+		nerdywithme_queue_delayed_script('nerdywithme-reading-bar', $reading_file, $reading_version);
 
-		wp_enqueue_script(
-			'nerdywithme-toc',
-			get_template_directory_uri() . $toc_file,
-			array(),
-			$toc_version,
-			true
-		);
-		wp_script_add_data('nerdywithme-toc', 'defer', true);
+		if (nerdywithme_single_has_toc()) {
+			nerdywithme_queue_delayed_script('nerdywithme-toc', $toc_file, $toc_version);
+		}
 
 		wp_enqueue_script(
 			'nerdywithme-single-cleanup',
@@ -174,24 +167,10 @@ function nerdywithme_enqueue_assets() {
 	}
 
 	if (nerdywithme_cookie_banner_enabled()) {
-		wp_enqueue_script(
-			'nerdywithme-cookie-consent',
-			get_template_directory_uri() . $cookie_file,
-			array(),
-			$cookie_version,
-			true
-		);
-		wp_script_add_data('nerdywithme-cookie-consent', 'defer', true);
+		nerdywithme_queue_delayed_script('nerdywithme-cookie-consent', $cookie_file, $cookie_version);
 	}
 
-	wp_enqueue_script(
-		'nerdywithme-back-to-top',
-		get_template_directory_uri() . $back_to_top_file,
-		array(),
-		$back_to_top_version,
-		true
-	);
-	wp_script_add_data('nerdywithme-back-to-top', 'defer', true);
+	nerdywithme_queue_delayed_script('nerdywithme-back-to-top', $back_to_top_file, $back_to_top_version);
 }
 add_action('wp_enqueue_scripts', 'nerdywithme_enqueue_assets');
 add_action('wp_ajax_nerdywithme_live_search', 'nerdywithme_handle_live_search');
@@ -269,6 +248,49 @@ add_filter('style_loader_tag', 'nerdywithme_async_font_stylesheet', 10, 4);
 
 function nerdywithme_has_search_modal() {
 	return apply_filters('nerdywithme_enable_search_modal', true);
+}
+
+function nerdywithme_get_search_modal_config() {
+	return array(
+		'ajaxUrl'          => admin_url('admin-ajax.php'),
+		'nonce'            => wp_create_nonce('nwm_live_search'),
+		'minChars'         => 2,
+		'emptyLabel'       => __('Start typing to search posts, categories, and tools.', 'nerdywithme'),
+		'loadingLabel'     => __('Searching...', 'nerdywithme'),
+		'postsLabel'       => __('Posts', 'nerdywithme'),
+		'categoriesLabel'  => __('Categories', 'nerdywithme'),
+		'toolsLabel'       => __('Tools', 'nerdywithme'),
+		'noResultsLabel'   => __('No matching results yet. Try a broader keyword.', 'nerdywithme'),
+		'viewAllLabel'     => __('See full search results', 'nerdywithme'),
+		'exploreLabel'     => __('Explore categories', 'nerdywithme'),
+		'recentLabel'      => __('Recent searches', 'nerdywithme'),
+		'clearRecentLabel' => __('Clear recent', 'nerdywithme'),
+		'searchThisLabel'  => __('Search for "%s"', 'nerdywithme'),
+	);
+}
+
+function nerdywithme_single_has_toc($post_id = 0) {
+	$post_id = $post_id ? (int) $post_id : get_queried_object_id();
+
+	if (! $post_id) {
+		return false;
+	}
+
+	$post = get_post($post_id);
+
+	if (! $post instanceof WP_Post) {
+		return false;
+	}
+
+	$content = (string) $post->post_content;
+
+	if ('' === trim($content)) {
+		return false;
+	}
+
+	preg_match_all('/<h[23][^>]*>.*?<\/h[23]>/is', $content, $matches);
+
+	return count($matches[0]) >= 2;
 }
 
 function nerdywithme_score_search_match($query, $primary_text, $secondary_text = '') {
@@ -526,6 +548,157 @@ function nerdywithme_resource_hints($urls, $relation_type) {
 }
 add_filter('wp_resource_hints', 'nerdywithme_resource_hints', 10, 2);
 
+function nerdywithme_print_delayed_script_loader() {
+	$scripts = $GLOBALS['nerdywithme_delayed_scripts'] ?? array();
+
+	if (empty($scripts) || ! is_array($scripts)) {
+		return;
+	}
+
+	$script_urls = array_values(
+		array_filter(
+			array_map('esc_url_raw', $scripts)
+		)
+	);
+
+	if (empty($script_urls)) {
+		return;
+	}
+	?>
+	<script>
+	(function () {
+	  var scriptUrls = <?php echo wp_json_encode($script_urls); ?>;
+
+	  if (!Array.isArray(scriptUrls) || !scriptUrls.length) {
+	    return;
+	  }
+
+	  function loadScript(src) {
+	    if (!src || document.querySelector('script[src="' + src.replace(/"/g, '\\"') + '"]')) {
+	      return;
+	    }
+
+	    var script = document.createElement("script");
+	    script.src = src;
+	    script.defer = true;
+	    document.body.appendChild(script);
+	  }
+
+	  function loadAllScripts() {
+	    scriptUrls.forEach(loadScript);
+	  }
+
+	  if ("requestIdleCallback" in window) {
+	    window.requestIdleCallback(loadAllScripts, { timeout: 1800 });
+	    return;
+	  }
+
+	  window.setTimeout(loadAllScripts, 900);
+	})();
+	</script>
+	<?php
+}
+add_action('wp_footer', 'nerdywithme_print_delayed_script_loader', 100);
+
+function nerdywithme_print_search_modal_loader() {
+	if (! nerdywithme_has_search_modal()) {
+		return;
+	}
+
+	$search_file    = $GLOBALS['nerdywithme_search_modal_src'] ?? '';
+	$search_version = $GLOBALS['nerdywithme_search_modal_version'] ?? '';
+
+	if (! $search_file) {
+		return;
+	}
+
+	$search_url = nerdywithme_get_versioned_asset_url($search_file, $search_version);
+	$config     = nerdywithme_get_search_modal_config();
+	?>
+	<script>
+	(function () {
+	  var searchToggle = document.querySelector(".search-toggle");
+	  var searchUrl = <?php echo wp_json_encode(esc_url_raw($search_url)); ?>;
+	  var searchConfig = <?php echo wp_json_encode($config); ?>;
+	  var loadPromise = null;
+
+	  if (!searchToggle || !searchUrl) {
+	    return;
+	  }
+
+	  window.nwmSearchModalConfig = searchConfig;
+
+	  function loadSearchModalScript() {
+	    if (window.NWMSearchModalInitialized) {
+	      return Promise.resolve();
+	    }
+
+	    if (loadPromise) {
+	      return loadPromise;
+	    }
+
+	    loadPromise = new Promise(function (resolve, reject) {
+	      var existing = document.querySelector('script[data-nwm-search-modal-script="true"]');
+
+	      if (existing) {
+	        if (window.NWMSearchModalInitialized) {
+	          resolve();
+	          return;
+	        }
+
+	        existing.addEventListener("load", function () {
+	          resolve();
+	        }, { once: true });
+	        existing.addEventListener("error", reject, { once: true });
+	        return;
+	      }
+
+	      var script = document.createElement("script");
+	      script.src = searchUrl;
+	      script.defer = true;
+	      script.setAttribute("data-nwm-search-modal-script", "true");
+	      script.onload = function () {
+	        resolve();
+	      };
+	      script.onerror = reject;
+	      document.body.appendChild(script);
+	    });
+
+	    return loadPromise;
+	  }
+
+	  function warmSearchModal() {
+	    loadSearchModalScript().catch(function () {
+	      loadPromise = null;
+	    });
+	  }
+
+	  function handleFirstClick(event) {
+	    if (window.NWMSearchModalInitialized) {
+	      return;
+	    }
+
+	    event.preventDefault();
+	    warmSearchModal();
+	    loadSearchModalScript().then(function () {
+	      window.setTimeout(function () {
+	        searchToggle.click();
+	      }, 0);
+	    }).catch(function () {
+	      loadPromise = null;
+	    });
+	  }
+
+	  searchToggle.addEventListener("click", handleFirstClick, true);
+	  searchToggle.addEventListener("mouseenter", warmSearchModal, { once: true });
+	  searchToggle.addEventListener("focus", warmSearchModal, { once: true });
+	  searchToggle.addEventListener("touchstart", warmSearchModal, { once: true, passive: true });
+	})();
+	</script>
+	<?php
+}
+add_action('wp_footer', 'nerdywithme_print_search_modal_loader', 95);
+
 function nerdywithme_get_home_hero_post_id() {
 	static $hero_id = null;
 
@@ -660,10 +833,9 @@ function nerdywithme_customize_register($wp_customize) {
 		array('platform' => 'facebook', 'url' => '#'),
 		array('platform' => 'x', 'url' => '#'),
 		array('platform' => 'instagram', 'url' => '#'),
-		array('platform' => 'pinterest', 'url' => '#'),
 	);
 
-	for ($i = 1; $i <= 4; $i++) {
+	for ($i = 1; $i <= 3; $i++) {
 		$default = $social_link_defaults[ $i - 1 ];
 
 		$wp_customize->add_setting(
@@ -1532,13 +1704,9 @@ function nerdywithme_social_links() {
 			'platform' => 'instagram',
 			'url'      => nerdywithme_get_option('instagram_url', '#'),
 		),
-		4 => array(
-			'platform' => 'pinterest',
-			'url'      => nerdywithme_get_option('pinterest_url', '#'),
-		),
 	);
 
-	for ($i = 1; $i <= 4; $i++) {
+	for ($i = 1; $i <= 3; $i++) {
 		$default  = $defaults[ $i ];
 		$platform = nerdywithme_sanitize_social_platform(get_theme_mod('nerdywithme_social_link_' . $i . '_platform', $default['platform']));
 		$url      = esc_url(get_theme_mod('nerdywithme_social_link_' . $i . '_url', $default['url']));
@@ -1576,12 +1744,6 @@ function nerdywithme_social_links() {
 				'platform' => 'instagram',
 				'text'     => 'ig',
 				'url'      => nerdywithme_get_option('instagram_url', '#'),
-			),
-			array(
-				'label'    => __('Pinterest', 'nerdywithme'),
-				'platform' => 'pinterest',
-				'text'     => 'pt',
-				'url'      => nerdywithme_get_option('pinterest_url', '#'),
 			),
 		);
 	}

@@ -52,7 +52,7 @@ if ($featured_id) {
 	</div>
 </section>
 
-<section class="page-section">
+<section class="page-section nwm-deferred-render">
 	<div class="archive-grid archive-grid--blog">
 		<div class="blog-page">
 			<?php if ($featured_id) : ?>

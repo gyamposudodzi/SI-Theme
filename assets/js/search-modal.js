@@ -1,4 +1,9 @@
-document.addEventListener("DOMContentLoaded", function () {
+function initNwmSearchModal() {
+  if (window.NWMSearchModalInitialized) {
+    return;
+  }
+
+  window.NWMSearchModalInitialized = true;
   const body = document.body;
   const searchToggle = document.querySelector(".search-toggle");
   const searchPanel = document.querySelector(".search-panel");
@@ -13,6 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const navToggle = document.querySelector(".nav-toggle");
   const megaPanel = document.querySelector(".mega-panel");
   const config = window.nwmSearchModalConfig || {};
+  const recentSearchesKey = "nwmRecentSearches";
 
   if (!searchToggle || !searchPanel) {
     return;
@@ -29,6 +35,120 @@ document.addEventListener("DOMContentLoaded", function () {
     searchPanel.setAttribute("aria-hidden", "true");
   }
 
+  function escapeHtml(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function escapeRegExp(value) {
+    return String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  function highlightText(value, query) {
+    const escapedValue = escapeHtml(value);
+    const trimmedQuery = String(query || "").trim();
+
+    if (!trimmedQuery) {
+      return escapedValue;
+    }
+
+    const tokens = trimmedQuery
+      .split(/\s+/)
+      .map(function (token) {
+        return token.trim();
+      })
+      .filter(Boolean)
+      .sort(function (a, b) {
+        return b.length - a.length;
+      });
+
+    if (!tokens.length) {
+      return escapedValue;
+    }
+
+    const pattern = tokens.map(escapeRegExp).join("|");
+    return escapedValue.replace(new RegExp("(" + pattern + ")", "gi"), "<mark>$1</mark>");
+  }
+
+  function readRecentSearches() {
+    try {
+      const stored = window.localStorage.getItem(recentSearchesKey);
+      const parsed = stored ? JSON.parse(stored) : [];
+      return Array.isArray(parsed) ? parsed.filter(Boolean).slice(0, 5) : [];
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function writeRecentSearches(items) {
+    try {
+      window.localStorage.setItem(recentSearchesKey, JSON.stringify(items.slice(0, 5)));
+    } catch (error) {
+      // Ignore storage failures.
+    }
+  }
+
+  function saveRecentSearch(query) {
+    const trimmedQuery = String(query || "").trim();
+
+    if (trimmedQuery.length < Number(config.minChars || 2)) {
+      return;
+    }
+
+    const recent = readRecentSearches().filter(function (item) {
+      return item.toLowerCase() !== trimmedQuery.toLowerCase();
+    });
+
+    recent.unshift(trimmedQuery);
+    writeRecentSearches(recent);
+  }
+
+  function clearRecentSearches() {
+    try {
+      window.localStorage.removeItem(recentSearchesKey);
+    } catch (error) {
+      // Ignore storage failures.
+    }
+  }
+
+  function buildRecentSearches() {
+    const recent = readRecentSearches();
+
+    if (!recent.length) {
+      return "";
+    }
+
+    return (
+      '<section class="search-panel__recent">' +
+      '<div class="search-panel__recent-head">' +
+      '<h3 class="search-panel__group-title">' +
+      escapeHtml(config.recentLabel || "Recent searches") +
+      "</h3>" +
+      '<button type="button" class="search-panel__recent-clear" data-search-clear-recent>' +
+      escapeHtml(config.clearRecentLabel || "Clear recent") +
+      "</button>" +
+      "</div>" +
+      '<div class="search-panel__recent-list">' +
+      recent
+        .map(function (item) {
+          return (
+            '<button type="button" class="search-panel__recent-chip" data-search-recent="' +
+            escapeHtml(item) +
+            '">' +
+            escapeHtml(item) +
+            "</button>"
+          );
+        })
+        .join("") +
+      "</div>" +
+      "</section>"
+    );
+  }
+
   function showDefaultState() {
     if (searchFilters) {
       searchFilters.hidden = false;
@@ -39,8 +159,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (searchResults) {
-      searchResults.hidden = true;
-      searchResults.innerHTML = "";
+      const recentMarkup = buildRecentSearches();
+      searchResults.hidden = !recentMarkup;
+      searchResults.innerHTML = recentMarkup;
     }
 
     if (searchStatus) {
@@ -66,7 +187,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  function buildGroup(title, items) {
+  function buildGroup(title, items, query) {
     if (!Array.isArray(items) || !items.length) {
       return "";
     }
@@ -81,13 +202,13 @@ document.addEventListener("DOMContentLoaded", function () {
         .map(function (item) {
           return (
             '<a class="search-panel__result" href="' +
-            item.url +
+            escapeHtml(item.url) +
             '">' +
             '<strong class="search-panel__result-title">' +
-            item.title +
+            highlightText(item.title, query) +
             "</strong>" +
             (item.meta
-              ? '<span class="search-panel__result-meta">' + item.meta + "</span>"
+              ? '<span class="search-panel__result-meta">' + escapeHtml(item.meta) + "</span>"
               : "") +
             "</a>"
           );
@@ -106,18 +227,18 @@ document.addEventListener("DOMContentLoaded", function () {
     return (
       '<section class="search-panel__empty-state">' +
       '<p class="search-panel__empty-copy">' +
-      (config.noResultsLabel || "No matching results yet. Try a broader keyword.") +
+      escapeHtml(config.noResultsLabel || "No matching results yet. Try a broader keyword.") +
       "</p>" +
       '<div class="search-panel__empty-actions">' +
       '<a class="search-panel__empty-button" href="' +
       searchUrl.toString() +
       '">' +
-      (config.viewAllLabel || "See full search results") +
+      escapeHtml(config.viewAllLabel || "See full search results") +
       "</a>" +
       "</div>" +
       (fallbackFiltersMarkup
         ? '<div class="search-panel__empty-filters"><h3 class="search-panel__group-title">' +
-          (config.exploreLabel || "Explore categories") +
+          escapeHtml(config.exploreLabel || "Explore categories") +
           "</h3>" +
           '<div class="search-panel__filters search-panel__filters--recovery">' +
           fallbackFiltersMarkup +
@@ -154,9 +275,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     searchResults.innerHTML =
-      buildGroup(config.postsLabel || "Posts", posts) +
-      buildGroup(config.categoriesLabel || "Categories", categories) +
-      buildGroup(config.toolsLabel || "Tools", tools);
+      buildGroup(config.postsLabel || "Posts", posts, query) +
+      buildGroup(config.categoriesLabel || "Categories", categories, query) +
+      buildGroup(config.toolsLabel || "Tools", tools, query);
 
     activeResultIndex = -1;
   }
@@ -264,6 +385,31 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
+  if (searchResults) {
+    searchResults.addEventListener("click", function (event) {
+      const clearButton = event.target.closest("[data-search-clear-recent]");
+      if (clearButton) {
+        clearRecentSearches();
+        showDefaultState();
+        return;
+      }
+
+      const recentButton = event.target.closest("[data-search-recent]");
+      if (recentButton && searchInput) {
+        const recentQuery = recentButton.getAttribute("data-search-recent") || "";
+        searchInput.value = recentQuery;
+        searchInput.focus();
+        fetchResults(recentQuery);
+        return;
+      }
+
+      const resultLink = event.target.closest(".search-panel__result");
+      if (resultLink && searchInput) {
+        saveRecentSearch(searchInput.value);
+      }
+    });
+  }
+
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && body.classList.contains("search-open")) {
       closeSearch();
@@ -338,6 +484,14 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  if (searchForm) {
+    searchForm.addEventListener("submit", function () {
+      if (searchInput) {
+        saveRecentSearch(searchInput.value);
+      }
+    });
+  }
+
   window.addEventListener("resize", function () {
     if (window.innerWidth <= 560 && body.classList.contains("search-open")) {
       searchPanel.setAttribute("aria-hidden", "false");
@@ -345,4 +499,10 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   showDefaultState();
-});
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initNwmSearchModal, { once: true });
+} else {
+  initNwmSearchModal();
+}

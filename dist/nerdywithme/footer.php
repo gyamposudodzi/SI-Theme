@@ -7,7 +7,7 @@
 ?>
 		</div>
 	</main>
-	<footer class="site-footer">
+	<footer class="site-footer nwm-deferred-render">
 		<div class="nwm-shell">
 			<?php if (function_exists('nerdywithme_tools_render_ad_slot')) : ?>
 				<div class="theme-ad-slot theme-ad-slot--footer">

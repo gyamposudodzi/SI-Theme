@@ -272,17 +272,24 @@ button, input, textarea, select { font: inherit; }
 .menu > li > a {
   display: inline-flex;
   align-items: center;
-  min-height: 36px;
-  padding: 0 8px;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 10px;
   border-radius: 0;
   font-weight: 600;
   font-size: 0.95rem;
   letter-spacing: -0.01em;
 }
 .menu > li > a:hover,
+.menu > li > a:focus-visible {
+  color: var(--nwm-secondary);
+}
 .menu > .current-menu-item > a,
 .menu > .current-menu-ancestor > a {
-  color: var(--nwm-secondary);
+  color: var(--nwm-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 2px;
 }
 .menu li.menu-item-has-children > a::after {
   content: "▾";
@@ -1153,6 +1160,16 @@ textarea { min-height: 160px; padding: 16px 18px; }
   height: 100%;
   min-height: 0;
 }
+.compact-hero-side__heading {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
 .compact-hero-side .card {
   display: grid;
   grid-template-rows: auto auto;
@@ -1235,7 +1252,20 @@ textarea { min-height: 160px; padding: 16px 18px; }
   padding-bottom: 16px;
   border-bottom: 1px solid #eceef4;
 }
-.section-link { font-weight: 700; color: var(--nwm-secondary); font-size: 0.84rem; }
+.section-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 12px;
+  font-weight: 700;
+  color: #0d1f5e;
+  font-size: 0.84rem;
+}
+.section-link:hover,
+.section-link:focus-visible {
+  color: #091645;
+}
 .category-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
 .category-pill {
   padding: 16px; text-align: center; border-radius: 28px; background: #fff; border: 1px solid rgba(19, 42, 120, 0.08); box-shadow: 0 18px 34px rgba(16, 20, 55, 0.06);
@@ -1436,6 +1466,7 @@ textarea { min-height: 160px; padding: 16px 18px; }
 }
 .row-post:last-child { padding-bottom: 0; }
 .row-post__thumb {
+  display: block;
   position: relative;
   overflow: hidden;
   border-radius: 0;
@@ -1655,6 +1686,11 @@ textarea { min-height: 160px; padding: 16px 18px; }
   max-width: 27ch;
 }
 .list-post__title { font-size: 1.22rem; line-height: 1.1; font-weight: 800; }
+.rank-list__title a,
+.list-post__title,
+.row-post__title a {
+  display: inline-block;
+}
 .compact-list__item--featured {
   grid-template-columns: 1fr;
   gap: 12px;
@@ -1833,10 +1869,10 @@ textarea { min-height: 160px; padding: 16px 18px; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 42px;
+  min-height: 44px;
   padding: 0 18px;
   border-radius: 0;
-  background: var(--nwm-secondary);
+  background: #b43b16;
   color: #fff;
   font-size: 0.9rem;
   font-weight: 700;
@@ -1846,7 +1882,7 @@ textarea { min-height: 160px; padding: 16px 18px; }
 }
 .profile-card__button:hover,
 .profile-card__button:focus-visible {
-  background: #e5532d;
+  background: #8f2f11;
   color: #fff;
 }
 .widget-card--plain {
@@ -2672,16 +2708,17 @@ body.reader-bar--content .reading-bar__progress {
   padding: 0 18px;
   border: 0;
   border-radius: 0;
-  background: var(--nwm-secondary);
+  background: var(--nwm-primary);
   color: #fff;
   font-weight: 800;
+  font-size: 0.92rem;
   box-shadow: none;
 }
 
 .nwm-cookie-banner__button:hover,
 .nwm-cookie-banner__button:focus-visible {
   color: #fff;
-  background: #f45127;
+  background: #0d1f5e;
 }
 
 .nwm-cookie-banner__button--ghost {
@@ -3786,6 +3823,65 @@ body.home .hot-grid__feature .card__title {
   .search-panel__title {
     font-size: 0.92rem;
     line-height: 1.08;
+  }
+  .post-meta,
+  .post-meta a {
+    gap: 12px;
+  }
+  .post-categories {
+    gap: 12px;
+  }
+  .menu > .current-menu-item > a,
+  .menu > .current-menu-ancestor > a {
+    background: var(--nwm-primary);
+    color: #fff;
+    text-decoration: none;
+  }
+  .menu > .current-menu-item > a:hover,
+  .menu > .current-menu-item > a:focus-visible,
+  .menu > .current-menu-ancestor > a:hover,
+  .menu > .current-menu-ancestor > a:focus-visible {
+    background: #0d1f5e;
+    color: #fff;
+  }
+  .section-link {
+    padding: 0 14px;
+    background: var(--nwm-primary);
+    color: #fff;
+  }
+  .section-link:hover,
+  .section-link:focus-visible {
+    background: #0d1f5e;
+    color: #fff;
+  }
+  .compact-hero-side__heading.screen-reader-text {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0 0 2px;
+    overflow: visible;
+    clip: auto;
+    font-size: 0.72rem;
+    line-height: 1.2;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #3d4c7a;
+  }
+  .post-categories a {
+    min-height: 30px;
+    padding: 0 10px;
+    font-size: 0.68rem;
+  }
+  .rank-list__title a,
+  .list-post__title,
+  .row-post__title a {
+    min-height: 44px;
+    padding-block: 8px;
+  }
+  .list-post__content,
+  .row-post__content,
+  .rank-list__content {
+    gap: 10px;
   }
 
   .nwm-cookie-banner__actions {

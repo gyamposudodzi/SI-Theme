@@ -17,6 +17,7 @@ get_header();
 <section class="page-section nwm-deferred-render">
 	<div class="archive-grid">
 		<div class="post-grid">
+			<h2 class="screen-reader-text"><?php esc_html_e('Archive posts', 'nerdywithme'); ?></h2>
 			<?php if (have_posts()) : ?>
 				<?php while (have_posts()) : the_post(); ?>
 					<?php nerdywithme_card(get_the_ID()); ?>

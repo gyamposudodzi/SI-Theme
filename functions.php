@@ -130,8 +130,19 @@ function nerdywithme_enqueue_assets() {
 	wp_script_add_data('nerdywithme-nav-search', 'defer', true);
 
 	if (nerdywithme_has_search_modal()) {
-		$GLOBALS['nerdywithme_search_modal_src'] = $search_file;
-		$GLOBALS['nerdywithme_search_modal_version'] = $search_version;
+		wp_enqueue_script(
+			'nerdywithme-search-modal',
+			get_template_directory_uri() . $search_file,
+			array(),
+			$search_version,
+			true
+		);
+		wp_script_add_data('nerdywithme-search-modal', 'defer', true);
+		wp_localize_script(
+			'nerdywithme-search-modal',
+			'nwmSearchModalConfig',
+			nerdywithme_get_search_modal_config()
+		);
 	}
 
 	if (! is_page('tools') && ! is_404() && (is_front_page() || is_home() || is_archive() || is_search() || is_single())) {
@@ -599,105 +610,6 @@ function nerdywithme_print_delayed_script_loader() {
 	<?php
 }
 add_action('wp_footer', 'nerdywithme_print_delayed_script_loader', 100);
-
-function nerdywithme_print_search_modal_loader() {
-	if (! nerdywithme_has_search_modal()) {
-		return;
-	}
-
-	$search_file    = $GLOBALS['nerdywithme_search_modal_src'] ?? '';
-	$search_version = $GLOBALS['nerdywithme_search_modal_version'] ?? '';
-
-	if (! $search_file) {
-		return;
-	}
-
-	$search_url = nerdywithme_get_versioned_asset_url($search_file, $search_version);
-	$config     = nerdywithme_get_search_modal_config();
-	?>
-	<script>
-	(function () {
-	  var searchToggle = document.querySelector(".search-toggle");
-	  var searchUrl = <?php echo wp_json_encode(esc_url_raw($search_url)); ?>;
-	  var searchConfig = <?php echo wp_json_encode($config); ?>;
-	  var loadPromise = null;
-
-	  if (!searchToggle || !searchUrl) {
-	    return;
-	  }
-
-	  window.nwmSearchModalConfig = searchConfig;
-
-	  function loadSearchModalScript() {
-	    if (window.NWMSearchModalInitialized) {
-	      return Promise.resolve();
-	    }
-
-	    if (loadPromise) {
-	      return loadPromise;
-	    }
-
-	    loadPromise = new Promise(function (resolve, reject) {
-	      var existing = document.querySelector('script[data-nwm-search-modal-script="true"]');
-
-	      if (existing) {
-	        if (window.NWMSearchModalInitialized) {
-	          resolve();
-	          return;
-	        }
-
-	        existing.addEventListener("load", function () {
-	          resolve();
-	        }, { once: true });
-	        existing.addEventListener("error", reject, { once: true });
-	        return;
-	      }
-
-	      var script = document.createElement("script");
-	      script.src = searchUrl;
-	      script.defer = true;
-	      script.setAttribute("data-nwm-search-modal-script", "true");
-	      script.onload = function () {
-	        resolve();
-	      };
-	      script.onerror = reject;
-	      document.body.appendChild(script);
-	    });
-
-	    return loadPromise;
-	  }
-
-	  function warmSearchModal() {
-	    loadSearchModalScript().catch(function () {
-	      loadPromise = null;
-	    });
-	  }
-
-	  function handleFirstClick(event) {
-	    if (window.NWMSearchModalInitialized) {
-	      return;
-	    }
-
-	    event.preventDefault();
-	    warmSearchModal();
-	    loadSearchModalScript().then(function () {
-	      window.setTimeout(function () {
-	        searchToggle.click();
-	      }, 0);
-	    }).catch(function () {
-	      loadPromise = null;
-	    });
-	  }
-
-	  searchToggle.addEventListener("click", handleFirstClick, true);
-	  searchToggle.addEventListener("mouseenter", warmSearchModal, { once: true });
-	  searchToggle.addEventListener("focus", warmSearchModal, { once: true });
-	  searchToggle.addEventListener("touchstart", warmSearchModal, { once: true, passive: true });
-	})();
-	</script>
-	<?php
-}
-add_action('wp_footer', 'nerdywithme_print_search_modal_loader', 95);
 
 function nerdywithme_get_home_hero_post_id() {
 	static $hero_id = null;

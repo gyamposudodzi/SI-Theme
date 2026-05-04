@@ -75,6 +75,7 @@ if (count($editor_ids) < 3) {
 		<?php endif; ?>
 
 		<div class="compact-hero-side">
+			<h2 class="compact-hero-side__heading screen-reader-text"><?php esc_html_e('More featured posts', 'nerdywithme'); ?></h2>
 			<?php foreach ($hero_side_ids as $side_id) : ?>
 				<?php nerdywithme_card($side_id, 'compact'); ?>
 			<?php endforeach; ?>
@@ -83,12 +84,12 @@ if (count($editor_ids) < 3) {
 </section>
 
 <?php if (function_exists('nerdywithme_tools_render_ad_slot')) : ?>
-	<section class="page-section theme-ad-slot theme-ad-slot--homepage nwm-deferred-render">
+	<section class="page-section theme-ad-slot theme-ad-slot--homepage">
 		<?php nerdywithme_tools_render_ad_slot('homepage_after_hero'); ?>
 	</section>
 <?php endif; ?>
 
-<section class="page-section nwm-deferred-render">
+<section class="page-section">
 	<?php nerdywithme_section_heading(__('Connect With My Favorite Apps', 'nerdywithme'), __('Chosen by the editor.', 'nerdywithme')); ?>
 	<div class="app-strip app-strip--social">
 		<?php foreach ($home_social_cards as $card) : ?>
@@ -100,7 +101,7 @@ if (count($editor_ids) < 3) {
 	</div>
 </section>
 
-<section class="page-section nwm-deferred-render">
+<section class="page-section">
 	<?php nerdywithme_section_heading(__('What\'s Hot Right Now', 'nerdywithme'), __('Timely reads on markets, trader workflow, and the tech that sharpens decision-making.', 'nerdywithme'), home_url('/blog'), __('View all', 'nerdywithme')); ?>
 	<div class="hot-grid">
 		<div class="hot-grid__feature">
@@ -116,7 +117,7 @@ if (count($editor_ids) < 3) {
 	</div>
 </section>
 
-<section class="page-section nwm-deferred-render">
+<section class="page-section">
 	<?php nerdywithme_section_heading(__('Editor Picks', 'nerdywithme'), __('The clearest beginner guides, systematic trading lessons, and tech-first reads to start with.', 'nerdywithme'), home_url('/blog'), __('View all', 'nerdywithme')); ?>
 	<div class="subgrid">
 		<?php foreach ($editor_ids as $pick_id) : ?>
@@ -125,7 +126,7 @@ if (count($editor_ids) < 3) {
 	</div>
 </section>
 
-<section class="page-section nwm-deferred-render">
+<section class="page-section">
 	<?php nerdywithme_section_heading(__('Popular Articles', 'nerdywithme'), __('Longer reads on execution, technical analysis, automation, and AI-assisted trading systems.', 'nerdywithme')); ?>
 	<div class="latest-grid">
 		<div class="row-posts">
@@ -137,7 +138,7 @@ if (count($editor_ids) < 3) {
 	</div>
 </section>
 
-<section class="page-section nwm-deferred-render">
+<section class="page-section">
 	<div class="triple-columns">
 		<div>
 			<?php nerdywithme_section_heading(__('Starter Reads', 'nerdywithme')); ?>

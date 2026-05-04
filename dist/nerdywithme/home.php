@@ -55,6 +55,7 @@ if ($featured_id) {
 <section class="page-section nwm-deferred-render">
 	<div class="archive-grid archive-grid--blog">
 		<div class="blog-page">
+			<h2 class="screen-reader-text"><?php esc_html_e('Latest blog posts', 'nerdywithme'); ?></h2>
 			<?php if ($featured_id) : ?>
 				<div class="blog-page__feature">
 					<?php nerdywithme_card($featured_id, 'lead'); ?>

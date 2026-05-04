@@ -8,7 +8,7 @@ Latest package files currently present in this folder:
 
 - Theme: `nerdywithme-theme-1.0.9.zip`
 - Theme flat package: `nerdywithme-theme-1.0.9-flat.zip`
-- Theme dev package: `nerdywithme-theme-1.0.9-dev-2026-04-30.zip`
+- Theme dev package: `nerdywithme-theme-1.0.9-dev-2026-05-04.zip`
 - Plugin: `nerdywithme-tools-0.1.2.zip`
 - Plugin dev package: `nerdywithme-tools-0.1.2-dev-2026-04-30.zip`
 - Plugin alias: `nerdywithme-tools-latest.zip`

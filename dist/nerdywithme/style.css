@@ -3868,8 +3868,8 @@ body.home .hot-grid__feature .card__title {
     color: #3d4c7a;
   }
   .post-categories a {
-    min-height: 30px;
-    padding: 0 10px;
+    min-height: 26px;
+    padding: 0 8px;
     font-size: 0.68rem;
   }
   .rank-list__title a,
@@ -3931,6 +3931,10 @@ body.home .hot-grid__feature .card__title {
     max-width: none;
   }
   body.home .compact-hero-card .entry-title { font-size: clamp(1.43rem, 7.5vw, 2.03rem); }
+  body.home .hot-grid__feature .card__title {
+    font-size: clamp(1.43rem, 7.5vw, 2.03rem);
+    line-height: 1.02;
+  }
   body.home .compact-hero-card .entry-summary {
     display: block;
     width: 100%;
@@ -3940,6 +3944,30 @@ body.home .hot-grid__feature .card__title {
   body.home .compact-hero-side .card__thumb {
     min-height: 0;
     aspect-ratio: 16 / 9;
+  }
+  body.home .hot-grid__strip {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  body.home .hot-grid__strip .card {
+    display: grid;
+    grid-template-rows: auto auto;
+    gap: 10px;
+    align-content: start;
+    height: auto;
+  }
+  body.home .hot-grid__strip .card__thumb {
+    min-height: 0;
+    aspect-ratio: 16 / 9;
+    height: auto;
+  }
+  body.home .hot-grid__strip .card__content {
+    gap: 6px;
+    align-content: start;
+  }
+  body.home .hot-grid__strip .card__title {
+    font-size: 1.15rem;
+    line-height: 1.12;
   }
   body.home .app-strip--social { grid-template-columns: 1fr; }
   body.home .app-strip--social .app-chip { min-height: 76px; }

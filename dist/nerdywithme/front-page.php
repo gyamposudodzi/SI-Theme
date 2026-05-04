@@ -106,7 +106,23 @@ if (count($editor_ids) < 3) {
 	<div class="hot-grid">
 		<div class="hot-grid__feature">
 			<?php foreach ($hot_pair_ids as $hot_id) : ?>
-				<?php nerdywithme_card($hot_id); ?>
+				<article <?php post_class('card', $hot_id); ?>>
+					<a class="card__thumb" href="<?php echo esc_url(get_permalink($hot_id)); ?>">
+						<?php echo nerdywithme_get_post_image_tag($hot_id, 'nwm-card', array('alt' => get_the_title($hot_id)), nerdywithme_get_image_sizes_hint('standard-card')); ?>
+					</a>
+					<div class="card__content">
+						<?php nerdywithme_post_meta($hot_id); ?>
+						<h3 class="card__title">
+							<a
+								href="<?php echo esc_url(get_permalink($hot_id)); ?>"
+								data-mobile-trim-title
+								data-mobile-trim-limit="65"
+								data-full-title="<?php echo esc_attr(get_the_title($hot_id)); ?>"
+							><?php echo esc_html(get_the_title($hot_id)); ?></a>
+						</h3>
+						<p class="card__excerpt"><?php echo esc_html(wp_trim_words(get_the_excerpt($hot_id), 20)); ?></p>
+					</div>
+				</article>
 			<?php endforeach; ?>
 		</div>
 		<div class="hot-grid__strip">

@@ -220,6 +220,9 @@ class NerdyWithMe_Tools_Admin {
 		$sanitized = array(
 			'ads'                           => array(),
 			'ad_settings'                   => array(),
+			'social_profiles'               => array(),
+			'profile_card'                  => array(),
+			'cookie_content'                => array(),
 			'enable_risk_calculator'        => ! empty($input['enable_risk_calculator']),
 			'enable_position_size_calculator' => ! empty($input['enable_position_size_calculator']),
 			'enable_pip_value_calculator'   => ! empty($input['enable_pip_value_calculator']),
@@ -292,6 +295,29 @@ class NerdyWithMe_Tools_Admin {
 		foreach ($this->get_tool_slug_defaults() as $slug => $default_slug) {
 			$raw = isset($input['tool_slugs'][ $slug ]) ? sanitize_title($input['tool_slugs'][ $slug ]) : $default_slug;
 			$sanitized['tool_slugs'][ $slug ] = $raw ? $raw : $default_slug;
+		}
+
+		foreach ($this->get_social_profile_defaults() as $platform => $default_url) {
+			$sanitized['social_profiles'][ $platform ] = isset($input['social_profiles'][ $platform ])
+				? esc_url_raw($input['social_profiles'][ $platform ])
+				: $default_url;
+		}
+
+		$profile_input = is_array($input['profile_card'] ?? null) ? $input['profile_card'] : array();
+		$profile_defaults = $this->get_profile_card_defaults();
+		$sanitized['profile_card'] = array(
+			'button_label' => isset($profile_input['button_label']) ? sanitize_text_field($profile_input['button_label']) : $profile_defaults['button_label'],
+			'button_url'   => isset($profile_input['button_url']) ? esc_url_raw($profile_input['button_url']) : $profile_defaults['button_url'],
+		);
+
+		$cookie_input    = is_array($input['cookie_content'] ?? null) ? $input['cookie_content'] : array();
+		$cookie_defaults = $this->get_cookie_content_defaults();
+		foreach ($cookie_defaults as $key => $default_value) {
+			if (is_string($default_value) && false !== strpos($key, '_items')) {
+				$sanitized['cookie_content'][ $key ] = isset($cookie_input[ $key ]) ? sanitize_textarea_field($cookie_input[ $key ]) : $default_value;
+			} else {
+				$sanitized['cookie_content'][ $key ] = isset($cookie_input[ $key ]) ? sanitize_textarea_field($cookie_input[ $key ]) : $default_value;
+			}
 		}
 
 		return $sanitized;
@@ -485,6 +511,8 @@ class NerdyWithMe_Tools_Admin {
 				<div class="nwm-tools-admin__tabs" role="tablist" aria-label="<?php esc_attr_e('Plugin settings sections', 'nerdywithme-tools'); ?>">
 					<button type="button" class="nwm-tools-admin__tab is-active" data-nwm-admin-tab="tools"><?php esc_html_e('Tools', 'nerdywithme-tools'); ?></button>
 					<button type="button" class="nwm-tools-admin__tab" data-nwm-admin-tab="seo"><?php esc_html_e('SEO', 'nerdywithme-tools'); ?></button>
+					<button type="button" class="nwm-tools-admin__tab" data-nwm-admin-tab="profiles"><?php esc_html_e('Profiles', 'nerdywithme-tools'); ?></button>
+					<button type="button" class="nwm-tools-admin__tab" data-nwm-admin-tab="cookie"><?php esc_html_e('Cookie', 'nerdywithme-tools'); ?></button>
 					<button type="button" class="nwm-tools-admin__tab" data-nwm-admin-tab="ads"><?php esc_html_e('Ads', 'nerdywithme-tools'); ?></button>
 					<button type="button" class="nwm-tools-admin__tab" data-nwm-admin-tab="help"><?php esc_html_e('Help', 'nerdywithme-tools'); ?></button>
 				</div>
@@ -558,6 +586,198 @@ class NerdyWithMe_Tools_Admin {
 								</div>
 							</article>
 						<?php endforeach; ?>
+					</div>
+				</section>
+
+				<section class="nwm-tools-admin__panel" data-nwm-admin-panel="profiles">
+					<div class="nwm-tools-admin__panel-header">
+						<h2><?php esc_html_e('Shared Social Profiles', 'nerdywithme-tools'); ?></h2>
+						<p><?php esc_html_e('Store your core social profile URLs and sidebar follow CTA here so theme changes do not make you re-enter them. The theme will reuse these values in headers, footers, cards, and the sidebar profile button.', 'nerdywithme-tools'); ?></p>
+					</div>
+					<div class="nwm-tools-admin__cards nwm-tools-admin__cards--seo">
+						<article class="nwm-tools-admin__card">
+							<div class="nwm-tools-admin__card-head">
+								<div>
+									<h3><?php esc_html_e('Social profile URLs', 'nerdywithme-tools'); ?></h3>
+									<p><?php esc_html_e('Add the platforms you actually use. Leave any unused profile blank.', 'nerdywithme-tools'); ?></p>
+								</div>
+							</div>
+							<div class="nwm-tools-admin__fields">
+								<?php foreach ($this->get_social_profile_labels() as $platform => $label) : ?>
+									<label>
+										<span><?php echo esc_html($label); ?></span>
+										<input type="url" name="<?php echo esc_attr(self::OPTION_KEY . '[social_profiles][' . $platform . ']'); ?>" value="<?php echo esc_attr($settings['social_profiles'][ $platform ] ?? ''); ?>" placeholder="https://">
+									</label>
+								<?php endforeach; ?>
+							</div>
+						</article>
+						<article class="nwm-tools-admin__card">
+							<div class="nwm-tools-admin__card-head">
+								<div>
+									<h3><?php esc_html_e('Sidebar Profile Button', 'nerdywithme-tools'); ?></h3>
+									<p><?php esc_html_e('Control the label and destination for the sidebar profile card button from the plugin so it survives theme swaps.', 'nerdywithme-tools'); ?></p>
+								</div>
+							</div>
+							<div class="nwm-tools-admin__fields">
+								<label>
+									<span><?php esc_html_e('Button Label', 'nerdywithme-tools'); ?></span>
+									<input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[profile_card][button_label]'); ?>" value="<?php echo esc_attr($settings['profile_card']['button_label'] ?? $this->get_profile_card_defaults()['button_label']); ?>">
+								</label>
+								<label>
+									<span><?php esc_html_e('Button URL', 'nerdywithme-tools'); ?></span>
+									<input type="url" name="<?php echo esc_attr(self::OPTION_KEY . '[profile_card][button_url]'); ?>" value="<?php echo esc_attr($settings['profile_card']['button_url'] ?? $this->get_profile_card_defaults()['button_url']); ?>" placeholder="https://">
+								</label>
+							</div>
+						</article>
+					</div>
+				</section>
+
+				<section class="nwm-tools-admin__panel" data-nwm-admin-panel="cookie">
+					<div class="nwm-tools-admin__panel-header">
+						<h2><?php esc_html_e('Cookie Banner and Modal Copy', 'nerdywithme-tools'); ?></h2>
+						<p><?php esc_html_e('Edit the wording shown in the lightweight cookie banner and cookie preferences modal without touching theme files.', 'nerdywithme-tools'); ?></p>
+					</div>
+					<div class="nwm-tools-admin__cards nwm-tools-admin__cards--seo">
+						<article class="nwm-tools-admin__card">
+							<div class="nwm-tools-admin__card-head">
+								<div>
+									<h3><?php esc_html_e('Banner copy', 'nerdywithme-tools'); ?></h3>
+									<p><?php esc_html_e('This is the first lightweight message readers see before opening the full cookie panel.', 'nerdywithme-tools'); ?></p>
+								</div>
+							</div>
+							<div class="nwm-tools-admin__fields">
+								<?php $cookie_content = $settings['cookie_content'] ?? $this->get_cookie_content_defaults(); ?>
+								<label>
+									<span><?php esc_html_e('Banner title', 'nerdywithme-tools'); ?></span>
+									<input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][banner_title]'); ?>" value="<?php echo esc_attr($cookie_content['banner_title'] ?? ''); ?>">
+								</label>
+								<label>
+									<span><?php esc_html_e('Banner message', 'nerdywithme-tools'); ?></span>
+									<textarea name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][banner_text]'); ?>" rows="3"><?php echo esc_textarea($cookie_content['banner_text'] ?? ''); ?></textarea>
+								</label>
+								<label>
+									<span><?php esc_html_e('Cookie details button', 'nerdywithme-tools'); ?></span>
+									<input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][details_label]'); ?>" value="<?php echo esc_attr($cookie_content['details_label'] ?? ''); ?>">
+								</label>
+								<label>
+									<span><?php esc_html_e('Necessary only button', 'nerdywithme-tools'); ?></span>
+									<input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][necessary_label]'); ?>" value="<?php echo esc_attr($cookie_content['necessary_label'] ?? ''); ?>">
+								</label>
+								<label>
+									<span><?php esc_html_e('Accept all button', 'nerdywithme-tools'); ?></span>
+									<input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][accept_label]'); ?>" value="<?php echo esc_attr($cookie_content['accept_label'] ?? ''); ?>">
+								</label>
+								<label>
+									<span><?php esc_html_e('Floating cookie button label', 'nerdywithme-tools'); ?></span>
+									<input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][fab_label]'); ?>" value="<?php echo esc_attr($cookie_content['fab_label'] ?? ''); ?>">
+								</label>
+							</div>
+						</article>
+						<article class="nwm-tools-admin__card">
+							<div class="nwm-tools-admin__card-head">
+								<div>
+									<h3><?php esc_html_e('Modal header and summary', 'nerdywithme-tools'); ?></h3>
+									<p><?php esc_html_e('These fields control the main introduction inside the cookie preferences modal.', 'nerdywithme-tools'); ?></p>
+								</div>
+							</div>
+							<div class="nwm-tools-admin__fields">
+								<label>
+									<span><?php esc_html_e('Modal eyebrow', 'nerdywithme-tools'); ?></span>
+									<input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][modal_eyebrow]'); ?>" value="<?php echo esc_attr($cookie_content['modal_eyebrow'] ?? ''); ?>">
+								</label>
+								<label>
+									<span><?php esc_html_e('Modal title', 'nerdywithme-tools'); ?></span>
+									<input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][modal_title]'); ?>" value="<?php echo esc_attr($cookie_content['modal_title'] ?? ''); ?>">
+								</label>
+								<label>
+									<span><?php esc_html_e('Current choice label', 'nerdywithme-tools'); ?></span>
+									<input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][status_label]'); ?>" value="<?php echo esc_attr($cookie_content['status_label'] ?? ''); ?>">
+								</label>
+								<label>
+									<span><?php esc_html_e('Summary copy', 'nerdywithme-tools'); ?></span>
+									<textarea name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][summary_text]'); ?>" rows="4"><?php echo esc_textarea($cookie_content['summary_text'] ?? ''); ?></textarea>
+								</label>
+							</div>
+						</article>
+						<article class="nwm-tools-admin__card">
+							<div class="nwm-tools-admin__card-head">
+								<div>
+									<h3><?php esc_html_e('Essential cookies section', 'nerdywithme-tools'); ?></h3>
+									<p><?php esc_html_e('Use one line per bullet item.', 'nerdywithme-tools'); ?></p>
+								</div>
+							</div>
+							<div class="nwm-tools-admin__fields">
+								<label>
+									<span><?php esc_html_e('Section title', 'nerdywithme-tools'); ?></span>
+									<input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][essential_title]'); ?>" value="<?php echo esc_attr($cookie_content['essential_title'] ?? ''); ?>">
+								</label>
+								<label>
+									<span><?php esc_html_e('Section body', 'nerdywithme-tools'); ?></span>
+									<textarea name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][essential_body]'); ?>" rows="4"><?php echo esc_textarea($cookie_content['essential_body'] ?? ''); ?></textarea>
+								</label>
+								<label>
+									<span><?php esc_html_e('Bullet items', 'nerdywithme-tools'); ?></span>
+									<textarea name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][essential_items]'); ?>" rows="5"><?php echo esc_textarea($cookie_content['essential_items'] ?? ''); ?></textarea>
+								</label>
+							</div>
+						</article>
+						<article class="nwm-tools-admin__card">
+							<div class="nwm-tools-admin__card-head">
+								<div>
+									<h3><?php esc_html_e('Optional cookies section', 'nerdywithme-tools'); ?></h3>
+									<p><?php esc_html_e('Use one line per bullet item.', 'nerdywithme-tools'); ?></p>
+								</div>
+							</div>
+							<div class="nwm-tools-admin__fields">
+								<label>
+									<span><?php esc_html_e('Section title', 'nerdywithme-tools'); ?></span>
+									<input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][optional_title]'); ?>" value="<?php echo esc_attr($cookie_content['optional_title'] ?? ''); ?>">
+								</label>
+								<label>
+									<span><?php esc_html_e('Section body', 'nerdywithme-tools'); ?></span>
+									<textarea name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][optional_body]'); ?>" rows="4"><?php echo esc_textarea($cookie_content['optional_body'] ?? ''); ?></textarea>
+								</label>
+								<label>
+									<span><?php esc_html_e('Bullet items', 'nerdywithme-tools'); ?></span>
+									<textarea name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][optional_items]'); ?>" rows="5"><?php echo esc_textarea($cookie_content['optional_items'] ?? ''); ?></textarea>
+								</label>
+							</div>
+						</article>
+						<article class="nwm-tools-admin__card">
+							<div class="nwm-tools-admin__card-head">
+								<div>
+									<h3><?php esc_html_e('Storage at a glance', 'nerdywithme-tools'); ?></h3>
+									<p><?php esc_html_e('Edit the three cards that summarize storage type, retention, and user control.', 'nerdywithme-tools'); ?></p>
+								</div>
+							</div>
+							<div class="nwm-tools-admin__fields">
+								<label><span><?php esc_html_e('Section title', 'nerdywithme-tools'); ?></span><input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][glance_title]'); ?>" value="<?php echo esc_attr($cookie_content['glance_title'] ?? ''); ?>"></label>
+								<label><span><?php esc_html_e('Type label', 'nerdywithme-tools'); ?></span><input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][glance_type_label]'); ?>" value="<?php echo esc_attr($cookie_content['glance_type_label'] ?? ''); ?>"></label>
+								<label><span><?php esc_html_e('Type value', 'nerdywithme-tools'); ?></span><textarea name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][glance_type_value]'); ?>" rows="2"><?php echo esc_textarea($cookie_content['glance_type_value'] ?? ''); ?></textarea></label>
+								<label><span><?php esc_html_e('Retention label', 'nerdywithme-tools'); ?></span><input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][glance_retention_label]'); ?>" value="<?php echo esc_attr($cookie_content['glance_retention_label'] ?? ''); ?>"></label>
+								<label><span><?php esc_html_e('Retention value', 'nerdywithme-tools'); ?></span><textarea name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][glance_retention_value]'); ?>" rows="2"><?php echo esc_textarea($cookie_content['glance_retention_value'] ?? ''); ?></textarea></label>
+								<label><span><?php esc_html_e('Control label', 'nerdywithme-tools'); ?></span><input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][glance_control_label]'); ?>" value="<?php echo esc_attr($cookie_content['glance_control_label'] ?? ''); ?>"></label>
+								<label><span><?php esc_html_e('Control value', 'nerdywithme-tools'); ?></span><textarea name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][glance_control_value]'); ?>" rows="2"><?php echo esc_textarea($cookie_content['glance_control_value'] ?? ''); ?></textarea></label>
+							</div>
+						</article>
+						<article class="nwm-tools-admin__card">
+							<div class="nwm-tools-admin__card-head">
+								<div>
+									<h3><?php esc_html_e('Preferences section', 'nerdywithme-tools'); ?></h3>
+									<p><?php esc_html_e('Control the copy around the essential and optional cookie toggles.', 'nerdywithme-tools'); ?></p>
+								</div>
+							</div>
+							<div class="nwm-tools-admin__fields">
+								<label><span><?php esc_html_e('Section title', 'nerdywithme-tools'); ?></span><input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][preferences_title]'); ?>" value="<?php echo esc_attr($cookie_content['preferences_title'] ?? ''); ?>"></label>
+								<label><span><?php esc_html_e('Essential preference title', 'nerdywithme-tools'); ?></span><input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][pref_essential_title]'); ?>" value="<?php echo esc_attr($cookie_content['pref_essential_title'] ?? ''); ?>"></label>
+								<label><span><?php esc_html_e('Essential preference body', 'nerdywithme-tools'); ?></span><textarea name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][pref_essential_body]'); ?>" rows="3"><?php echo esc_textarea($cookie_content['pref_essential_body'] ?? ''); ?></textarea></label>
+								<label><span><?php esc_html_e('Optional preference title', 'nerdywithme-tools'); ?></span><input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][pref_optional_title]'); ?>" value="<?php echo esc_attr($cookie_content['pref_optional_title'] ?? ''); ?>"></label>
+								<label><span><?php esc_html_e('Optional preference body', 'nerdywithme-tools'); ?></span><textarea name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][pref_optional_body]'); ?>" rows="3"><?php echo esc_textarea($cookie_content['pref_optional_body'] ?? ''); ?></textarea></label>
+								<label><span><?php esc_html_e('Privacy policy link label', 'nerdywithme-tools'); ?></span><input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][privacy_label]'); ?>" value="<?php echo esc_attr($cookie_content['privacy_label'] ?? ''); ?>"></label>
+								<label><span><?php esc_html_e('Save preferences button', 'nerdywithme-tools'); ?></span><input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][save_preferences_label]'); ?>" value="<?php echo esc_attr($cookie_content['save_preferences_label'] ?? ''); ?>"></label>
+								<label><span><?php esc_html_e('Reset choice button', 'nerdywithme-tools'); ?></span><input type="text" name="<?php echo esc_attr(self::OPTION_KEY . '[cookie_content][reset_choice_label]'); ?>" value="<?php echo esc_attr($cookie_content['reset_choice_label'] ?? ''); ?>"></label>
+							</div>
+						</article>
 					</div>
 				</section>
 
@@ -732,6 +952,9 @@ class NerdyWithMe_Tools_Admin {
 		$defaults = array(
 			'ads'                             => array_fill_keys(array_keys($this->get_ad_slot_labels()), ''),
 			'ad_settings'                     => $this->get_ad_behavior_defaults(),
+			'social_profiles'                 => $this->get_social_profile_defaults(),
+			'profile_card'                    => $this->get_profile_card_defaults(),
+			'cookie_content'                  => $this->get_cookie_content_defaults(),
 			'enable_risk_calculator'          => true,
 			'enable_position_size_calculator' => true,
 			'enable_pip_value_calculator'     => true,
@@ -749,6 +972,9 @@ class NerdyWithMe_Tools_Admin {
 
 		$settings['ads']         = wp_parse_args(is_array($settings['ads']) ? $settings['ads'] : array(), $defaults['ads']);
 		$settings['ad_settings'] = wp_parse_args(is_array($settings['ad_settings']) ? $settings['ad_settings'] : array(), $defaults['ad_settings']);
+		$settings['social_profiles'] = wp_parse_args(is_array($settings['social_profiles']) ? $settings['social_profiles'] : array(), $defaults['social_profiles']);
+		$settings['profile_card'] = wp_parse_args(is_array($settings['profile_card']) ? $settings['profile_card'] : array(), $defaults['profile_card']);
+		$settings['cookie_content'] = wp_parse_args(is_array($settings['cookie_content']) ? $settings['cookie_content'] : array(), $defaults['cookie_content']);
 
 		foreach ($defaults['ad_settings'] as $slot => $slot_defaults) {
 			$settings['ad_settings'][ $slot ] = wp_parse_args(
@@ -775,6 +1001,96 @@ class NerdyWithMe_Tools_Admin {
 			'sidebar'             => __('Sidebar Ad', 'nerdywithme-tools'),
 			'single_inline'       => __('Single Post Inline Ad', 'nerdywithme-tools'),
 			'footer'              => __('Footer Promo Slot', 'nerdywithme-tools'),
+		);
+	}
+
+	/**
+	 * Shared social profile labels.
+	 *
+	 * @return array
+	 */
+	private function get_social_profile_labels() {
+		return array(
+			'facebook'    => __('Facebook URL', 'nerdywithme-tools'),
+			'x'           => __('X URL', 'nerdywithme-tools'),
+			'instagram'   => __('Instagram URL', 'nerdywithme-tools'),
+			'pinterest'   => __('Pinterest URL', 'nerdywithme-tools'),
+			'youtube'     => __('YouTube URL', 'nerdywithme-tools'),
+			'tiktok'      => __('TikTok URL', 'nerdywithme-tools'),
+			'discord'     => __('Discord URL', 'nerdywithme-tools'),
+			'telegram'    => __('Telegram URL', 'nerdywithme-tools'),
+			'linkedin'    => __('LinkedIn URL', 'nerdywithme-tools'),
+			'github'      => __('GitHub URL', 'nerdywithme-tools'),
+			'reddit'      => __('Reddit URL', 'nerdywithme-tools'),
+			'tradingview' => __('TradingView URL', 'nerdywithme-tools'),
+			'whatsapp'    => __('WhatsApp URL', 'nerdywithme-tools'),
+			'snapchat'    => __('Snapchat URL', 'nerdywithme-tools'),
+			'threads'     => __('Threads URL', 'nerdywithme-tools'),
+			'twitch'      => __('Twitch URL', 'nerdywithme-tools'),
+			'newsletter'  => __('Newsletter URL', 'nerdywithme-tools'),
+			'website'     => __('Website URL', 'nerdywithme-tools'),
+		);
+	}
+
+	/**
+	 * Shared social profile defaults.
+	 *
+	 * @return array
+	 */
+	private function get_social_profile_defaults() {
+		return array_fill_keys(array_keys($this->get_social_profile_labels()), '');
+	}
+
+	/**
+	 * Sidebar profile card defaults.
+	 *
+	 * @return array
+	 */
+	private function get_profile_card_defaults() {
+		return array(
+			'button_label' => __('Follow', 'nerdywithme-tools'),
+			'button_url'   => '#',
+		);
+	}
+
+	/**
+	 * Cookie banner/modal copy defaults.
+	 *
+	 * @return array
+	 */
+	private function get_cookie_content_defaults() {
+		return array(
+			'banner_title'            => __('Cookies on NerdyWithMe', 'nerdywithme-tools'),
+			'banner_text'             => __('We use essential cookies to keep the site working and optional cookies to understand what readers find useful.', 'nerdywithme-tools'),
+			'details_label'           => __('Cookie details', 'nerdywithme-tools'),
+			'necessary_label'         => __('Necessary only', 'nerdywithme-tools'),
+			'accept_label'            => __('Accept all', 'nerdywithme-tools'),
+			'fab_label'               => __('Cookies', 'nerdywithme-tools'),
+			'modal_eyebrow'           => __('Cookie preferences', 'nerdywithme-tools'),
+			'modal_title'             => __('How NerdyWithMe uses cookies', 'nerdywithme-tools'),
+			'status_label'            => __('Current choice', 'nerdywithme-tools'),
+			'summary_text'            => __('This panel explains what the site stores in your browser today and what may be stored when optional features are enabled later.', 'nerdywithme-tools'),
+			'essential_title'         => __('Essential cookies', 'nerdywithme-tools'),
+			'essential_body'          => __('These keep core parts of the site working, such as your cookie choice and standard WordPress behaviour when you interact with forms or comments.', 'nerdywithme-tools'),
+			'essential_items'         => "nwm_cookie_consent: remembers whether you chose necessary-only or accepted optional cookies.\nWordPress comment cookies: may remember your name, email, and website if you ask the comment form to save them.",
+			'optional_title'          => __('Optional cookies', 'nerdywithme-tools'),
+			'optional_body'           => __('Optional storage is there for convenience and future measurement features. It is not required to browse the site.', 'nerdywithme-tools'),
+			'optional_items'          => "nwmActiveTool: remembers the last calculator tab you used in the tools area so you can pick up where you left off.\nFuture analytics or ad measurement tools should only run after optional consent is accepted.",
+			'glance_title'            => __('Storage at a glance', 'nerdywithme-tools'),
+			'glance_type_label'       => __('Type', 'nerdywithme-tools'),
+			'glance_type_value'       => __('Cookie and local storage', 'nerdywithme-tools'),
+			'glance_retention_label'  => __('Retention', 'nerdywithme-tools'),
+			'glance_retention_value'  => __('Consent is currently kept for 180 days unless you clear your browser data.', 'nerdywithme-tools'),
+			'glance_control_label'    => __('Control', 'nerdywithme-tools'),
+			'glance_control_value'    => __('You can return to this panel any time using the cookie button at the lower left.', 'nerdywithme-tools'),
+			'preferences_title'       => __('Choose what you allow', 'nerdywithme-tools'),
+			'pref_essential_title'    => __('Essential cookies', 'nerdywithme-tools'),
+			'pref_essential_body'     => __('Required for core site behaviour and always on.', 'nerdywithme-tools'),
+			'pref_optional_title'     => __('Optional cookies', 'nerdywithme-tools'),
+			'pref_optional_body'      => __('Allow convenience storage and future measurement features.', 'nerdywithme-tools'),
+			'privacy_label'           => __('Read the full privacy policy', 'nerdywithme-tools'),
+			'save_preferences_label'  => __('Save preferences', 'nerdywithme-tools'),
+			'reset_choice_label'      => __('Reset choice', 'nerdywithme-tools'),
 		);
 	}
 

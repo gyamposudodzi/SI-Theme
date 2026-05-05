@@ -1,6 +1,7 @@
 (function () {
   var banner = document.querySelector("[data-cookie-banner]");
   var modal = document.querySelector("[data-cookie-modal]");
+  var fab = document.querySelector(".nwm-cookie-fab");
   var modalTriggers = document.querySelectorAll("[data-cookie-modal-open]");
   var modalClosers = document.querySelectorAll("[data-cookie-modal-close]");
   var statusValue = document.querySelector("[data-cookie-status]");
@@ -16,6 +17,8 @@
   var storageKey = "nwmCookieConsent_" + consentVersion;
   var cookieName = "nwm_cookie_consent_" + consentVersion;
   var expiryDays = 180;
+  var fabHideDelay = 30000;
+  var fabHideTimer = null;
 
   function readCookie(name) {
     var escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -68,6 +71,49 @@
     }
   }
 
+  function clearFabHideTimer() {
+    if (fabHideTimer) {
+      window.clearTimeout(fabHideTimer);
+      fabHideTimer = null;
+    }
+  }
+
+  function showFab() {
+    clearFabHideTimer();
+
+    if (fab) {
+      fab.hidden = false;
+      fab.removeAttribute("aria-hidden");
+      fab.classList.remove("is-hidden");
+    }
+  }
+
+  function hideFab() {
+    clearFabHideTimer();
+
+    if (fab) {
+      fab.hidden = true;
+      fab.setAttribute("aria-hidden", "true");
+      fab.classList.add("is-hidden");
+    }
+  }
+
+  function scheduleFabHide(value) {
+    if (!fab) {
+      return;
+    }
+
+    if (value === "accepted") {
+      showFab();
+      fabHideTimer = window.setTimeout(function () {
+        hideFab();
+      }, fabHideDelay);
+      return;
+    }
+
+    showFab();
+  }
+
   function getConsentLabel(value) {
     if (value === "accepted") {
       return "Optional cookies accepted";
@@ -95,6 +141,7 @@
   function saveConsent(value) {
     writeStoredConsent(value);
     applyConsentState(value);
+    scheduleFabHide(value);
     closeBanner();
     closeModal();
 
@@ -119,6 +166,7 @@
       "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax";
 
     applyConsentState("");
+    showFab();
     openBanner();
     closeModal();
   }
@@ -145,6 +193,7 @@
 
   var storedConsent = readStoredConsent();
   applyConsentState(storedConsent);
+  scheduleFabHide(storedConsent);
 
   if (!storedConsent) {
     openBanner();

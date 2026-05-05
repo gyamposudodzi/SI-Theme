@@ -6,7 +6,7 @@
  */
 
 if (! defined('NERDYWITHME_VERSION')) {
-	define('NERDYWITHME_VERSION', '1.0.9');
+	define('NERDYWITHME_VERSION', '1.1.0');
 }
 
 function nerdywithme_get_versioned_asset_url($file, $version) {
@@ -1350,7 +1350,7 @@ function nerdywithme_get_social_cards($context = 'home') {
 			'icon_text'   => $icon_text,
 			'handle'      => sanitize_text_field(get_theme_mod($base . 'handle', $default['handle'])),
 			'description' => sanitize_text_field(get_theme_mod($base . 'description', $default['description'])),
-			'url'         => esc_url(get_theme_mod($base . 'url', $default['url'])),
+			'url'         => nerdywithme_get_shared_social_url($platform, get_theme_mod($base . 'url', $default['url'])),
 			'icon_image'  => $image_id ? wp_get_attachment_image_url($image_id, 'thumbnail') : '',
 			'label'       => $platform_meta['label'] ?: __('Custom', 'nerdywithme'),
 		);
@@ -1368,11 +1368,24 @@ function nerdywithme_render_card_icon($card, $icon_class) {
 }
 
 function nerdywithme_get_profile_card_settings() {
+	$default_button_label = __('Follow', 'nerdywithme');
+	$default_button_url   = '#';
+	$theme_button_label   = sanitize_text_field(get_theme_mod('nerdywithme_profile_button_label', $default_button_label));
+	$theme_button_url     = esc_url(get_theme_mod('nerdywithme_profile_button_url', $default_button_url));
+
+	if (function_exists('nerdywithme_tools_get_profile_card_setting')) {
+		$button_label = nerdywithme_tools_get_profile_card_setting('button_label', $theme_button_label);
+		$button_url   = nerdywithme_tools_get_profile_card_setting('button_url', $theme_button_url);
+	} else {
+		$button_label = $theme_button_label;
+		$button_url   = $theme_button_url;
+	}
+
 	return array(
 		'handle'       => sanitize_text_field(get_theme_mod('nerdywithme_profile_handle', '@nerdywithme')),
 		'followers'    => sanitize_text_field(get_theme_mod('nerdywithme_profile_followers', __('127K followers', 'nerdywithme'))),
-		'button_label' => sanitize_text_field(get_theme_mod('nerdywithme_profile_button_label', __('Follow', 'nerdywithme'))),
-		'button_url'   => esc_url(get_theme_mod('nerdywithme_profile_button_url', '#')),
+		'button_label' => $button_label,
+		'button_url'   => $button_url,
 	);
 }
 
@@ -1408,6 +1421,22 @@ function nerdywithme_get_profile_stack_urls() {
 	}
 
 	return array_slice($urls, 0, 3);
+}
+
+function nerdywithme_get_cookie_copy($key, $default = '') {
+	if (function_exists('nerdywithme_tools_get_cookie_content')) {
+		return nerdywithme_tools_get_cookie_content($key, $default);
+	}
+
+	return $default;
+}
+
+function nerdywithme_cookie_copy_lines($key, $fallback_lines = array()) {
+	$raw = nerdywithme_get_cookie_copy($key, implode("\n", $fallback_lines));
+	$lines = preg_split('/\r\n|\r|\n/', (string) $raw);
+	$lines = array_values(array_filter(array_map('trim', $lines)));
+
+	return ! empty($lines) ? $lines : $fallback_lines;
 }
 
 function nerdywithme_fallback_image() {
@@ -1515,6 +1544,17 @@ function nerdywithme_get_option($key, $default = '') {
 	return get_theme_mod('nerdywithme_' . $key, $default);
 }
 
+function nerdywithme_get_shared_social_url($platform, $fallback = '') {
+	if (function_exists('nerdywithme_tools_get_social_profile_url')) {
+		$shared = nerdywithme_tools_get_social_profile_url($platform, '');
+		if ($shared) {
+			return esc_url($shared);
+		}
+	}
+
+	return esc_url($fallback);
+}
+
 function nerdywithme_reader_bar_custom_css() {
 	$size = nerdywithme_sanitize_reader_bar_size(get_theme_mod('nerdywithme_reader_bar_size', 'standard'));
 
@@ -1606,15 +1646,15 @@ function nerdywithme_social_links() {
 	$defaults = array(
 		1 => array(
 			'platform' => 'facebook',
-			'url'      => nerdywithme_get_option('facebook_url', '#'),
+			'url'      => nerdywithme_get_shared_social_url('facebook', nerdywithme_get_option('facebook_url', '#')),
 		),
 		2 => array(
 			'platform' => 'x',
-			'url'      => nerdywithme_get_option('x_url', '#'),
+			'url'      => nerdywithme_get_shared_social_url('x', nerdywithme_get_option('x_url', '#')),
 		),
 		3 => array(
 			'platform' => 'instagram',
-			'url'      => nerdywithme_get_option('instagram_url', '#'),
+			'url'      => nerdywithme_get_shared_social_url('instagram', nerdywithme_get_option('instagram_url', '#')),
 		),
 	);
 
@@ -1622,6 +1662,9 @@ function nerdywithme_social_links() {
 		$default  = $defaults[ $i ];
 		$platform = nerdywithme_sanitize_social_platform(get_theme_mod('nerdywithme_social_link_' . $i . '_platform', $default['platform']));
 		$url      = esc_url(get_theme_mod('nerdywithme_social_link_' . $i . '_url', $default['url']));
+		if (! $url || '#' === $url) {
+			$url = nerdywithme_get_shared_social_url($platform, $default['url']);
+		}
 		if ('custom' === $platform && '#' === $url) {
 			$platform = $default['platform'];
 		}
@@ -1643,19 +1686,19 @@ function nerdywithme_social_links() {
 				'label'    => __('Facebook', 'nerdywithme'),
 				'platform' => 'facebook',
 				'text'     => 'f',
-				'url'      => nerdywithme_get_option('facebook_url', '#'),
+				'url'      => nerdywithme_get_shared_social_url('facebook', nerdywithme_get_option('facebook_url', '#')),
 			),
 			array(
 				'label'    => __('X', 'nerdywithme'),
 				'platform' => 'x',
 				'text'     => 'x',
-				'url'      => nerdywithme_get_option('x_url', '#'),
+				'url'      => nerdywithme_get_shared_social_url('x', nerdywithme_get_option('x_url', '#')),
 			),
 			array(
 				'label'    => __('Instagram', 'nerdywithme'),
 				'platform' => 'instagram',
 				'text'     => 'ig',
-				'url'      => nerdywithme_get_option('instagram_url', '#'),
+				'url'      => nerdywithme_get_shared_social_url('instagram', nerdywithme_get_option('instagram_url', '#')),
 			),
 		);
 	}

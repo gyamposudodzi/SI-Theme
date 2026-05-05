@@ -12,7 +12,7 @@ get_header();
 	<?php while (have_posts()) : the_post(); ?>
 		<?php
 		$single_style = nerdywithme_get_single_post_style(get_the_ID());
-		$summary      = get_the_excerpt() ? get_the_excerpt() : wp_trim_words(wp_strip_all_tags(get_the_content()), 28);
+		$summary      = get_the_excerpt();
 		$previous_post = get_previous_post();
 		$next_post     = get_next_post();
 		$prepared      = nerdywithme_prepare_single_content(get_the_ID());
@@ -58,7 +58,9 @@ get_header();
 				<header class="single-hero single-hero--feature">
 					<?php nerdywithme_post_meta(get_the_ID()); ?>
 					<h1 class="entry-title"><?php the_title(); ?></h1>
-					<p class="entry-summary"><?php echo esc_html($summary); ?></p>
+					<?php if ($summary) : ?>
+						<p class="entry-summary"><?php echo esc_html($summary); ?></p>
+					<?php endif; ?>
 					<?php nerdywithme_render_share_links(get_the_ID()); ?>
 					<div class="single-hero__image">
 						<?php echo nerdywithme_get_post_image_tag(get_the_ID(), 'nwm-hero', array('alt' => get_the_title(), 'loading' => 'eager', 'fetchpriority' => 'high'), nerdywithme_get_image_sizes_hint('single-hero')); ?>
@@ -109,7 +111,9 @@ get_header();
 							<div class="single-hero__intro">
 								<?php nerdywithme_post_meta(get_the_ID()); ?>
 								<h1 class="entry-title"><?php the_title(); ?></h1>
-								<p class="entry-summary"><?php echo esc_html($summary); ?></p>
+								<?php if ($summary) : ?>
+									<p class="entry-summary"><?php echo esc_html($summary); ?></p>
+								<?php endif; ?>
 								<?php nerdywithme_render_share_links(get_the_ID()); ?>
 							</div>
 							<div class="single-hero__image single-hero__image--standard">

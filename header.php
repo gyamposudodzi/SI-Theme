@@ -47,14 +47,18 @@
 					);
 					?>
 				</nav>
-				<?php if ($search_enabled) : ?>
-					<div class="header-tools">
+				<div class="header-tools">
+					<button class="header-tools__button theme-toggle" type="button" data-theme-toggle aria-pressed="false">
+						<span class="theme-toggle__icon" aria-hidden="true"></span>
+						<span class="screen-reader-text" data-theme-toggle-label><?php esc_html_e('Switch to dark mode', 'nerdywithme'); ?></span>
+					</button>
+					<?php if ($search_enabled) : ?>
 						<button class="header-tools__button search-toggle" type="button" aria-expanded="false" aria-controls="search-panel">
 							<span class="screen-reader-text"><?php esc_html_e('Open search', 'nerdywithme'); ?></span>
 							<span class="header-tools__icon" aria-hidden="true">&#8981;</span>
 						</button>
-					</div>
-				<?php endif; ?>
+					<?php endif; ?>
+				</div>
 			</div>
 			<div class="mega-panel" aria-hidden="true">
 				<div class="mega-panel__drawer">

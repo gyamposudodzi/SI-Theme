@@ -904,7 +904,8 @@ html[data-nwm-theme="dark"] .nwm-tool-toolbar__field span,
 html[data-nwm-theme="dark"] .nwm-tool-breakdown__header h4,
 html[data-nwm-theme="dark"] .nwm-tool-chart__header h4,
 html[data-nwm-theme="dark"] .nwm-tool-chart__meta strong,
-html[data-nwm-theme="dark"] .nwm-tool-breakdown__table th {
+html[data-nwm-theme="dark"] .nwm-tool-breakdown__table th,
+html[data-nwm-theme="dark"] .nwm-demo-ad__title {
   color: var(--nwm-primary);
 }
 

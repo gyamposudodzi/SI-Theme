@@ -28,7 +28,18 @@
 			<div class="site-header__top">
 				<?php nerdywithme_render_social_links(); ?>
 				<?php nerdywithme_branding(false); ?>
-				<div class="site-header__cta" aria-hidden="true"></div>
+				<div class="site-header__cta">
+					<button class="header-tools__button theme-toggle theme-toggle--desktop" type="button" data-theme-toggle aria-pressed="false">
+						<svg class="theme-toggle__sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+							<circle cx="12" cy="12" r="4"></circle>
+							<path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path>
+						</svg>
+						<svg class="theme-toggle__moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+							<path d="M20.5 14.3A8.5 8.5 0 0 1 9.7 3.5a8.5 8.5 0 1 0 10.8 10.8Z"></path>
+						</svg>
+						<span class="screen-reader-text" data-theme-toggle-label><?php esc_html_e('Switch to dark mode', 'nerdywithme'); ?></span>
+					</button>
+				</div>
 			</div>
 			<div class="site-header__nav">
 				<button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-navigation">
@@ -47,14 +58,24 @@
 					);
 					?>
 				</nav>
-				<?php if ($search_enabled) : ?>
-					<div class="header-tools">
+				<div class="header-tools">
+					<button class="header-tools__button theme-toggle theme-toggle--responsive" type="button" data-theme-toggle aria-pressed="false">
+						<svg class="theme-toggle__sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+							<circle cx="12" cy="12" r="4"></circle>
+							<path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"></path>
+						</svg>
+						<svg class="theme-toggle__moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+							<path d="M20.5 14.3A8.5 8.5 0 0 1 9.7 3.5a8.5 8.5 0 1 0 10.8 10.8Z"></path>
+						</svg>
+						<span class="screen-reader-text" data-theme-toggle-label><?php esc_html_e('Switch to dark mode', 'nerdywithme'); ?></span>
+					</button>
+					<?php if ($search_enabled) : ?>
 						<button class="header-tools__button search-toggle" type="button" aria-expanded="false" aria-controls="search-panel">
 							<span class="screen-reader-text"><?php esc_html_e('Open search', 'nerdywithme'); ?></span>
 							<span class="header-tools__icon" aria-hidden="true">&#8981;</span>
 						</button>
-					</div>
-				<?php endif; ?>
+					<?php endif; ?>
+				</div>
 			</div>
 			<div class="mega-panel" aria-hidden="true">
 				<div class="mega-panel__drawer">

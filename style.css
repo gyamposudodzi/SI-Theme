@@ -4267,11 +4267,6 @@ html[data-nwm-theme="dark"] .site-brand__mark {
   box-shadow: none;
 }
 
-html[data-nwm-theme="dark"] .site-brand--lockup .site-brand__mark {
-  margin: 0;
-  transform: none;
-}
-
 html[data-nwm-theme="dark"] .site-brand__mark .site-brand__logo--light,
 html[data-nwm-theme="dark"] .site-brand__mark .site-brand__fallback {
   display: none;

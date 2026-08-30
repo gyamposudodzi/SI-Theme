@@ -4265,6 +4265,10 @@ html[data-nwm-theme="dark"] .site-brand__mark {
   background: linear-gradient(135deg, #252b40, #1b3152);
 }
 
+html[data-nwm-theme="dark"] .site-brand__mark img {
+  filter: brightness(0) invert(1);
+}
+
 html[data-nwm-theme="dark"] .site-brand__fallback {
   background: linear-gradient(135deg, #5066c2, #263b91);
   color: #fff;

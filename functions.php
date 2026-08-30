@@ -1783,6 +1783,7 @@ function nerdywithme_branding($show_tagline = true, $variant = '') {
 	$custom_logo_id = nerdywithme_get_brand_logo_id();
 	$tagline        = get_bloginfo('description');
 	$variant        = $variant ? $variant : nerdywithme_get_option('brand_style', 'refined');
+	$dark_logo_url  = get_template_directory_uri() . '/assets/images/nwm-logo-white.svg';
 	?>
 	<a class="site-brand site-brand--<?php echo esc_attr($variant); ?>" href="<?php echo esc_url(home_url('/')); ?>" rel="home">
 		<?php if ('lockup' === $variant) : ?>
@@ -1791,10 +1792,11 @@ function nerdywithme_branding($show_tagline = true, $variant = '') {
 					<span class="site-title__lead">nerdy</span>
 					<span class="site-brand__mark">
 						<?php if ($custom_logo_id) : ?>
-							<?php echo wp_get_attachment_image($custom_logo_id, 'thumbnail'); ?>
+							<?php echo wp_get_attachment_image($custom_logo_id, 'thumbnail', false, array('class' => 'site-brand__logo site-brand__logo--light')); ?>
 						<?php else : ?>
 							<span class="site-brand__fallback">N</span>
 						<?php endif; ?>
+						<img class="site-brand__logo site-brand__logo--dark" src="<?php echo esc_url($dark_logo_url); ?>" alt="" aria-hidden="true" loading="lazy" decoding="async">
 					</span>
 					<span class="site-title__tail">withme.</span>
 				</span>
@@ -1805,10 +1807,11 @@ function nerdywithme_branding($show_tagline = true, $variant = '') {
 		<?php else : ?>
 			<span class="site-brand__mark">
 				<?php if ($custom_logo_id) : ?>
-					<?php echo wp_get_attachment_image($custom_logo_id, 'thumbnail'); ?>
+					<?php echo wp_get_attachment_image($custom_logo_id, 'thumbnail', false, array('class' => 'site-brand__logo site-brand__logo--light')); ?>
 				<?php else : ?>
 					<span class="site-brand__fallback">N</span>
 				<?php endif; ?>
+				<img class="site-brand__logo site-brand__logo--dark" src="<?php echo esc_url($dark_logo_url); ?>" alt="" aria-hidden="true" loading="lazy" decoding="async">
 			</span>
 			<span class="site-brand__text">
 				<span class="site-title"><?php echo wp_kses_post(nerdywithme_site_title_markup()); ?></span>

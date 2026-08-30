@@ -4689,44 +4689,30 @@ html[data-nwm-theme="dark"] .theme-toggle {
   position: relative;
 }
 
-.theme-toggle__icon {
-  position: relative;
-  display: inline-flex;
-  width: 18px;
-  height: 18px;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid currentColor;
-  border-radius: 50%;
+.theme-toggle__sun,
+.theme-toggle__moon {
+  display: block;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.theme-toggle__icon::before {
-  content: "";
-  position: absolute;
-  width: 6px;
-  height: 6px;
-  top: -5px;
-  right: -5px;
-  border-radius: 50%;
-  background: currentColor;
-  box-shadow: -9px 0 0 -1px currentColor, 0 9px 0 -1px currentColor, -9px 9px 0 -1px currentColor;
+.theme-toggle__moon {
+  display: none;
+  fill: currentColor;
+  stroke: none;
 }
 
-html[data-nwm-theme="dark"] .theme-toggle__icon {
-  border: 0;
-  border-radius: 0;
-  background: currentColor;
-  transform: none;
+html[data-nwm-theme="dark"] .theme-toggle__sun {
+  display: none;
 }
 
-html[data-nwm-theme="dark"] .theme-toggle__icon::before {
-  width: 16px;
-  height: 16px;
-  top: -4px;
-  right: -5px;
-  background: var(--nwm-surface);
-  border-radius: 50%;
-  box-shadow: none;
+html[data-nwm-theme="dark"] .theme-toggle__moon {
+  display: block;
 }
 
 @media (max-width: 820px) {

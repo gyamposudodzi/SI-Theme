@@ -4320,7 +4320,6 @@ html[data-nwm-theme="dark"] .search-panel__recent,
 html[data-nwm-theme="dark"] .search-panel__result,
 html[data-nwm-theme="dark"] .search-panel__empty-state,
 html[data-nwm-theme="dark"] .single-share-modal__links a,
-html[data-nwm-theme="dark"] .card,
 html[data-nwm-theme="dark"] .mini-post,
 html[data-nwm-theme="dark"] .category-pill,
 html[data-nwm-theme="dark"] .app-chip__icon,
@@ -4339,6 +4338,16 @@ html[data-nwm-theme="dark"] .nwm-back-to-top {
   background: var(--nwm-surface);
   border-color: var(--nwm-border);
   color: var(--nwm-text);
+}
+
+html[data-nwm-theme="dark"] .single-post,
+html[data-nwm-theme="dark"] .single-content,
+html[data-nwm-theme="dark"] .entry-content,
+html[data-nwm-theme="dark"] .card,
+html[data-nwm-theme="dark"] .mini-post,
+html[data-nwm-theme="dark"] .compact-hero-side .card {
+  background: transparent;
+  box-shadow: none;
 }
 
 html[data-nwm-theme="dark"] .button--ghost {

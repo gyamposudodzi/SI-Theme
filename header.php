@@ -28,7 +28,12 @@
 			<div class="site-header__top">
 				<?php nerdywithme_render_social_links(); ?>
 				<?php nerdywithme_branding(false); ?>
-				<div class="site-header__cta" aria-hidden="true"></div>
+				<div class="site-header__cta">
+					<button class="header-tools__button theme-toggle theme-toggle--desktop" type="button" data-theme-toggle aria-pressed="false">
+						<span class="theme-toggle__icon" aria-hidden="true"></span>
+						<span class="screen-reader-text" data-theme-toggle-label><?php esc_html_e('Switch to dark mode', 'nerdywithme'); ?></span>
+					</button>
+				</div>
 			</div>
 			<div class="site-header__nav">
 				<button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-navigation">
@@ -48,7 +53,7 @@
 					?>
 				</nav>
 				<div class="header-tools">
-					<button class="header-tools__button theme-toggle" type="button" data-theme-toggle aria-pressed="false">
+					<button class="header-tools__button theme-toggle theme-toggle--responsive" type="button" data-theme-toggle aria-pressed="false">
 						<span class="theme-toggle__icon" aria-hidden="true"></span>
 						<span class="screen-reader-text" data-theme-toggle-label><?php esc_html_e('Switch to dark mode', 'nerdywithme'); ?></span>
 					</button>

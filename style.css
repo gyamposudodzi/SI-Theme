@@ -4263,7 +4263,13 @@ html[data-nwm-theme="dark"] *::-webkit-scrollbar-thumb:hover {
 }
 
 html[data-nwm-theme="dark"] .site-brand__mark {
-  background: linear-gradient(135deg, #252b40, #1b3152);
+  background: transparent;
+  box-shadow: none;
+}
+
+html[data-nwm-theme="dark"] .site-brand--lockup .site-brand__mark {
+  margin: 0;
+  transform: none;
 }
 
 html[data-nwm-theme="dark"] .site-brand__mark .site-brand__logo--light,

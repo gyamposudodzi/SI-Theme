@@ -3643,7 +3643,7 @@ body.home .hot-grid__feature .card__title {
     margin: 0;
     font-size: 1.38rem;
     line-height: 1;
-    transform: scaleX(-1);
+    transform: translateY(-1.5px) scaleX(-1);
   }
   .site-header__top .social-links { display: none; }
   .site-header__top .site-brand {
@@ -3903,6 +3903,7 @@ body.home .hot-grid__feature .card__title {
     width: 18.4px;
     height: 18.4px;
     font-size: 1.265rem;
+    transform: translateY(-1.5px) scaleX(-1);
   }
   .site-header__nav .theme-toggle__sun,
   .site-header__nav .theme-toggle__moon {

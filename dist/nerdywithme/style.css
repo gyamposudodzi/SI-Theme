@@ -3616,12 +3616,16 @@ body.home .hot-grid__feature .card__title {
   .site-header__nav .header-tools__button:hover,
   .site-header__nav .header-tools__button:focus-visible,
   .site-header__nav .theme-toggle--responsive:hover,
-  .site-header__nav .theme-toggle--responsive:focus-visible,
+  .site-header__nav .theme-toggle--responsive:focus-visible {
+    background: transparent;
+    border-color: transparent;
+    transform: none;
+  }
   .site-header__nav .nav-toggle:hover,
   .site-header__nav .nav-toggle:focus-visible {
     background: transparent;
     border-color: transparent;
-    transform: none;
+    transform: translateY(-50%);
   }
   .site-header__nav .theme-toggle__sun,
   .site-header__nav .theme-toggle__moon {
@@ -4854,5 +4858,10 @@ html[data-nwm-theme="dark"] .theme-toggle__moon {
     background: transparent;
     border: 0;
     box-shadow: none;
+  }
+
+  html[data-nwm-theme="dark"] .site-header__nav .nav-toggle:hover,
+  html[data-nwm-theme="dark"] .site-header__nav .nav-toggle:focus-visible {
+    transform: translateY(-50%);
   }
 }

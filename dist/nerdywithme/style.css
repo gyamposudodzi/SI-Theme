@@ -3629,10 +3629,18 @@ body.home .hot-grid__feature .card__title {
   }
   .site-header__nav .theme-toggle__sun,
   .site-header__nav .theme-toggle__moon {
-    display: block;
     width: 18px;
     height: 18px;
     flex: 0 0 auto;
+  }
+  .site-header__nav .theme-toggle__moon {
+    display: none;
+  }
+  html[data-nwm-theme="dark"] .site-header__nav .theme-toggle__sun {
+    display: none;
+  }
+  html[data-nwm-theme="dark"] .site-header__nav .theme-toggle__moon {
+    display: block;
   }
   .site-header__nav .header-tools__icon {
     display: flex;
@@ -4840,6 +4848,18 @@ html[data-nwm-theme="dark"] .theme-toggle__sun {
 }
 
 html[data-nwm-theme="dark"] .theme-toggle__moon {
+  display: block;
+}
+
+.theme-toggle--responsive .theme-toggle__moon {
+  display: none;
+}
+
+html[data-nwm-theme="dark"] .theme-toggle--responsive .theme-toggle__sun {
+  display: none;
+}
+
+html[data-nwm-theme="dark"] .theme-toggle--responsive .theme-toggle__moon {
   display: block;
 }
 

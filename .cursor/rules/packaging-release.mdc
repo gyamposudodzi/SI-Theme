@@ -1,0 +1,25 @@
+---
+description: Release packaging must bump versions and copy ZIPs to Documents
+alwaysApply: true
+---
+
+# Packaging And Release Zips
+
+Whenever packaging the theme and/or plugin for upload:
+
+1. **Bump versions by 1 unit before packaging**
+   - Theme patch version: `1.1.2` → `1.1.3` (update `style.css` Theme header and `NERDYWITHME_VERSION` in `functions.php`)
+   - Plugin patch version: `0.1.5` → `0.1.6` (update plugin header, `NERDYWITHME_TOOLS_VERSION`, and `.codex-plugin/plugin.json`)
+   - Keep README / `dist/README.md` package names and version notes aligned with the new versions
+   - Use the existing naming pattern: `nerdywithme-theme-X.Y.Z.zip`, `nerdywithme-tools-X.Y.Z.zip`, plus flat/dev/latest aliases as already used in `dist/`
+
+2. **Copy packaged ZIPs to Documents after every package**
+   - Destination folder: `C:\Users\DELL\Documents\nwm zip files`
+   - Copy the upload-ready theme and plugin ZIPs there (at minimum the main versioned theme and plugin ZIPs; also copy flat/dev/latest aliases when those are created)
+   - Create the folder if it is missing
+
+3. **Packaging conventions**
+   - Theme ZIP root folder must be `nerdywithme/` and must include `style.css`
+   - Plugin ZIP root folder must be `nerdywithme-tools/`
+   - Prefer `7z` for archive creation so WordPress can install the package cleanly
+   - Sync `dist/nerdywithme/` and staging folders with the packaged source

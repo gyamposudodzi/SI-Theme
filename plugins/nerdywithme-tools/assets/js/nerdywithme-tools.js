@@ -218,6 +218,43 @@ function nwmGetCompoundChartLabelIndexes(length) {
   return indexes;
 }
 
+function nwmIsCompactToolsViewport() {
+  return Boolean(window.matchMedia && window.matchMedia("(max-width: 760px)").matches);
+}
+
+function nwmGetCompoundLineChartLayout(chartNode) {
+  var compact = nwmIsCompactToolsViewport();
+  var measuredWidth = chartNode && chartNode.clientWidth ? chartNode.clientWidth : 0;
+
+  if (compact) {
+    return {
+      width: Math.max(320, measuredWidth || 360),
+      height: 320,
+      paddingLeft: 54,
+      paddingRight: 16,
+      paddingTop: 18,
+      paddingBottom: 44,
+      gridFontSize: 13,
+      labelFontSize: 12,
+      lineWidth: 3.5,
+      pointRadius: 5.5
+    };
+  }
+
+  return {
+    width: 720,
+    height: 260,
+    paddingLeft: 88,
+    paddingRight: 24,
+    paddingTop: 20,
+    paddingBottom: 42,
+    gridFontSize: 12,
+    labelFontSize: 11,
+    lineWidth: 4,
+    pointRadius: 4
+  };
+}
+
 function nwmRenderCompoundLineChart(chartNode, rows, currency) {
   if (!chartNode) {
     return;
@@ -228,12 +265,13 @@ function nwmRenderCompoundLineChart(chartNode, rows, currency) {
     return;
   }
 
-  var width = 720;
-  var height = 260;
-  var paddingLeft = 88;
-  var paddingRight = 24;
-  var paddingTop = 20;
-  var paddingBottom = 42;
+  var layout = nwmGetCompoundLineChartLayout(chartNode);
+  var width = layout.width;
+  var height = layout.height;
+  var paddingLeft = layout.paddingLeft;
+  var paddingRight = layout.paddingRight;
+  var paddingTop = layout.paddingTop;
+  var paddingBottom = layout.paddingBottom;
   var chartHeight = height - paddingTop - paddingBottom;
   var chartWidth = width - paddingLeft - paddingRight;
   var maxBalance = Math.max.apply(null, rows.map(function (row) { return row.balance; })) || 1;
@@ -266,7 +304,7 @@ function nwmRenderCompoundLineChart(chartNode, rows, currency) {
     return (
         '<g class="nwm-tool-chart__gridline">' +
         '<line x1="' + paddingLeft + '" y1="' + y.toFixed(2) + '" x2="' + (width - paddingRight) + '" y2="' + y.toFixed(2) + '"></line>' +
-        '<text x="8" y="' + (y + 4).toFixed(2) + '">' + nwmFormatCurrencyWithSymbol(currency, balance) + '</text>' +
+        '<text x="6" y="' + (y + 4).toFixed(2) + '" font-size="' + layout.gridFontSize + '">' + nwmFormatCurrencyWithSymbol(currency, balance) + '</text>' +
       '</g>'
     );
   }).join("");
@@ -274,7 +312,7 @@ function nwmRenderCompoundLineChart(chartNode, rows, currency) {
   var pointMarkup = points.map(function (point, index) {
     var anchor = index === points.length - 1 ? "end" : index === 0 ? "start" : "middle";
     var label = labelIndexes[index]
-      ? '<text class="nwm-tool-chart__label" text-anchor="' + anchor + '" x="' + point.x.toFixed(2) + '" y="' + (height - 12) + '">' + point.label + '</text>'
+      ? '<text class="nwm-tool-chart__label" text-anchor="' + anchor + '" font-size="' + layout.labelFontSize + '" x="' + point.x.toFixed(2) + '" y="' + (height - 12) + '">' + point.label + '</text>'
       : "";
     var detailLabel = point.label.replace(/"/g, "&quot;");
     var detailBalance = nwmFormatCurrencyWithSymbol(currency, rows[index].balance).replace(/"/g, "&quot;");
@@ -283,7 +321,7 @@ function nwmRenderCompoundLineChart(chartNode, rows, currency) {
 
     return (
       '<g class="nwm-tool-chart__point-group">' +
-        '<circle class="nwm-tool-chart__point" tabindex="0" cx="' + point.x.toFixed(2) + '" cy="' + point.y.toFixed(2) + '" r="4"' +
+        '<circle class="nwm-tool-chart__point" tabindex="0" cx="' + point.x.toFixed(2) + '" cy="' + point.y.toFixed(2) + '" r="' + layout.pointRadius + '"' +
           ' data-nwm-compound-chart-point' +
           ' data-tooltip-label="' + detailLabel + '"' +
           ' data-tooltip-balance="' + detailBalance + '"' +
@@ -296,9 +334,9 @@ function nwmRenderCompoundLineChart(chartNode, rows, currency) {
   }).join("");
 
   chartNode.innerHTML =
-    '<svg class="nwm-tool-chart__svg" viewBox="0 0 ' + width + " " + height + '" role="img" aria-label="Compound growth line chart">' +
+    '<svg class="nwm-tool-chart__svg" viewBox="0 0 ' + width + " " + height + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Compound growth line chart">' +
       gridLines +
-      '<polyline class="nwm-tool-chart__line" fill="none" points="' + polyline + '"></polyline>' +
+      '<polyline class="nwm-tool-chart__line" fill="none" stroke-width="' + layout.lineWidth + '" points="' + polyline + '"></polyline>' +
       pointMarkup +
     '</svg>' +
     '<div class="nwm-tool-chart__tooltip" data-nwm-compound-chart-tooltip hidden>' +
@@ -1190,5 +1228,15 @@ if (nwmToolsPresent) {
       nwmPopulateCompoundCalculatorFromUrl(calculator);
       nwmUpdateCompoundCalculator(calculator);
     });
+  });
+
+  var nwmCompoundChartResizeTimer = 0;
+  window.addEventListener("resize", function () {
+    window.clearTimeout(nwmCompoundChartResizeTimer);
+    nwmCompoundChartResizeTimer = window.setTimeout(function () {
+      document.querySelectorAll("[data-nwm-compound-calculator]").forEach(function (calculator) {
+        nwmUpdateCompoundCalculator(calculator);
+      });
+    }, 180);
   });
 }

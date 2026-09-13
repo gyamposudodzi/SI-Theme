@@ -3589,17 +3589,29 @@ body.home .hot-grid__feature .card__title {
   }
   .site-header__nav .header-tools {
     right: 0;
-    gap: 2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0;
+    height: 34px;
   }
   .site-header__nav .header-tools__button,
   .site-header__nav .theme-toggle--responsive,
   .site-header__nav .nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: 34px;
     height: 34px;
+    min-width: 34px;
     min-height: 34px;
+    padding: 0;
+    margin: 0;
+    line-height: 0;
     border: 0;
     background: transparent;
     box-shadow: none;
+    vertical-align: middle;
   }
   .site-header__nav .header-tools__button:hover,
   .site-header__nav .header-tools__button:focus-visible,
@@ -3613,13 +3625,21 @@ body.home .hot-grid__feature .card__title {
   }
   .site-header__nav .theme-toggle__sun,
   .site-header__nav .theme-toggle__moon {
-    width: 16px;
-    height: 16px;
+    display: block;
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
   }
   .site-header__nav .header-tools__icon {
-    width: 28px;
-    height: 28px;
-    font-size: 1.55rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    font-size: 1.2rem;
+    line-height: 1;
+    transform: scaleX(-1);
   }
   .site-header__top .social-links { display: none; }
   .site-header__top .site-brand {
@@ -3866,26 +3886,29 @@ body.home .hot-grid__feature .card__title {
   }
   .site-header__nav .header-tools {
     gap: 0;
+    height: 32px;
   }
   .site-header__nav .header-tools__button,
   .site-header__nav .theme-toggle--responsive {
     width: 32px;
     height: 32px;
+    min-width: 32px;
     min-height: 32px;
   }
-  .site-header__nav .header-tools__icon {
-    width: 26px;
-    height: 26px;
-    font-size: 1.45rem;
-  }
+  .site-header__nav .header-tools__icon,
   .site-header__nav .theme-toggle__sun,
   .site-header__nav .theme-toggle__moon {
-    width: 15px;
-    height: 15px;
+    width: 16px;
+    height: 16px;
+  }
+  .site-header__nav .header-tools__icon {
+    font-size: 1.1rem;
   }
   .site-header__nav .nav-toggle {
     width: 36px;
     height: 36px;
+    min-width: 36px;
+    min-height: 36px;
   }
   .site-header__top .site-brand {
     grid-column: 2;

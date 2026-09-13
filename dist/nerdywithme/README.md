@@ -69,12 +69,12 @@ Key files:
 
 The theme header currently declares:
 
-- Theme version: `1.1.1`
+- Theme version: `1.1.2`
 - Tested up to: `6.7`
 
 The plugin bootstrap currently declares:
 
-- Plugin version: `0.1.4`
+- Plugin version: `0.1.5`
 
 ## Local Structure
 

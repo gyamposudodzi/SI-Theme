@@ -6,7 +6,7 @@
  */
 
 if (! defined('NERDYWITHME_VERSION')) {
-	define('NERDYWITHME_VERSION', '1.1.1');
+	define('NERDYWITHME_VERSION', '1.1.2');
 }
 
 function nerdywithme_get_versioned_asset_url($file, $version) {

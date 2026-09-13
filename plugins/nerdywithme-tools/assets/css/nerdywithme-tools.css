@@ -930,6 +930,10 @@
   }
 }
 
+html[data-nwm-theme="dark"] .nwm-tools-hub {
+  gap: 28px;
+}
+
 html[data-nwm-theme="dark"] .nwm-tools-hub__nav,
 html[data-nwm-theme="dark"] .nwm-tool-card,
 html[data-nwm-theme="dark"] .nwm-tool-card--placeholder {
@@ -938,8 +942,23 @@ html[data-nwm-theme="dark"] .nwm-tool-card--placeholder {
   box-shadow: none;
 }
 
+html[data-nwm-theme="dark"] .nwm-tools-hub__nav {
+  padding: 22px;
+}
+
+html[data-nwm-theme="dark"] .nwm-tools-hub__menu {
+  gap: 12px;
+}
+
 html[data-nwm-theme="dark"] .nwm-tools-hub__pane-header {
   border-bottom-color: transparent;
+  padding-bottom: 14px;
+  margin-bottom: 4px;
+}
+
+html[data-nwm-theme="dark"] .nwm-tool-card,
+html[data-nwm-theme="dark"] .nwm-tool-card--placeholder {
+  padding: 28px;
 }
 
 html[data-nwm-theme="dark"] .nwm-tools-hub__nav-header h2,
@@ -977,6 +996,8 @@ html[data-nwm-theme="dark"] .nwm-tool-presets__button {
   border-color: transparent;
   color: var(--nwm-text);
   box-shadow: none;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 html[data-nwm-theme="dark"] .nwm-tool-toolbar__field select,
@@ -1085,4 +1106,24 @@ html[data-nwm-theme="dark"] .nwm-ad-slot--style-premium .nwm-demo-ad {
 html[data-nwm-theme="dark"] .nwm-managed-ad--image {
   border-color: var(--nwm-border);
   box-shadow: 0 18px 34px rgba(0, 0, 0, 0.28);
+}
+
+@media (max-width: 760px) {
+  html[data-nwm-theme="dark"] .nwm-tools-hub__nav {
+    padding: 16px;
+    background: var(--nwm-surface);
+  }
+
+  html[data-nwm-theme="dark"] .nwm-tools-hub__menu {
+    gap: 12px;
+  }
+
+  html[data-nwm-theme="dark"] .nwm-tool-card,
+  html[data-nwm-theme="dark"] .nwm-tool-card--placeholder {
+    padding: 22px;
+  }
+
+  html[data-nwm-theme="dark"] .nwm-tool-chart {
+    padding: 16px 14px;
+  }
 }

@@ -934,8 +934,12 @@ html[data-nwm-theme="dark"] .nwm-tools-hub__nav,
 html[data-nwm-theme="dark"] .nwm-tool-card,
 html[data-nwm-theme="dark"] .nwm-tool-card--placeholder {
   background: var(--nwm-surface);
-  border-color: var(--nwm-border);
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.24);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+html[data-nwm-theme="dark"] .nwm-tools-hub__pane-header {
+  border-bottom-color: transparent;
 }
 
 html[data-nwm-theme="dark"] .nwm-tools-hub__nav-header h2,
@@ -968,7 +972,13 @@ html[data-nwm-theme="dark"] .nwm-demo-ad__meta {
 }
 
 html[data-nwm-theme="dark"] .nwm-tools-hub__tab,
-html[data-nwm-theme="dark"] .nwm-tool-presets__button,
+html[data-nwm-theme="dark"] .nwm-tool-presets__button {
+  background: var(--nwm-input-bg);
+  border-color: transparent;
+  color: var(--nwm-text);
+  box-shadow: none;
+}
+
 html[data-nwm-theme="dark"] .nwm-tool-toolbar__field select,
 html[data-nwm-theme="dark"] .nwm-tool-grid input,
 html[data-nwm-theme="dark"] .nwm-tool-grid select {
@@ -982,8 +992,9 @@ html[data-nwm-theme="dark"] .nwm-tools-hub__tab.is-active,
 html[data-nwm-theme="dark"] .nwm-tool-presets__button:hover,
 html[data-nwm-theme="dark"] .nwm-tool-presets__button:focus-visible {
   background: #303750;
-  border-color: #596486;
+  border-color: transparent;
   color: var(--nwm-secondary);
+  box-shadow: none;
 }
 
 html[data-nwm-theme="dark"] .nwm-tool-grid input:focus,
@@ -998,13 +1009,13 @@ html[data-nwm-theme="dark"] .nwm-tool-grid input::placeholder {
 
 html[data-nwm-theme="dark"] .nwm-tool-card__note {
   background: #2d3249;
-  border-color: var(--nwm-border);
+  border-color: transparent;
 }
 
 html[data-nwm-theme="dark"] .nwm-tool-results div,
 html[data-nwm-theme="dark"] .nwm-tool-card--compound .nwm-tool-results div {
   background: #252b40;
-  border-color: var(--nwm-border);
+  border-color: transparent;
 }
 
 html[data-nwm-theme="dark"] .nwm-tool-card--compound {
@@ -1013,7 +1024,7 @@ html[data-nwm-theme="dark"] .nwm-tool-card--compound {
 
 html[data-nwm-theme="dark"] .nwm-tool-chart {
   background: linear-gradient(180deg, #20263a, #171b2d);
-  border-color: var(--nwm-border);
+  border-color: transparent;
 }
 
 html[data-nwm-theme="dark"] .nwm-tool-chart__gridline line {
